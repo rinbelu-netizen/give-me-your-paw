@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hey buddy, give me your paw! 絵日記帳 - 2013年12月</title>
+<style>
+  :root {
+    --bg: #faf6ef;
+    --card-bg: #ffffff;
+    --border: #e8dfd0;
+    --text: #4a4238;
+    --text-muted: #9a9082;
+    --accent: #c98a5e;
+    --accent-bg: #f5e6d8;
+    --accent-text: #8a5a35;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    padding: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: "Hiragino Kaku Gothic ProN", "Yu Gothic", "Meiryo", sans-serif;
+    line-height: 1.8;
+  }
+  header {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 32px 20px 16px;
+    text-align: center;
+  }
+  header h1 {
+    font-size: 22px;
+    font-weight: 500;
+    margin: 0 0 4px;
+    color: var(--text);
+  }
+  header p {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin: 0;
+  }
+  .controls {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 12px 20px 20px;
+    position: sticky;
+    top: 0;
+    background: var(--bg);
+    z-index: 10;
+  }
+  #search {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    font-size: 14px;
+    background: var(--card-bg);
+    color: var(--text);
+    margin-bottom: 10px;
+  }
+  .tag-filter {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .tag-btn {
+    font-size: 11px;
+    padding: 4px 12px;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    background: var(--card-bg);
+    color: var(--text-muted);
+    cursor: pointer;
+  }
+  .tag-btn.active {
+    background: var(--accent);
+    color: #fff;
+    border-color: var(--accent);
+  }
+  .count {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 0 20px 8px;
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+  main {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 0 20px 60px;
+  }
+  .entry {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 20px;
+    margin-bottom: 16px;
+  }
+  .entry-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+  .entry-title {
+    font-size: 16px;
+    font-weight: 500;
+  }
+  .entry-date {
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+  .photo-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+    gap: 6px;
+    margin-bottom: 12px;
+  }
+  .photo-grid a {
+    position: relative;
+    display: block;
+    aspect-ratio: 1;
+    overflow: hidden;
+    border-radius: 8px;
+    background: var(--accent-bg);
+  }
+  .photo-grid img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .photo-grid .num {
+    position: absolute;
+    bottom: 3px;
+    right: 4px;
+    font-size: 10px;
+    background: rgba(0,0,0,0.55);
+    color: #fff;
+    padding: 1px 5px;
+    border-radius: 8px;
+  }
+  .no-photo {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-bottom: 12px;
+  }
+  .truncated-note {
+    font-size: 12px;
+    color: var(--accent-text);
+    background: var(--accent-bg);
+    border-radius: 8px;
+    padding: 6px 10px;
+    margin: 0 0 12px;
+    display: inline-block;
+  }
+  .entry-text {
+    font-size: 14px;
+    line-height: 1.85;
+    margin: 0 0 12px;
+    white-space: pre-line;
+  }
+  .entry-text b {
+    color: var(--accent-text);
+    font-weight: 500;
+  }
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .tag-pill {
+    font-size: 11px;
+    padding: 2px 10px;
+    border-radius: 12px;
+    background: var(--accent-bg);
+    color: var(--accent-text);
+    cursor: pointer;
+    border: none;
+  }
+  .comments {
+    margin-top: 16px;
+    padding-top: 14px;
+    border-top: 1px dashed var(--border);
+  }
+  .comments-label {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+  }
+  .comment {
+    font-size: 13px;
+    line-height: 1.7;
+    margin-bottom: 12px;
+    padding-left: 10px;
+    border-left: 2px solid var(--accent-bg);
+  }
+  .comment-meta {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-bottom: 2px;
+  }
+  .comment-meta .author {
+    color: var(--accent-text);
+    font-weight: 500;
+  }
+  .no-results {
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 14px;
+    padding: 40px 0;
+    display: none;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Hey buddy, give me your paw! 絵日記帳</h1>
+  <p>ウィペットのぽー＆バド（＆うめ）と暮らす日常あれこれ ― 2013年12月 ※so-netブログ移行後・archive.orgより復元</p>
+</header>
+
+<div class="controls">
+  <input type="text" id="search" placeholder="キーワードで探す（例: 震災、ドッグラン、うみちゃん）">
+  <div class="tag-filter" id="tagFilter"></div>
+</div>
+<div class="count" id="count"></div>
+
+<main id="main"></main>
+<p class="no-results" id="noResults">該当する記事が見つかりません。</p>
+
+<script>
+const entries = [
+  {
+    "date": "2013.12.08",
+    "title": "四国な一日。",
+    "tags": [
+      "ぽー",
+      "バド",
+      "home",
+      "2013年12月"
+    ],
+    "images": [],
+    "photosLost": true,
+    "text": "香川県のカマタマーレ讃岐がJ2昇格を決めた、\n１２月８日の１５時頃 国立競技場におりました。\n徳島ヴォルティスのJ1昇格が決まる最後の試合。\n奈良から四国の徳島に移り住んだのは約６年前。\n地元チームがあることを知り、\nファンクラブにも入り試合を観に行っていました。\nでもね、その頃はとっても弱くて最下位を争うようなチームだったの。\nその後はぽーを迎えたことなどでしばらくは観戦に行かず、\n結果だけをチェックするのみになってしまって。\nさらに今年の春には四国からも離れることになり関東在住に。\nでも、だけれども。転勤になってよかったー！\nだって、四国初のJ1昇格試合を目の前で応援できたんだもん。\n勝ち試合、初めて生で観たかも。しかも、J1昇格ですよっ！\n徳島と香川のJ1・J2昇格のニュースを続けて見られることも嬉しい。\n知名度低い徳島だから、これで少し有名になれば嬉しいな〜♪\n海と橋を渡るのがみなさんちと大変やろうけど。。\n徳島のサポーターが応援に使っているのは阿波踊りの鐘。\nリズムも阿波踊りのときと同じなんですョ。\nこの鐘の音が全国放送で流れる日がくればいいなぁ、\nなんて数年前に願ってみたりもしてました。\nwinning walkの動画。鐘の音が聞こえるかと思います。\n（あ、大笑いされてるのは知らないヒトですwみんな大興奮だったもんねー♪）\nぽバド、留守番ありがとねー♪\nあ〜〜うれしー！！",
+    "truncated": false,
+    "comments": []
+  },
+  {
+    "date": "2013.12.11",
+    "title": "３回目。",
+    "tags": [
+      "ぽー",
+      "バド",
+      "病院",
+      "2013年12月"
+    ],
+    "images": [],
+    "photosLost": true,
+    "text": "ワクチン接種と今年度最後のフィラリア駆虫薬処方のため病院へ行ってきました〜。\nと言っても、それは先週の12月2日 月曜日のこと。（ちなみに病院は診察時にイヌを預けちゃう例のトコロ）\n四国の自宅周辺は、猿に猪と野生動物が盛り沢山なうえ、牛舎もあるしネズミもいるからレプトスピラは外せない。\n一方、電車やバスは深夜過ぎても運行しており、何時になっても必ず誰かが通りを歩いているそんな転勤先の新居周辺。\n四国の自宅周辺で深夜に徘徊しているのは野生猿くらいだもんねー\n新居から徒歩３分の交差点で信号待ちの図〜。\nならばワクチンの種類を減らしてもいいかも〜と、ちょっと考えタ。\nが、今のところアレルギーなども起こしていないし、生活上必要であると判断してやはり８種を受けることに。\nというのも、所変わっても森の中を散策したり、毎日の散歩ではこんな畑の脇を歩いたりしているからなのです。(●´ω｀●)\n（四国の自宅周辺と変わらない風景だけれど、これも関東のぷち都会での一枚（笑）\nさてさて、件の病院での受診は今回で３回目。どんな反応をしたのか、その記録がこの日記の真の目的。\n長くなるので、続きはコチラからどうぞですー ⇩\n（この記事は概要のみ復元されています。全文は保存されていません。）",
+    "truncated": true,
+    "comments": []
+  },
+  {
+    "date": "2013.12.15",
+    "title": "足柄運動会2013冬〜前編〜",
+    "tags": [
+      "ぽー",
+      "バド",
+      "足柄運動会",
+      "2013年12月"
+    ],
+    "images": [],
+    "photosLost": true,
+    "text": "寒波が来るかもョ。などという天気予報にも関わらず、\nぽかぽか陽気ですっきり快晴な2013年12月15日。\n足柄cocoにて開催された『足柄運動会』。\nほめ家＆ロン家主催で、毎年夏と冬に開催してくれている犬連れ運動会。\n今回で７回目になるそうで、たくさんの協賛と、\nルアーコーシングに爪切りや犬服販売（全てチャリティ）もあったり。\n主催は企業などではなく友達な個人だから、\nお昼ご飯も持ち寄って参加者みなで作り上げ盛り上げていく運動会。\n（我が家の手伝い担当は、ほぼたっつーだったけどね(´▽｀;)ゝエﾍ）\nそんな足柄運動会2013冬の陣、\n６月（→足柄運動会2013初夏）に引き続き２度目の参加だじぇー！\nはじめに：主催のほめ家、ロン家、サポートをしている家族の皆様、\n素敵な写真を撮ってくださっているラキつば父さん一家、\nリーダー、サブリーダーのご家族、そして参加者のみなさま。\n楽しい１日をありがとうございましたー♪\n３７家族（犬：７２頭）が赤・白・黄の３チームに分かれ、\nイヌと一緒に飼主たちが楽しむ運動会。いよいよスタート〜(ﾉ*´▽)ﾉﾜｰｲ♪\n（photo by ラキつば父さん）\n前回ほとんど写真が撮れなかった反省を生かし、\n敢えてカメラは持って行かずにiPhoneでの中途半端撮影で。（生かす？？）\nそして素敵な写真はラキつば父さんをはじめ頂き物で綴りま〜す♪\n６月は初参加なことや、ヒトやイヌの多さにおろおろどきどきしていたけれど、\n２回目とあってちょっと周りを見渡す余裕もできた私たち。\nランの入り口にて先ず気がついたのはコレ！！（ほめろぐで見た看板だぁ〜♪）\nほめ家のブリジットこと、ブリしゃん。その跳躍力はすばらしく、\nドッグランのネットなんぞひょいっと身軽に飛び越えちゃう。\nと、そんなジャンプ後の写真・・これじゃぁ、逆立ちの瞬間やんねー\nこちらはラキつば父さん撮影の、ルアーに向かって大ジャンプなブリしゃん。\nカメラの違いも大きいだろうけどセンスやタイミングの問題もあるよな〜\nさてさて、私たちは赤チーム。\nリーダ：ダカラぱぱ、サブリーダー：ルファ父 の元にて頑張りまーす！\n続きはコチラから↓\n（この記事は概要のみ復元されています。全文は保存されていません。）",
+    "truncated": true,
+    "comments": []
+  },
+  {
+    "date": "2013.12.18",
+    "title": "足柄運動会2013冬〜トモダチ編〜",
+    "tags": [
+      "ぽー",
+      "バド",
+      "足柄運動会",
+      "2013年12月"
+    ],
+    "images": [],
+    "photosLost": true,
+    "text": "パン食い競争予選が終了したならば、\nいよいよ待ってましたぁ〜！お昼ご飯タイム〜♪\nそしてこのお昼休憩を使って、\nチャリティのルアーコーシングや爪切りそして犬服販売も行われる。\nでも、その前にしっかり腹ごしらえしないとね〜♪\nテーブルの数が足りなくなるほどにずらりと並ぶ、\nおでんに、豚汁、炊き込みご飯数種、サンドイッチ、スモークチキン、etc...\n毎度のことなのだけど食べるのに夢中で、\n肝心の料理の写真を撮ったためしが無いという。。。（;´▽｀A``）\n美味しい香りに惹かれてイヌたちもテーブルの方に興味津々。\nって・・・あれ？このコたち、どこかで見たような？？？\nこのコ達はだあれ？ というわけで、続きはコチラ↓\nそう。彼女達は徳島にいる頃によく遊んだ、仲良し姉妹。\nランちゃ〜〜ん♪\nムウちゃ〜〜ん♪ 長距離の移動、おつかれさまでしたぁ！\n喋り口調を真似てみタ！ でも、ちょっと違うかなー\nというか、ムウちゃんに至っては犬種不明になってしもうたぁ〜。( ´艸｀)\nランムウ家は黄チームなので、タープの場所も別。\nこのお昼タイムに、ようやくのんびり会話する機会ができマシタ♪\n実は彼女たちが会場に到着して直ぐに、挨拶をしていたのだけれどネ。\nイヌもヒトもたくさん集まってるからね〜。\nぽバドもランムウもお互いを認識できていなかったらしい。\n突然にぴんっ！ときたらしい、ランちゃん。\nバウスタイルを取り、大喜びではしゃぎ始めるランちゃん。\nそんな彼女の様子にムウちゃんもぽーの匂いを再確認して理解した！\nというわけで、たあかさんも呼び隣のランになだれ込む。\nランちゃんのこの喜びっぷりに、嬉しくってにまにましちゃったョ(*￣▽￣*)\n邪魔をしに向かってるコがいますけれどもネ（笑\nそしてネット際で何やらしているムウちゃーん！アナタの相手もいるのょ〜♪\nたっつーもムウちゃんと遊べて大喜びしてたょ〜♪\n参加犬の中で唯一のダルメシアンなムウちゃんだけれど、\nドット柄の服でぽバドもダルメシアンぽく見える気がするー（え？ムリがある？？）\n感動の再会は５分ほどで終了〜！\nランムウ家にコーシングの順が回ってキタからね。\nざんねーん。\nでもね、ランムウちゃんにとって初めてのコーシングなのだ！\n行ってらっしゃーい！楽しんできてね〜♪\nとうわけで、ランムウ家のブログはこちら→ガリガリらんちゃんムチムチむうちゃん\n（楽しむのに夢中で写真がなーい！ブログどうしよーと言ってたけれどね〜）\nその後、会場に一旦戻ったけれど、遊び足りないと訴えるぽーさん。\n（バドは時々フリーで遊ばせたりしたけれど、ぽーは繋いでること多かったもんね）\nアルが隣のランに居るのが見えたので、お邪魔させて頂くことに。\nしかも、ほめろぐにてよく見かけていたシノン＆ラニも一緒♪\n間もなく２歳を迎えるというシノンと１歳のアルとラニ。\nそこに違和感なく混ざり、嬉しそうにはしゃぐ４歳のぽーと2.5歳のバド。\nぽーが本気で喧嘩をしたり怪我をする姿も見てきているから不安もあり、\n沢山のイヌと接触できる場ではマズルガードを外してやれないけれど・・・\nほんとは、ぽーの方がイヌ同士で遊ぶことが好きなのよねぇ。\nしかもラニのことがかなり気になるらしい。( ´艸｀)\n一方、シノンラニのお姉ちゃんにディスクで遊んでもらうバド。\nボールでもディスクでも、とにかく何でも投げてもらえば追いかけちゃうバド。\nしかもとっても投げるのが上手で、おかげで大喜びで走り回ってマシタ♪\nいつもはラニがディスクで遊んでもらってるのかなー。\nディスクを追うバドをラニが追い、その２頭をシノンとアルが追う。\nぽーはひたすらにラニの後を追っていた。(*≧ｍ≦*)ﾌﾟﾌﾟｯ\nたっぷり走って遊んで、バドにいたっては服を脱がせるほどデシタ。\n一緒に遊んでくれてありがとう〜。またどこかでお会いしたときにはよろしくです♪\nさてさて、\n楽しいお昼休憩が終わったら、「パン食い競走の決勝」。\n午前の部で１位になった人たちで競います。\n（しかーし私ってば、肝心な時にトイレに行ったり何やかやしていて記憶があやふや）\n続いては、「借り犬競争」。\n借り物競走ならぬ、借り犬競争〜。\n１人ずつ順に、イヌたちの名が書かれたくじを引き、\nずらりと並べられたイヌのなかから正解のイヌを借りてきます。\nもちろん対象は別チームのイヌ。\n制限時間内に正解した頭数がポイントとして加算される。\n私たち赤チームのイヌは黄チームが選び、そして赤は白チームのイヌを選ぶ。\n頭数は２０〜３０くらいなので、なんとか覚えられないこともない頭数。\nできればよく知っているコや、特徴のあるコの名を引きたい。\n選ばれる側としては、似たイヌ同士で服やカラーを交換したり、\n並べる順番を工夫したりしてミスリードを狙う。\n黄チームには、主催でもあり毎回外すことのないゆうこさんがいる。\nランムウ母とたあかさんもいるからなぁ〜手強そう。\nとはいえ、白チームには記憶力抜群のアロママがいるもんね。\n結局のところ、\n各チームくじ運にも左右されるし、どれだけ直前予習したかも大きかったり。\nあとは緊張や焦りで知ってるはずなのに間違えたり。ねっ！←誰に言ってるんやろ（笑\nもうね、借り犬競争、大好き♡\nさーて、ぽバドはどこだ？\n実は、ぽーはいなかったり。\n隣のコに喧嘩売ったらいかんからね、端っこに繋いでもらったのです。\nだから、この写真の中にはいないのでした〜。(￣∇￣*)ゞｴﾍﾍ\n（いつも端っこだと、端＝ぽーになっちゃうな！）\nというわけで、正解は次回につづく〜",
+    "truncated": false,
+    "comments": []
+  },
+  {
+    "date": "2013.12.23",
+    "title": "足柄運動会2013冬〜後編〜",
+    "tags": [
+      "ぽー",
+      "バド",
+      "足柄運動会",
+      "2013年12月"
+    ],
+    "images": [],
+    "photosLost": true,
+    "text": "前回ラストの写真「バドはどこでしょう？」の答え〜。\nバドは服を脱がされて、こんなところに居ました。\nでは、ぽバドの服を着ているのは誰か？\nということの前に、・・この借り犬競争、一番手は私たち赤チームでした。\n当てるのは白チームのイヌたち。\n実は競技が始まる前、\n皆で白チームのタープに行って名前とイヌを確認させてもらっていたのですョ。\nダックスのソラーレは「太陽」、マルチーズのセレーノは「元気」、\nという意味であることを教えて頂いたり。\nココベルジャスミン家とお話をさせて頂いたり。\n借り犬競争のための予習が目的でもあったのだけれど、\n別チームの飼主さんたちと言葉を交わす良い機会にもなりました〜♪\n（あーイヌ達の写真をこの時に撮らせてもらえば良かったのだなぁ・・）\n予習もばっちりな借り犬競争。続きはコチラ⇩\n白チームには夏に同じチームだったアロナルやコークたち、\nお昼に遊んだシノン・ラニも居る。\n頭数も少ないし楽勝〜〜♪とか思ってたけど・・・んなことなかった。\nいざ並べられると大混乱。\nウィペット以外を引きたかったのだけど手にしたくじには、\nウィペット櫻・杏・龍家の「龍」の名が。\nでも分かるぞ！結果は、見事正解〜♪\nいや〜面白かった！\n知っているコが居る方が楽しいかも。どきどき感が癖になりそう。\n私たちの順が終わると、次は白チームが黄チームのイヌを当てる番。\nその間に赤チームはこそこそと準備を始めます。\nレッドブリンドルのジャック・ビオラ・バドで服や首輪を交換。\nと言っても、体の大きなバドがふたりの服を着れるわけがないので、\nジャックのカラーだけ借りてみる。\nそしてバドの服はジャックに、ジャックの服はビオラに。\nって、ジャックが二頭いることになってるやん！∑(ﾟ∇ﾟ|||)\nバドよりもさらに体の大きいぽーはというと、\n今回はロンが同じチームだもんね〜。しかも、毛色は同じブルー。\nせっかくロンの格好いいカラーを借りているというに、\n困惑気味でたたずむぽー（笑\nイベントやオフ会などにほぼ参加してないから、知名度低いはずのぽー＆バド。\nこれで分からないはずだワ。(￣∀￣*)ウシシシシ♪\nなーんて思っていたのに、まさかのあんな指令が出ていたとは！\nそれはこんな指令（笑）⇩\n「ロンはわかる〜、と皆が言うので、\nあとはぽーとバドだけでかいから、そこだけ覚えればよし！！」\n（前回記事のコメント欄からそのまま抜粋したった〜(￣m￣* ）\nしかもみやきちさんには、ぽバドの服を着ているのが、\nロンとジャックだということまで分かっていたようで。＼(;ﾟ∇ﾟ)/アーレー？\n（photo by みやきちさん）\nそんな可笑し哀しな状況の中、ジャックの名前を引いたランムウ母。\nどうかしら、どうかしら？と見守っていると・・あれ？あれれ？\nジャック！ジャックーと、言いながら連れてきたのはバド。\nたぁかさんの「ちがうーなんでやねん〜」という顔が忘れられないョ。(*≧ｍ≦)=3\nしかも、バドはなんだか嬉しそうだったのよね（笑\nいや〜ランムウ母、間違えてくれてありがとうデシタ〜(o≧∇≦)o♪\n服やカラーを交換した甲斐があったよぅ〜！\n結局その後は順に、ぽバドともに当てられちゃったけどねん（笑\nこのゲームで思うほどに点数を取れなかった赤チーム。\nなんとか首位をキープしているものの、白・黄・赤ともに僅差。\n残る競技はあと２つ！さてさて、どのチームに軍配があがるのか。\n各チーム応援にもますます熱が入りますっ！！(￣Д￣)ﾉ\"ｶﾞﾝﾊﾞﾚｰｰｰ！！\n続いての競技は、「選抜リレー」。\n第一走者は我らがリーダー ダカラぱぱ＆ビオラ。\n続いて子供達が走り、全身で赤を背負ってくれたロンママへと繋がるバトン。\n（ロン家から頂いてきた写真〜。赤いパンツに、靴も赤に履き替え真っ赤だぁ！）\n夏にも同じチームだったスポック父が走る！走るっ！\n外見と実年齢のギャップにもびっくりなのだけれど、その走りも凄過ぎデス！\nいよいよ、最終走者へと渡されたバトン。\nほめさんとの大接戦の末、\n勝利のゴールを決めたのはルファ父ーっ！！ヾ(≧▽≦)ﾉヤッター☆\nはふーっ！思い出しながら、書きながら、再び盛り上がっちゃったョ。\n勝敗の行方は、最後のゲーム「ピンポン玉運び」まで持ち越される。\n午前中の反省を生かして並び直してみたりと、気合いも入れ直す赤チーム。\nお盆を持つペアは静かに、そして周りは大きな声で声援を送る。\nこちらは黄チームの様子。\nすでに運び終わったメンバーも前にまわって応援する。\nぴんぽん玉の乗ったお盆がほめさん＆ゆうこさんに渡される瞬間〜\nそして白チームがぴんぽん玉運びを行っている間、\n富士山がよく見えると聞いてこんなところから写真を撮ってマシタ！\n（雲がかかってるし、ゲームの様子が全くわからんではないか）\nそして、最終結果は・・・・\n赤チームいっちばーん！！優勝だじぇーっ♪♪♪\n次回は何色かな。どなたと同じチームになるかな。\n常に空回りでお騒がせな私たちですが、みなさまよろしくお願いしまっす！\nマテマテゲームの動画をロン家から借りてきました〜。\n動画で見られると面白さ楽しさ倍増♪\n最後に、写真や動画を頂いたおうちのブログなどを紹介しマス。\nみなさま、ありがとでした〜♪",
+    "truncated": false,
+    "comments": []
+  },
+  {
+    "date": "2013.12.25",
+    "title": "Merry Christmas〜!!",
+    "tags": [
+      "日常",
+      "2013年12月"
+    ],
+    "images": [],
+    "photosLost": true,
+    "text": "今年は何もしないことを決め込んでいたクリスマスイブ。\nでも一応イブだしということで、スペアリ（イ）ブを用意してみたり（笑\n早く帰りたいなぁと呟いていたたっつーが帰宅できたのは22時を過ぎてのこと。\nが、こんなお土産とともに帰宅〜♪\nえ〜こんな時間から〜困るぅ〜♪\nとうわけで、スペアリブ＆チョコケーキの組み合わせで若干胃もたれ気味な今日。\n実は北陸に住む友人一家から、クリスマスプレゼントを頂いたりもしちゃって、思いがけない楽しい嬉しいクリスマスイブとなりました。\nわ〜ぃ♪\nというわけで、このHappy気分をみなさんにも！\nMerry Christmas, and I wish you all the best in the new year!!",
+    "truncated": false,
+    "comments": []
+  }
+];
+
+(function() {
+  const seen = {};
+  entries.forEach(function(e) {
+    const key = e.date;
+    seen[key] = (seen[key] || 0) + 1;
+    e.id = 'e' + e.date.replace(/\./g, '-') + '-' + seen[key];
+  });
+})();
+
+
+// ---- render ----
+const allTags = [...new Set(entries.flatMap(e => e.tags))];
+let activeTags = new Set();
+let keyword = "";
+
+function highlightNums(text) {
+  return text.replace(/\[(\d+)\]/g, '<b>[$1]</b>');
+}
+
+function esc(s) {
+  return String(s == null ? "" : s).replace(/[&<>]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
+}
+
+function renderTagFilter() {
+  const el = document.getElementById('tagFilter');
+  el.innerHTML = allTags.map(t =>
+    `<button class="tag-btn${activeTags.has(t) ? ' active' : ''}" data-tag="${t}">${t}</button>`
+  ).join('');
+  el.querySelectorAll('.tag-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const tag = btn.dataset.tag;
+      if (activeTags.has(tag)) activeTags.delete(tag); else activeTags.add(tag);
+      renderTagFilter();
+      renderEntries();
+    });
+  });
+}
+
+function matches(entry) {
+  const tagOk = activeTags.size === 0 || entry.tags.some(t => activeTags.has(t));
+  const kw = keyword.trim();
+  const kwOk = kw === "" ||
+    entry.title.includes(kw) ||
+    entry.text.includes(kw) ||
+    entry.tags.some(t => t.includes(kw));
+  return tagOk && kwOk;
+}
+
+function renderEntries() {
+  const main = document.getElementById('main');
+  const filtered = entries.filter(matches);
+  document.getElementById('count').textContent = `${filtered.length} / ${entries.length} 件表示中`;
+  document.getElementById('noResults').style.display = filtered.length === 0 ? 'block' : 'none';
+
+  main.innerHTML = filtered.map(entry => `
+    <article class="entry" id="${entry.id}">
+      <div class="entry-head">
+        <span class="entry-title">${entry.title}</span>
+        <span class="entry-date">${entry.date}</span>
+      </div>
+      ${entry.images.length > 0 ? `
+      <div class="photo-grid">
+        ${entry.images.map((src, i) => `
+          <a href="${src}" target="_blank" rel="noopener">
+            <img src="${src}" loading="lazy" alt="${entry.title} 写真${i+1}">
+            <span class="num">${i+1}</span>
+          </a>
+        `).join('')}
+      </div>` : entry.photosLost ? `<p class="no-photo">（写真は掲載されていましたが、保存されていないため表示できません）</p>` : `<p class="no-photo">（この記事には写真がありません）</p>`}
+      ${entry.truncated ? `<p class="truncated-note">（＊続きは読めない）</p>` : ''}
+      <p class="entry-text">${highlightNums(entry.text)}</p>
+      <div class="tags">
+        ${entry.tags.map(t => `<button class="tag-pill" data-tag="${t}">${t}</button>`).join('')}
+      </div>
+      ${entry.comments && entry.comments.length > 0 ? `
+      <div class="comments">
+        <div class="comments-label">コメント（${entry.comments.length}件）</div>
+        ${entry.comments.map(c => `
+          <div class="comment">
+            <div class="comment-meta"><span class="author">${esc(c.author)}</span>${c.date ? ' ・ ' + esc(c.date) : ''}</div>
+            <div>${esc(c.text)}</div>
+          </div>
+        `).join('')}
+      </div>` : ''}
+    </article>
+  `).join('');
+
+  main.querySelectorAll('.tag-pill').forEach(btn => {
+    btn.addEventListener('click', () => {
+      activeTags = new Set([btn.dataset.tag]);
+      renderTagFilter();
+      renderEntries();
+      window.scrollTo({top:0, behavior:'smooth'});
+    });
+  });
+}
+
+document.getElementById('search').addEventListener('input', (e) => {
+  keyword = e.target.value;
+  renderEntries();
+});
+
+renderTagFilter();
+renderEntries();
+if (location.hash) {
+  const target = document.getElementById(location.hash.slice(1));
+  if (target) target.scrollIntoView({block: 'start'});
+}
+</script>
+
+</body>
+</html>

@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hey buddy, give me your paw! 絵日記帳 - 2013年8月</title>
+<style>
+  :root {
+    --bg: #faf6ef;
+    --card-bg: #ffffff;
+    --border: #e8dfd0;
+    --text: #4a4238;
+    --text-muted: #9a9082;
+    --accent: #c98a5e;
+    --accent-bg: #f5e6d8;
+    --accent-text: #8a5a35;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    padding: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: "Hiragino Kaku Gothic ProN", "Yu Gothic", "Meiryo", sans-serif;
+    line-height: 1.8;
+  }
+  header {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 32px 20px 16px;
+    text-align: center;
+  }
+  header h1 {
+    font-size: 22px;
+    font-weight: 500;
+    margin: 0 0 4px;
+    color: var(--text);
+  }
+  header p {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin: 0;
+  }
+  .controls {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 12px 20px 20px;
+    position: sticky;
+    top: 0;
+    background: var(--bg);
+    z-index: 10;
+  }
+  #search {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    font-size: 14px;
+    background: var(--card-bg);
+    color: var(--text);
+    margin-bottom: 10px;
+  }
+  .tag-filter {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .tag-btn {
+    font-size: 11px;
+    padding: 4px 12px;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    background: var(--card-bg);
+    color: var(--text-muted);
+    cursor: pointer;
+  }
+  .tag-btn.active {
+    background: var(--accent);
+    color: #fff;
+    border-color: var(--accent);
+  }
+  .count {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 0 20px 8px;
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+  main {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 0 20px 60px;
+  }
+  .entry {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 20px;
+    margin-bottom: 16px;
+  }
+  .entry-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+  .entry-title {
+    font-size: 16px;
+    font-weight: 500;
+  }
+  .entry-date {
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+  .photo-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+    gap: 6px;
+    margin-bottom: 12px;
+  }
+  .photo-grid a {
+    position: relative;
+    display: block;
+    aspect-ratio: 1;
+    overflow: hidden;
+    border-radius: 8px;
+    background: var(--accent-bg);
+  }
+  .photo-grid img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .photo-grid .num {
+    position: absolute;
+    bottom: 3px;
+    right: 4px;
+    font-size: 10px;
+    background: rgba(0,0,0,0.55);
+    color: #fff;
+    padding: 1px 5px;
+    border-radius: 8px;
+  }
+  .no-photo {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-bottom: 12px;
+  }
+  .truncated-note {
+    font-size: 12px;
+    color: var(--accent-text);
+    background: var(--accent-bg);
+    border-radius: 8px;
+    padding: 6px 10px;
+    margin: 0 0 12px;
+    display: inline-block;
+  }
+  .entry-text {
+    font-size: 14px;
+    line-height: 1.85;
+    margin: 0 0 12px;
+    white-space: pre-line;
+  }
+  .entry-text b {
+    color: var(--accent-text);
+    font-weight: 500;
+  }
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .tag-pill {
+    font-size: 11px;
+    padding: 2px 10px;
+    border-radius: 12px;
+    background: var(--accent-bg);
+    color: var(--accent-text);
+    cursor: pointer;
+    border: none;
+  }
+  .comments {
+    margin-top: 16px;
+    padding-top: 14px;
+    border-top: 1px dashed var(--border);
+  }
+  .comments-label {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+  }
+  .comment {
+    font-size: 13px;
+    line-height: 1.7;
+    margin-bottom: 12px;
+    padding-left: 10px;
+    border-left: 2px solid var(--accent-bg);
+  }
+  .comment-meta {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-bottom: 2px;
+  }
+  .comment-meta .author {
+    color: var(--accent-text);
+    font-weight: 500;
+  }
+  .no-results {
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 14px;
+    padding: 40px 0;
+    display: none;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Hey buddy, give me your paw! 絵日記帳</h1>
+  <p>ウィペットのぽー＆バド（＆うめ）と暮らす日常あれこれ ― 2013年8月 ※so-netブログ移行後・archive.orgより復元</p>
+</header>
+
+<div class="controls">
+  <input type="text" id="search" placeholder="キーワードで探す（例: 震災、ドッグラン、うみちゃん）">
+  <div class="tag-filter" id="tagFilter"></div>
+</div>
+<div class="count" id="count"></div>
+
+<main id="main"></main>
+<p class="no-results" id="noResults">該当する記事が見つかりません。</p>
+
+<script>
+const entries = [
+  {
+    "date": "2013.08.01",
+    "title": "よくあること。",
+    "tags": [
+      "ぽー",
+      "バド",
+      "2013年8月"
+    ],
+    "images": [],
+    "photosLost": true,
+    "text": "以前アメブロの方で、\n我が家の「よくあること」について書きました。\n今回はバドについての「バドだけにフツウなこと」\n散歩に行った後には、寝る。\nそれはバドだけでなく、ぽーにとってもよくあることだけれども。\nバドだけにフツウなことは、ココから。\n静まりかえった部屋に、聴こえるのは小さな寝息だけ。\nが、しばらくすると、ゴトンっと何が落ちる音がする。\nはい。バドが消えマシタ。(√・・)ドコイッタ？\nよーくよく目を凝らすと、足先がちろりと見えてマス♪\nそう。ゴトンは、バドが落ちた音。\n狭かろう助けてやろう、と布団をずらしてみるものの、\nそのまま寝ちゃえるのが、バドだけにフツウなこと。\nこれだけでは終わらない、バドだけにフツウなこと。\nゴハンを食べた後には、寝る。\nそれはバドだけでなく、ぽーにとってもよくあることだけれども。\nバドだけにフツウなことは、ココから。\n静まりかえった部屋に、聴こえるのは小さな寝息だけ。\nが、しばらくすると、ゴトンっと何が落ちる音がする。\nそそ。ここからの展開はモチロン同じね。d(ﾟ∀ﾟ*)ﾈｯ！\nゴトンは、バドが落ちた音。\nしかもちょっと重めなクッションごと落ちた音。\n（さすがにこの状況は飼主もビックリ。∑(･ω･ﾉ)ﾉ落ちたのではなく、怠惰な降り方したのかもだけど）\n狭かろう重かろう、とクッションを戻してみるものの、\n微動だにせず寝ちゃえるのが、バドだけにフツウなこと。\nバドだけにフツウなことは、他にもたーくさん。\nそれらはまたそのうち書き留めよう。(*^m^*) ムフ♪",
+    "truncated": false,
+    "comments": []
+  },
+  {
+    "date": "2013.08.04",
+    "title": "夏の風物詩。",
+    "tags": [
+      "ぽー",
+      "暮らし",
+      "2013年8月"
+    ],
+    "images": [],
+    "photosLost": true,
+    "text": "ここ数日、朝晩は涼しく快適な日が続いていましたが、\n週明けから再び猛暑到来のようですねぇ。\nそんな時には、涼を感じる夏の風物詩で少しでも涼しく。\n風鈴・打ち水・かき氷、暑気払いにはビールもいいね♪\nそういえば、先日ニュースで、\nお化け屋敷プロデューサーの話題がありました。\n人形などをただ歩きながら見ていくような、昔ながらのものではないそうな。\n指令を与えられ体験型にすることで、\n客も登場人物の一員になり恐怖もさらに増すお化け屋敷らしい。\nリアルホラーゲームみたいですねぇ。\n常にお客さんの反応を見ながら改善し、恐怖を追求しているそうですょ。\nインタビュー中の背後にあるお化け人形が気になって、\n話半分しか聞けませんでしたが（笑\n蒸し暑い夏の夜、ゾクリとさせてくれる「幽霊」。\n両手を胸の前にだらりと垂らし、柳の下にぼうっと現れる日本の幽霊。\n納涼にはぴったりな存在ですよね。\n前置きが長くなったけれど。先日、うちにも出たんですョ。((((( ；ﾟДﾟ)))))\nしかも、昼間から出たんデス。\n柳の下ではないし足もあるけれど。写真が撮れたので見てやってください。\nこれですっ⇩⇩⇩⇩\n・・・すみません。すみません。。\nぶっちゃけ、前置き長過ぎやし。引っ張り過ぎだわね。。(；´Д｀A ｀｀｀\nあ、しかしですね！\n先日はUMAも現れたんですョ！！いわゆる、未確認生物ですね。\n写真が撮れたので見てやってください。\nこれですっ⇩⇩⇩⇩\nいやー白眼コワイー。足の角度がヘンー(≧∇≦)ｷｬｰ♪\nあ・・・ぽー、起きちゃった？\nはい。というわけで!\n今、いちばん涼しくなっているのは、間違いなく私です。\nお粗末さまでした〜(￣∇￣*)ゞｴﾍﾍ",
+    "truncated": false,
+    "comments": []
+  },
+  {
+    "date": "2013.08.06",
+    "title": "迷子にさせないで。",
+    "tags": [
+      "ぽー",
+      "バド",
+      "犬と暮らす",
+      "2013年8月"
+    ],
+    "images": [],
+    "photosLost": true,
+    "text": "昨日は、ぽバドを連れて河川敷のランへ行ってきマシタ。\nここに来るのは５回目くらいでしょうか。\n場所にも慣れてきたらしく、とても楽しそうにしてくれるから、\n思わず私も一緒に走り回ってしまったョ。（暑い！疲れたっ！笑）\n嬉しそうなぽバドの様子を見るたびに思うのは、\n今のこの瞬間があることの大切さ。\nイヌ達の寿命はヒトと比べるとあまりに短い。\nだからこそ一緒に居られるその時間を大切にしたい。\nそう考えるようになったのは、\n先代犬のリンとベルとの暮らしがあったから。\nリンとは18歳、ベルとは16歳まで一緒に暮らすことができました。\nリン４歳、ベル２歳。（ちょうど今のぽバドと同じ頃やん〜♪）\nベルの晩年はまるでパピーのようで、それはもう可愛くて。(*´～｀*)\nそしてリンに至っては、耳や視力が衰えぼけたりと、\nイヌもヒトと同じように老化していくことを教えてくれました。\n飼主の声が聞こえなくても、姿を見ることができなくなっても、\nしっかりとコミュニケーションがとれるんですよねぇ。\nたぶんそれは、一緒に過ごした年数や、\n毎日積み重ねてきた信頼関係などのおかげではないかと思ったり。\n若い頃には不審者から私を守ってくれたりもしたリン。\nその時の話はコチラ→イヌとヒト。\nぼけてしまってからは、無防備に妙なところで寝ちゃったりなんかして。\nそっと抱き上げ、寝床に運んだ日々を思い出します。\nのんびりと穏やかに過ごした、年老いた彼らとの日々。\n年老いたり病気でだとしても、最後にはそばで看取ってやれること。\nそれはイヌにとっても飼主にとってもシアワセなことかもしれません。\nそう考えるようになったのは、\nリンを１２歳の頃に半年以上も迷子にした経験があったから。\nどこでどうしているのか。\n生死も分からないままの別れはとてもとても辛いです。\n幸いにも私たちはリンと再会することができましたけれども。\nリンが迷子だった半年間の体験談。\n本来なら私がここでまとめるべきなのですが、\nニコちゃん＆ニヤちゃん姉妹の飼主さんである、\nあがさんがブログで紹介してくださいました。\nそして、もし迷子になったときに出来る事や、\n迷子にしないための対策なども記事にされています。\nやはり最善は、「迷子にしないように」することなのです。\nもちろんうっかりだったり、予防しきれない場合もあるけれど。\nあがさんのブログには、\n他にもイヌと暮らす上でためになることがたくさん詰まっています。\n⇨SMILES@LA 続・ペットが迷子になったら\n迷子のペット達が、一日でも早く飼主と再会できますように。\nラストはやっぱこのコに頼ろう。\nバドくん、よろしく〜っ！！",
+    "truncated": false,
+    "comments": []
+  },
+  {
+    "date": "2013.08.21",
+    "title": "東北にて、ルアーコーシングに挑戦。",
+    "tags": [
+      "ぽー",
+      "バド",
+      "dog sports",
+      "2013年8月"
+    ],
+    "images": [],
+    "photosLost": true,
+    "text": "イヌ達に疑似餌（ルアー）を追いかけさせるドッグスポーツ ルアーコーシング。\n正式な大会といえば、２年前に南木曽でNPAに参加したきり。その大会後にバドを迎えに行ったので、NPAを経験したのは、ぽーのみ。\n（懐かしいなぁ〜。しかも、このときはぽーはルアーを見ていたらしい！）\n関東地方に引越したおかげで、コーシングに参加しやすい距離にはなったけれども。\n休みの予定が立て辛かったり、出場頭数制限もあるから気軽にエントリーするわけにもいかずだったりで。\n（じつは単純に飼主が面倒くさがりなだけ、というのはナイショー）\nそんな私たちに友人が教えてくれたのは、東北での練習会情報。\nHPを拝見させていただくと、なんだか和気あいあいな雰囲気。しかも『当日の見学だけもO.K.気軽にどうぞ〜』と書いている。\nあぁ、なんと嬉しい。私たちにぴったりやーん♪Ｏ(≧▽≦)Ｏ ﾜｰｲ♪\nというわけで、２０１３年８月１１日。秋田県 大潟村 道の駅おおがた裏広場 練習会に参加してきましたー！\n（書くのが遅くなりマシタ。記憶がすでに怪しい・・）\n今年、足柄運動会で走らせてもらったおかげで、とりあえず直線を完走することは確認できていたぽバド。\nこちらの会場には、100m直線と300mオーバルのコースが常設されておりまして。\nそんな長い距離を走りきってくれるのかしら。\nそもそも飼主命なバドがひとりで走るのかしら、←自分で書くとかなり恥ずかしいなー等々、わくわくどきどきしながらの参加なのデシタ。(*￣∇￣*)\n駐車場に到着すると、見覚えのある方がいらっしゃる。\nそう、その方は２年前の南木曽でお会いしたきりのKahnくんと、SAMURAI_Granvilleくんのご一家。（以下、愛称「ville」と表記させてもらいまーす)\nなんて楽しそうにルアーに食らいついていることか。（思いがけない再会で嬉しかった〜♪ぽバドの面倒を見て頂いたりとありがとうございました！）\n一方、ルアーに興味は示さないが、一応直線コースを走りきるぽバド。\nどれほどルアーを見ていないか。それは、キャシーママさんの撮ってくれた写真を見れば一目瞭然で。\n→バド君とぽー君１００mコースを走る（from 東北ルアーコーシング倶楽部ブログ）\n目線が全くルアーに向かっていないんですョ。他のコたちの写真と見比べると違いもよくわかって面白い。\nでも、でもね。とにかく楽しそう〜！o(≧∇≦o) だから、良いのだ。\nキャシーちゃん。あなたのママのおかげで、ぽバドの楽しい姿をまた一つ発見できたょ〜♪\n300mオーバルコースでは、バド一頭だけでは走らないかも。。。なーんて、飼主の不安から、\n１走目は会長さんちのタイガーくん、そしてぽバドの３頭でスタート。\nGo!の合図とともに、勢い良く走り出す３頭！！・・・が、なんということでしょう。（←こらこら）\nぽーがタイガーくんに体を寄せ、時には体当たりをしている。\nそんな２頭のことをバドは面白がっているかのように付いて走り、最終的にはぽバドでタイガーくんを挟んで走る格好に。（←さらにこらこらだ。。）\n会長さん曰く、ぽバドが群れとしてできあがっていて、狩りにいっているのかも、と。\nなるほどなぁ！小さい頃から、女のコとは追いかけっこして遊んでいたぽバド。だけどタイガーくんはしっかり男のコ。未去勢なんだよね。\n喧嘩にならなかっただけで感動していた私だけれども、遊んでいる雰囲気でもない。なーんて、関心している場合ではなく。\nタイガーくん、ごめんー。m(｡>(ｪ<)｡)m\nこの一走をきっかけに、ぽバドを離して走らせてみることに。と、その前に。ひとっ走りしたら休憩ね。\nちなみに、この写真に写っている係留金具、リード・椅子・タープ、全て会長さんからお借りしたものだったりするのです。\nもうね、何から何まで会長さん、スタッフさん、ご一緒したみなさんにお世話になりまくりだったのです。（ありがとうでしたぁ！！）\nさて、やってみなければ分からないのがイヌなわけで。バドの初挑戦のお相手は、Villeくん。結果はどうだったのか。\nそれはどぞ、動画で見てやってくださいな〜と、言いつつ。動画には、ぽーの100mやタイガーくんと走った様子なども詰まっています〜。しかも音量注意ですー。吠え声はいってますー。\nぽーも走ったんだけどね。後半はやる気なくしたりとかデシタ。それはそれで、やっぱりねーという感じでもあったり。\nそれでも他のコが走ってると、「オレも走らせろー！！」とぽバド揃ってうるさかったり（笑\n結局のところ・・イヌも飼主もめっちゃ楽しかった〜ヽ(´▽｀)/ヾ♪\nところで、この日は常連さんも少なめだったそうな。だからここで、お世話になったわんずを順に紹介！したいところなのですけれども・・・\nいつものようにマトモな写真を撮っていない私デス。そもそも全頭を撮っていなかったりする。そして名前も聞いたのになー。うろ覚えだったり。。ゴメンナサイ(＿ ＿|||)\nというわけで、以降、撮れたコのみ写真を羅列させてもらいますー。\n心ちゃん ジェンマくん ラウロくん デュッティくん タイガーくん スーパーこまちちゃん コーダくん ロンボくん\nバドが係留金具を引っこ抜いて走りだしたりと、何かとお騒がせした私たちですが、\n（離れた場所にいた私の元へ来ようとしたのだよなーorz バドにも、そして周りの方々にもケガがなくてヨカッタです。。ほんと、すみませんでした。）\n帰省時にはまた性懲りもなく気軽に参加させて頂こうと考えています。その際にはまたどうぞよろしくお願いいたします〜♪\nみなさんも、東北旅行の際に参加してみてはいかがでしょー\nコーシングを楽しめる犬種はウィペットに限らずなところも魅力なわけで。\nぽバドのようにルアー追わずとも走れたり、はたまたスタートしなかったりもあるかもだけど。普段とチガウ愛犬の姿が見られるかもですょ〜(￣∇+￣)\n→東北ルアーコーシング倶楽部",
+    "truncated": false,
+    "comments": []
+  }
+];
+
+(function() {
+  const seen = {};
+  entries.forEach(function(e) {
+    const key = e.date;
+    seen[key] = (seen[key] || 0) + 1;
+    e.id = 'e' + e.date.replace(/\./g, '-') + '-' + seen[key];
+  });
+})();
+
+
+// ---- render ----
+const allTags = [...new Set(entries.flatMap(e => e.tags))];
+let activeTags = new Set();
+let keyword = "";
+
+function highlightNums(text) {
+  return text.replace(/\[(\d+)\]/g, '<b>[$1]</b>');
+}
+
+function esc(s) {
+  return String(s == null ? "" : s).replace(/[&<>]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
+}
+
+function renderTagFilter() {
+  const el = document.getElementById('tagFilter');
+  el.innerHTML = allTags.map(t =>
+    `<button class="tag-btn${activeTags.has(t) ? ' active' : ''}" data-tag="${t}">${t}</button>`
+  ).join('');
+  el.querySelectorAll('.tag-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const tag = btn.dataset.tag;
+      if (activeTags.has(tag)) activeTags.delete(tag); else activeTags.add(tag);
+      renderTagFilter();
+      renderEntries();
+    });
+  });
+}
+
+function matches(entry) {
+  const tagOk = activeTags.size === 0 || entry.tags.some(t => activeTags.has(t));
+  const kw = keyword.trim();
+  const kwOk = kw === "" ||
+    entry.title.includes(kw) ||
+    entry.text.includes(kw) ||
+    entry.tags.some(t => t.includes(kw));
+  return tagOk && kwOk;
+}
+
+function renderEntries() {
+  const main = document.getElementById('main');
+  const filtered = entries.filter(matches);
+  document.getElementById('count').textContent = `${filtered.length} / ${entries.length} 件表示中`;
+  document.getElementById('noResults').style.display = filtered.length === 0 ? 'block' : 'none';
+
+  main.innerHTML = filtered.map(entry => `
+    <article class="entry" id="${entry.id}">
+      <div class="entry-head">
+        <span class="entry-title">${entry.title}</span>
+        <span class="entry-date">${entry.date}</span>
+      </div>
+      ${entry.images.length > 0 ? `
+      <div class="photo-grid">
+        ${entry.images.map((src, i) => `
+          <a href="${src}" target="_blank" rel="noopener">
+            <img src="${src}" loading="lazy" alt="${entry.title} 写真${i+1}">
+            <span class="num">${i+1}</span>
+          </a>
+        `).join('')}
+      </div>` : entry.photosLost ? `<p class="no-photo">（写真は掲載されていましたが、保存されていないため表示できません）</p>` : `<p class="no-photo">（この記事には写真がありません）</p>`}
+      ${entry.truncated ? `<p class="truncated-note">（＊続きは読めない）</p>` : ''}
+      <p class="entry-text">${highlightNums(entry.text)}</p>
+      <div class="tags">
+        ${entry.tags.map(t => `<button class="tag-pill" data-tag="${t}">${t}</button>`).join('')}
+      </div>
+      ${entry.comments && entry.comments.length > 0 ? `
+      <div class="comments">
+        <div class="comments-label">コメント（${entry.comments.length}件）</div>
+        ${entry.comments.map(c => `
+          <div class="comment">
+            <div class="comment-meta"><span class="author">${esc(c.author)}</span>${c.date ? ' ・ ' + esc(c.date) : ''}</div>
+            <div>${esc(c.text)}</div>
+          </div>
+        `).join('')}
+      </div>` : ''}
+    </article>
+  `).join('');
+
+  main.querySelectorAll('.tag-pill').forEach(btn => {
+    btn.addEventListener('click', () => {
+      activeTags = new Set([btn.dataset.tag]);
+      renderTagFilter();
+      renderEntries();
+      window.scrollTo({top:0, behavior:'smooth'});
+    });
+  });
+}
+
+document.getElementById('search').addEventListener('input', (e) => {
+  keyword = e.target.value;
+  renderEntries();
+});
+
+renderTagFilter();
+renderEntries();
+if (location.hash) {
+  const target = document.getElementById(location.hash.slice(1));
+  if (target) target.scrollIntoView({block: 'start'});
+}
+</script>
+
+</body>
+</html>

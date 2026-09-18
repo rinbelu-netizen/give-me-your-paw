@@ -1,0 +1,803 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hey buddy, give me your paw! 絵日記帳 - 2011年6月</title>
+<style>
+  :root {
+    --bg: #faf6ef;
+    --card-bg: #ffffff;
+    --border: #e8dfd0;
+    --text: #4a4238;
+    --text-muted: #9a9082;
+    --accent: #c98a5e;
+    --accent-bg: #f5e6d8;
+    --accent-text: #8a5a35;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    padding: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: "Hiragino Kaku Gothic ProN", "Yu Gothic", "Meiryo", sans-serif;
+    line-height: 1.8;
+  }
+  header {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 32px 20px 16px;
+    text-align: center;
+  }
+  header h1 {
+    font-size: 22px;
+    font-weight: 500;
+    margin: 0 0 4px;
+    color: var(--text);
+  }
+  header p {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin: 0;
+  }
+  .controls {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 12px 20px 20px;
+    position: sticky;
+    top: 0;
+    background: var(--bg);
+    z-index: 10;
+  }
+  #search {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    font-size: 14px;
+    background: var(--card-bg);
+    color: var(--text);
+    margin-bottom: 10px;
+  }
+  .tag-filter {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .tag-btn {
+    font-size: 11px;
+    padding: 4px 12px;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    background: var(--card-bg);
+    color: var(--text-muted);
+    cursor: pointer;
+  }
+  .tag-btn.active {
+    background: var(--accent);
+    color: #fff;
+    border-color: var(--accent);
+  }
+  .count {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 0 20px 8px;
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+  main {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 0 20px 60px;
+  }
+  .entry {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 20px;
+    margin-bottom: 16px;
+  }
+  .entry-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+  .entry-title {
+    font-size: 16px;
+    font-weight: 500;
+  }
+  .entry-date {
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+  .photo-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+    gap: 6px;
+    margin-bottom: 12px;
+  }
+  .photo-grid a {
+    position: relative;
+    display: block;
+    aspect-ratio: 1;
+    overflow: hidden;
+    border-radius: 8px;
+    background: var(--accent-bg);
+  }
+  .photo-grid img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .photo-grid .num {
+    position: absolute;
+    bottom: 3px;
+    right: 4px;
+    font-size: 10px;
+    background: rgba(0,0,0,0.55);
+    color: #fff;
+    padding: 1px 5px;
+    border-radius: 8px;
+  }
+  .no-photo {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-bottom: 12px;
+  }
+  .truncated-note {
+    font-size: 12px;
+    color: var(--accent-text);
+    background: var(--accent-bg);
+    border-radius: 8px;
+    padding: 6px 10px;
+    margin: 0 0 12px;
+    display: inline-block;
+  }
+  .entry-text {
+    font-size: 14px;
+    line-height: 1.85;
+    margin: 0 0 12px;
+    white-space: pre-line;
+  }
+  .entry-text b {
+    color: var(--accent-text);
+    font-weight: 500;
+  }
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .tag-pill {
+    font-size: 11px;
+    padding: 2px 10px;
+    border-radius: 12px;
+    background: var(--accent-bg);
+    color: var(--accent-text);
+    cursor: pointer;
+    border: none;
+  }
+  .comments {
+    margin-top: 16px;
+    padding-top: 14px;
+    border-top: 1px dashed var(--border);
+  }
+  .comments-label {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+  }
+  .comment {
+    font-size: 13px;
+    line-height: 1.7;
+    margin-bottom: 12px;
+    padding-left: 10px;
+    border-left: 2px solid var(--accent-bg);
+  }
+  .comment-meta {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-bottom: 2px;
+  }
+  .comment-meta .author {
+    color: var(--accent-text);
+    font-weight: 500;
+  }
+  .no-results {
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 14px;
+    padding: 40px 0;
+    display: none;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Hey buddy, give me your paw! 絵日記帳</h1>
+  <p>ウィペットのぽー＆バドと暮らす日常あれこれ ― 2011年6月</p>
+</header>
+
+<div class="controls">
+  <input type="text" id="search" placeholder="キーワードで探す（例: 震災、ドッグラン、うみちゃん）">
+  <div class="tag-filter" id="tagFilter"></div>
+</div>
+<div class="count" id="count"></div>
+
+<main id="main"></main>
+<p class="no-results" id="noResults">該当する記事が見つかりません。</p>
+
+<script>
+const entries = [
+  {
+    "date": "2011.06.01",
+    "title": "だから面白い。",
+    "tags": [
+      "ぽー",
+      "お友達",
+      "おでかけ",
+      "2011年6月"
+    ],
+    "images": [
+      "https://stat.ameba.jp/user_images/20110601/10/rinbelu/9c/20/j/o0399030111263614859.jpg",
+      "https://stat.ameba.jp/user_images/20110601/10/rinbelu/aa/41/j/o0399026711263625227.jpg",
+      "https://stat.ameba.jp/user_images/20110601/10/rinbelu/0a/8b/j/o0399028611263614860.jpg",
+      "https://stat.ameba.jp/user_images/20110601/10/rinbelu/17/d5/j/o0399026711263614861.jpg",
+      "https://stat.ameba.jp/user_images/20110601/10/rinbelu/a4/bc/j/o0380030011263624786.jpg",
+      "https://stat.ameba.jp/user_images/20110601/10/rinbelu/78/1f/j/o0399026711263654945.jpg",
+      "https://stat.ameba.jp/user_images/20110601/10/rinbelu/84/68/j/o0399026711263614862.jpg"
+    ],
+    "text": "昨日のこと。とあるお店の恒例BBQ大会、ぽーと一緒にちょこっと参加何故ぽーを連れて行くのかと言いますと、そこにはうみちゃんがいるからなのです[1] そしてこの方、ワイマラナーむぎちゃんも一緒[2] 遊び大好きわっさわさコンビのうみちゃん＆ぽー。ぽーが走ると大変なことになるので、お店に行く前にむぅちゃんとグランドでひとっ走りしてきたのだけれども・・・ところかまわずわっさわさ[3] あぁ、うみちゃんがどんどん車の下へ入ってしまぅ・・・[4] そしてこの日は新たな発見が幾つかありマシタ。犬種気質に「繊細・警戒心が強い」などがあるワイマラナー。人見知り＆犬見知りなむぅちゃんはママから片時も離れない例え離れてもその距離はわずか２、３mほど。そんなむぅちゃんが少しずつぽーと遊ぶようにもなり、初めての場所にも関わらずなんとこんなトコまで探検に[5] いつでもどこでもママにぴったり寄添うむぅちゃんが、ここまで離れているのはスバラシイ変化なのですょ～でもねむぅちゃんの「ママ命」はちょびっと羨ましい。だってマイペースぽーさんてば、その場に飽きてきたら１人でテクテク散歩にでかけるのだもの。だからこんな長～いリードで繋がれてマス[6] ぽーがあるスタッフと目が合う度にバウスタイルでわんわんっなぜだどうしたのかと思いきや、実は犬が苦手だったそうな。子犬時代はぴぃぴぃ鳴くぽーを心配してくれたりで、そんなことぜんぜん気がつきませんデシタそんな彼がぽーを触ろうと手を出したりひっこめたりなるほど行動が不審なので吠えているわけだ『威嚇してるわけじゃないから、思い切って触ってみよう！』しばらく彼の孤独な闘いが続き、遂にすっと伸ばした手がぽーの体へ。（その瞬間を誰にも見てもらえなかったけど）ぽーは素直に触らせそれ以降は吠える事もしなくなりましたぽーにとって、飼い主にとって良い経験に（実験に）なりました。何よりもその勇気にココロから感謝なのですさてさて、ヒトも犬も落ち着いてきたところで記念撮影に挑戦だ[7] おぉ、なかなか揃うようになってきたではないか～犬を飼う、犬と暮らす。ほんま面白いのですょ～～",
+    "truncated": false,
+    "comments": []
+  },
+  {
+    "date": "2011.06.02",
+    "title": "水。",
+    "tags": [
+      "ぽー",
+      "動画",
+      "健康",
+      "2011年6月"
+    ],
+    "images": [
+      "https://stat.ameba.jp/user_images/20110602/14/rinbelu/f0/d7/j/o0400025811265809643.jpg",
+      "https://stat.ameba.jp/user_images/20110602/14/rinbelu/94/0f/g/o0399026711265814795.gif",
+      "https://stat.ameba.jp/user_images/20110602/14/rinbelu/26/3a/j/o0400030011265814794.jpg"
+    ],
+    "text": "今日のこと。曇り空。陽射しも少ないので砂浜へぽーさん、大喜びで駆け回ってマス[1] GIFアニメ作成に挑戦してみました～～疾走してくるぽーをファインダーを覗いたまま、正面から捉える臨場感をどぞ～[2] 動画でええのんちゃうん？、というツッコミはなしで走ったら水分補給しましょうネ[3] ぽーはペットボトルやホースなどからの直飲み派ボウルなどから飲むこともしますがこの方が飲み易いらしい。というよりも、ボウルから飲む場合は廻りに水を飛び散らかしちゃいます水の飲み方が下手ねぇ～なんて思っていたのですが、こぼしてしまう理由が解ったようなのですょ～ハーバード大学のとあるグループが、犬の水飲み光景をハイスピードカメラやX線カメラで撮影。解析結果によると犬は以下のように水を飲んでいるようなのです。（めっちゃ簡単にまとめてしまいマシタ）1.舌の裏側で水をすくいあげ水柱をつくる。2.その水柱を咬むように口の中に入れる。3.そして吸い込むようして飲みこむ。百聞は一見にしかず、こちらの映像を見てくださいまし。→真相が明らかに！犬はどうやって水を飲む？元の文献はコチラ↓A.W.Crompton , Catherine MusinskyHow dogs lap:ingestion and intraoral transport in Canis familiarisbiology letters June 23, 2011; 7 (3)水を上方向から流してもうらうことになる、ペットボトルやホース直飲みを好むワケもこれで納得",
+    "truncated": false,
+    "comments": []
+  },
+  {
+    "date": "2011.06.03",
+    "title": "親子。",
+    "tags": [
+      "ぽー",
+      "家族",
+      "動画",
+      "2011年6月"
+    ],
+    "images": [
+      "https://stat.ameba.jp/user_images/20110519/13/rinbelu/d0/ff/j/o0400030011237380514.jpg",
+      "https://stat.ameba.jp/user_images/20110519/14/rinbelu/b2/e9/j/o0399026211237440428.jpg",
+      "https://stat.ameba.jp/user_images/20110603/11/rinbelu/08/83/g/o0399026711267487108.gif",
+      "https://stat.ameba.jp/user_images/20110603/11/rinbelu/3f/aa/g/o0399026711267487109.gif"
+    ],
+    "text": "木陰にいるぽーをパチリぽーさん！？光でマズルが白く写り、ティークそっくりではないか～[1] ティークとは、ぽーのお母さん2010年9月里帰り旅での１枚を。マズルも頭の形も似てるのだね～[2] ぽーとティークの間にいる子は妹のたんぽぽです。次はいつ帰れるかなぁところで、初挑戦したGIFアニメですが、オモシロイ昨日は９枚の画像で作りました。もっと枚数を増やすとどんな感じになるのか・・・ということで１５枚前後で作成。[3] 写真は５月２６日に海浜公園で遊んだときのもの。→とにかく楽しいのだ。動画とは違う動きで面白い～～けれどもずっと眺めていると目がチカチカして酔ぅ・・・ループを止めたり、画像を揃えるなど、色々と手を加えればもっと見易くできそうです。[4] オモシローイ！タノシーイ！！けど、やっぱり酔うな・・・これは",
+    "truncated": false,
+    "comments": []
+  },
+  {
+    "date": "2011.06.05",
+    "title": "Hello!Hello!",
+    "tags": [
+      "ぽー",
+      "お友達",
+      "おでかけ",
+      "2011年6月"
+    ],
+    "images": [
+      "https://stat.ameba.jp/user_images/20110605/17/rinbelu/85/bc/j/o0299044111272328347.jpg",
+      "https://stat.ameba.jp/user_images/20110605/17/rinbelu/1a/89/j/o0400030011272277914.jpg",
+      "https://stat.ameba.jp/user_images/20110605/18/rinbelu/8c/7a/j/o0399030311272392144.jpg",
+      "https://stat.ameba.jp/user_images/20110605/17/rinbelu/e7/0b/j/o0300041111272298384.jpg",
+      "https://stat.ameba.jp/user_images/20110605/17/rinbelu/3d/b5/j/o0399029811272277918.jpg"
+    ],
+    "text": "今日のこと。高速に乗りぷぃーんと帰省中デス淡路SAのドッグランに寄ったところ、なんとなんと出会っちゃいました。それはこの方、ワラビくん。そう、ぽーと同じウィペットなのですょ～[1] 今までワラビくんより大きいウィに出会ったことがなかったそうな。そんな彼の体重は15kg。[2] 筋肉ムキムキぽーに慣れている私たちにとっては、ワラビくんめっちゃ小柄でエレガントなのですけれど～[3] ちなみにワラビくんの後ろにいる方は他わんこの飼い主さんデス。（見事な構図になちゃった）それにしても、偶然ウィに出会えるなんて嬉しすぎデス。またどこかでお会いしましょうねぇ～そして実家に到着ふらっと散歩にでかけたところ、なんとなんと出会っちゃいました～。[4] １歳になるバーニーズのビアンちゃん～大きい犬が苦手だそうで、ぽーは見事『大きい犬』認定合格もちろんぽーよりビアンちゃんの方が大きいのです。けれども、ぽーが近寄ると困り顔で「いや～」と逃げちゃう。ビアンちゃんには申し訳ないけれどひじょーにカワイイさてさて今日から数日は実家の猫たちと楽しい同居生活です。色んな子に出会える散歩も楽しみな飼い主なのデシタ～[5]",
+    "truncated": false,
+    "comments": []
+  },
+  {
+    "date": "2011.06.06",
+    "title": "楽しむイヌとヒト。",
+    "tags": [
+      "ぽー",
+      "おでかけ",
+      "日常",
+      "2011年6月"
+    ],
+    "images": [
+      "https://stat.ameba.jp/user_images/20110606/16/rinbelu/24/38/j/o0400030011274339026.jpg",
+      "https://stat.ameba.jp/user_images/20110606/16/rinbelu/67/f0/j/o0400030011274339025.jpg",
+      "https://stat.ameba.jp/user_images/20110606/16/rinbelu/ec/bd/j/o0400030011274358544.jpg",
+      "https://stat.ameba.jp/user_images/20110606/16/rinbelu/0e/bb/j/o0400030011274358545.jpg",
+      "https://stat.ameba.jp/user_images/20110606/16/rinbelu/c1/76/j/o0400030011274358546.jpg",
+      "https://stat.ameba.jp/user_images/20110606/16/rinbelu/31/6e/j/o0400030011274339027.jpg",
+      "https://stat.ameba.jp/user_images/20110606/16/rinbelu/e7/70/j/o0400030011274358552.jpg"
+    ],
+    "text": "今日のこと。ぽーさん今日はどこへ歩きに行こうか。そうだ、あの公園へ行ってみようどこかって、それはココ。[1] 小さな森のようになっている公園。鬱蒼としているためあまり人気のない公園正直オバケよりヒトの方がコワい公園ということは、ぽーも自由に遊べちゃうかも[2] ぽーがのびのび楽しそうにしているので、私も滑り台で童心にかえってみマシタ[3] 何やら真剣な表情で登ってきましたょ～[4] つと立ち止まり下を眺めて・・・[5] 高さに怖くなったのか、踵を返し降りていきマシタ不安げな顔で見上げてくるので、私の楽しい滑り台遊びも終了デス。犬相手にケラケラ笑いながら滑り台で遊ぶ女性。これも十分、コワいヒトかもですねぇ～[6] 暑かったけど楽しかったねぇ～帰宅後の１枚は、なぜだか態度の大きいぽーさんで[7]",
+    "truncated": false,
+    "comments": []
+  },
+  {
+    "date": "2011.06.07",
+    "title": "ぽーとネコたち。",
+    "tags": [
+      "ぽー",
+      "家族",
+      "おもしろ",
+      "2011年6月"
+    ],
+    "images": [
+      "https://stat.ameba.jp/user_images/20110607/20/rinbelu/3f/71/j/o0400030011276680701.jpg",
+      "https://stat.ameba.jp/user_images/20110607/20/rinbelu/9e/37/j/o0399053311276680702.jpg",
+      "https://stat.ameba.jp/user_images/20110607/20/rinbelu/95/48/j/o0399030011276680703.jpg",
+      "https://stat.ameba.jp/user_images/20110607/20/rinbelu/cb/d7/j/o0399030011276680706.jpg"
+    ],
+    "text": "ぽーと実家のネコたちとの親密度彼らとの初対面は、ぽーが生後４ヶ月。そしてネコたちは生後９ヶ月でした。ぽーがいると警戒して食欲減退、トイレもできなかったネコたち・・・けれども、会う度にキョリが縮まってきました。[1] 今ではこんなキョリでごはん食べちゃってマス[2] ただし、ぽーが動くと逃げちゃうそんな緊張しっぱなしのネコたちにもリラックスを。[3] 爪とぎの下に仕込んでみると、もうね、ぽーの存在を忘れごろにゃご状態[4] 試しに指につけてみたら、かじかじされちゃいました～そうだっ！！！こんなにマタタビ効果が現れるならば、ぽーのカラダにすりつけてみたりなんかしたら・・「そもそも、ぽーのすぐ傍までネコたち来ないや～ん」by 母。・・・・あぁ、そうでしたネでもね、きっとあともうちょいなのだ！！",
+    "truncated": false,
+    "comments": []
+  },
+  {
+    "date": "2011.06.08",
+    "title": "「楽しい」のために。",
+    "tags": [
+      "ぽー",
+      "お友達",
+      "ケガ",
+      "2011年6月"
+    ],
+    "images": [
+      "https://stat.ameba.jp/user_images/20110608/18/rinbelu/90/7d/j/o0399026211278375111.jpg",
+      "https://stat.ameba.jp/user_images/20110608/17/rinbelu/e8/b7/j/o0399026711278183455.jpg",
+      "https://stat.ameba.jp/user_images/20110608/17/rinbelu/2a/bd/j/o0399026011278184106.jpg",
+      "https://stat.ameba.jp/user_images/20110608/17/rinbelu/57/51/j/o0399025211278184107.jpg",
+      "https://stat.ameba.jp/user_images/20110608/17/rinbelu/87/91/j/o0399026111278183458.jpg",
+      "https://stat.ameba.jp/user_images/20110608/17/rinbelu/7f/97/j/o0399026711278183453.jpg",
+      "https://stat.ameba.jp/user_images/20110608/17/rinbelu/84/86/j/o0399025511278184105.jpg",
+      "https://stat.ameba.jp/user_images/20110608/17/rinbelu/98/1f/j/o0400024411278184108.jpg"
+    ],
+    "text": "今日のこと。いつもとは勝手のチガウ実家散歩days。先日のような森の公園に行ったり、ロング散歩をしてみたりけれども、どうも体力を持て余し気味のぽーさん。普段はどこまでも続く砂浜を走ったり、廻りを気にせずわんこ友達と遊んだり。そんなことを毎日のようにしているものなぁどこかないかしらと探したら「銀木犀」を発見実家からは高速を使いつつ４０分ほどです。ひと月に一週間のみOPENのドッグカフェ＆ドッグラン（しかも今月は明日まで開いてるやん～♪）お店のわんこはサルーキー３頭だしボルゾイもいたそうです。しかも５月には「サイトハウンド祭」なんてやっていたのだというわけで、行ってきました[1] 広い。とにかく広い。約1,000坪らしいですが、休憩用ベンチはランの隅っこ。さすがサイトハウンドオーナーさんが作ったランです[2] ２時間かけてここへ来ていたラブちゃんたち。[3] ぽーはこの数日間を取り戻すかのように大はしゃぎ[4] 広～～～いラン内をめい一杯使って走るぽー[5] 遊び始めはハーネスを着せたまま。広いランをひたすら走って遊ぶぽーとわんこたち。レスリング遊びをするふうでもないので油断してしまいました[6] 水たまりの泥でハーネスが汚れるとカフェに入れないワ～なんて考えで脱がせて遊ばせていたところ、ぽーの左側面にわんこが正面から追突歯があたりケガとなりました治療は局所麻酔で中（筋肉）を２針、そして表皮を５針。ケガ直後はキャンと鳴き痛そうでしたが、「帰りたくないーまだみんなと遊ぶ！」という状態でぽーは元気ですょ～皮膚の薄いウィペット。ケガをしやすいことも見聞きして知っていました。いつかは直面するかもと覚悟していた縫うケガ。幸いにもケガをした場所は、サイトハウンド多頭飼いオーナーさんのラン。同じような怪我をよくするということでとてつもなく心強かったです追突しちゃったわんこの飼主さんからは連絡先を頂きました。でも、犬同士だもの。楽しく遊んでいたのだもの。ましてや故意ではないのだもの。ハーネスを着せていたままであればケガせずに済んだかもです。ぽーは痛い思いもせず、皆で楽しく遊び続けられていたのにね遊ぶこと大好きで、こんなに笑顔爆裂になるぽーなのだ。[7] たくさん遊んでたらケガだってするのだ。そしてそんなケガをしないように気をつけるのが飼主のつとめ。８月で２歳になるぽーさん。反省＆勉強になりました。抜糸は約２週間後、とにかく治さないとね。いまのぽーさん、ちょっと任侠ぽぃ（疲れて眠いのでこんな表情です。心配なさらずに～）[8] あぁ、しかし遊びの予定たくさんあったのになぁ・・・みなさまこれから連絡いれますぅ～～",
+    "truncated": false,
+    "comments": []
+  },
+  {
+    "date": "2011.06.09",
+    "title": "ぽー。",
+    "tags": [
+      "ぽー",
+      "散歩",
+      "健康",
+      "2011年6月"
+    ],
+    "images": [
+      "https://stat.ameba.jp/user_images/20110609/14/rinbelu/26/94/j/o0400030011279909755.jpg",
+      "https://stat.ameba.jp/user_images/20110609/14/rinbelu/7d/7f/j/o0400030011279909751.jpg",
+      "https://stat.ameba.jp/user_images/20110609/14/rinbelu/b0/ec/j/o0400030011279909752.jpg"
+    ],
+    "text": "今日のこと。痛みで昨晩はしおっとしていたものの、食欲もがっつり元気なぽーです今朝の散歩はいつもと違う場所へ。普段のさんぽコースとよく似た場所を発見。[1] １００mほどだけ続く道だけれどのんびりするねぇ[2] 蒸し暑くて口が開いちゃうせいもあるけれど楽しげなのだ[3] わんこと会うと遊びたくてテンション上がるので、しばらくはヒミツの場所で散歩ですょ～",
+    "truncated": false,
+    "comments": []
+  },
+  {
+    "date": "2011.06.10",
+    "title": "今日のぽーさん。",
+    "tags": [
+      "ぽー",
+      "家族",
+      "健康",
+      "2011年6月"
+    ],
+    "images": [
+      "https://stat.ameba.jp/user_images/20110610/17/rinbelu/38/96/j/o0399030011282086862.jpg",
+      "https://stat.ameba.jp/user_images/20110610/17/rinbelu/96/36/j/o0399030011282086861.jpg",
+      "https://stat.ameba.jp/user_images/20110610/17/rinbelu/0d/68/j/o0399029411282086860.jpg",
+      "https://stat.ameba.jp/user_images/20110610/17/rinbelu/d3/28/j/o0400029311282086868.jpg"
+    ],
+    "text": "今朝のこと。出張を終えた相方と合流です疲れるのかいつもより散歩短めのぽー。ですが相方と会えて嬉しいらしくちょこっと走りましたょ～[1] ぽーの目線の先には相方が[2] そして日々進展するぽーとネコたちとの関係ぽーがすぐ傍にいてもリラックスするようになってきました。けれども、ぽーの居る場所は常に確認。こんな感じで、checkです[3] ネコ３兄弟のボス的存在の『パセリ』。彼はこの距離でも平気なのですょ～（初期の頃はシャーッと言ってマシタ）[4] でもね、ぽーさん。ネコはおしりくんくんの挨拶はしないと思うょケガをした左側を下にして横になったり、散歩中に軽く走ったり。まだ2日目ですが少しずつ痛みもひいてるかもです。みなさまご心配おかけしてごめんなさい。そして飼主のココロの心配までしていただいてありがとうございます幸いに私もぽーもめげない性格また次の「楽しい」のために先ずはケガを治すこと優先で。そして今回のことを教訓にぽーとの暮らしを楽しみつつ精進します完治したらハイパーぽー＆飼主の相手をどぞよろしく～",
+    "truncated": false,
+    "comments": []
+  },
+  {
+    "date": "2011.06.13",
+    "title": "ただいま。",
+    "tags": [
+      "ぽー",
+      "健康",
+      "ケガ",
+      "2011年6月"
+    ],
+    "images": [
+      "https://stat.ameba.jp/user_images/20110613/14/rinbelu/28/47/j/o0399029711288094000.jpg",
+      "https://stat.ameba.jp/user_images/20110613/14/rinbelu/39/f4/j/o0400031811288094009.jpg",
+      "https://stat.ameba.jp/user_images/20110613/15/rinbelu/e2/f3/j/o0400026611288206393.jpg",
+      "https://stat.ameba.jp/user_images/20110613/15/rinbelu/82/a8/j/o0300040011288222551.jpg"
+    ],
+    "text": "今日のこと。実家より戻ってまいりました[1] しばらくは「治療経過」ブログになりそうですが、のんびりお付き合いくださいませ～病院選び、行くタイミング、治療方針などなど。飼主としてこれらの判断・決断をすることはホント難しい そして病院に任せきらず、自分で調べておくことは常に必要だと改めて感じているところです。今日の写真とともに、経過を記述してみマシタ。6月８日水曜日 ケガをした当日。『同じような傷の場合には、いつも皮膚を引っ張り縫ってもらう』と、サイトハウンド飼いでもあるランのオーナーさんのお話。そのアドバイスを元に治療開始。抗生物質の錠剤を処方され、抜糸は１０日～２週間後。抜糸までとくに通院は必要なしとのことでした。[2] 6月11日土曜日 前日からうっすらと一部で血が滲み、５mmほど傷が開いたため同病院にて受診。炎症止め入りの塗り薬を処方される。6月１３日月曜日 出血も炎症もおさまったのですが傷口がさらに開いたこと、抜糸に備え傷を診てもらっておくため。さらに気になることを訊ねるため、いつも通っている病院で受診。なんと今まで使用していた塗薬はステロイド軟膏でした（説明書に記載されてたじゃないか）炎症には効果はあるが傷を治す効果はない。ということで、組織再生効果のある塗薬に変更。ついでに抗生物質の錠剤も止め、以前に処方されたことのある抗生剤に変更してもらいました。なぜなら、ごくごく僅かですがおなかが緩くなっていたから。１歳以降、何があっても何を食べてもおなかを壊さないぽー。そんなぽーが抗生剤と軟膏を処方されてからゆる～いのです。形もあるし気にする程度でないかもだけどこの際、変更っ[3] 傷口を下側にして寝たり、布団でごろごろずりずりしたり。散歩に出ればギャロップ程度には走っちゃう。おとなしくしない&できないで、傷口開いたのかと考えていたけれど。軟膏のせいもあったかもしれません怪我をした当初に通っていた病院。先生は無類の動物好き、犬好きなのです。炎症はたしかに治まったのです。傷の状態が今とは異なるので、11日の処置はその時点では正しかったのかもしれない。しかし、もう縫い直せないこともあり訊ねなかったけれど、縫い方はどうだったのかしらなんて考えちゃう。今の病院だってまだ１００％信頼できるわけではないけれど・・・けれども、なのだ怪我を回避できるよう努力してやれるのも飼主。病院を選ぶのも、治療法を選ぶのも飼主なのだ。傷痕が残るのは仕方ないとしても、とにかく早く治して遊ばせてやりたい治ったら河川敷や砂浜で思いっきり遊ぼうねぇ[4] いや、今はおとなしくしてておくれ",
+    "truncated": false,
+    "comments": []
+  },
+  {
+    "date": "2011.06.14",
+    "title": "ウィペット症候群。",
+    "tags": [
+      "ぽー",
+      "おもしろ",
+      "日常",
+      "2011年6月"
+    ],
+    "images": [
+      "https://stat.ameba.jp/user_images/20110614/17/rinbelu/ff/50/j/o0400030011290392240.jpg",
+      "https://stat.ameba.jp/user_images/20110614/17/rinbelu/d7/4a/j/o0400030011290392239.jpg",
+      "https://stat.ameba.jp/user_images/20110614/17/rinbelu/64/1b/j/o0300040011290405032.jpg",
+      "https://stat.ameba.jp/user_images/20110614/17/rinbelu/f6/9b/j/o0399030011290407021.jpg",
+      "https://stat.ameba.jp/user_images/20110614/17/rinbelu/78/86/j/o0400030011290405033.jpg"
+    ],
+    "text": "塗薬を変更し１日経過した今日。傷口も乾き経過良好です～～ケガの話ばかりもナンですので、本日はチガウ話題を。ぽーは『whippet（ウィペット）』という犬種です初めてウィペットを見るヒトからは、鹿やカンガルーと間違われたりするぽー。そういえば「犬ですか？」と聞かれたこともあったなぁところが『犬＝ウィペット＝ぽー』に慣れると、妙な現象が起きるようなのです・・・よく利用している地元の産直市場での出来事相方が市場の片隅に小屋と動物を発見しマシタ。「ぽーみたいな細い犬がいるょ～」おぉ、ほんまやぁ！しかも二頭もいるやん と、返答するワタシ。[1] 車を降り２人でわくわくしながら『細い犬』のそばへ～[2] 「・・・あれ？なんでしたっけ、この動物？？」[3] ですねぇ。ヤギさんだね どうやら私たちの脳は『細い動物＝犬』と、認識するようになったらしい[4] 子ヤギなんて細い犬にしか見えないじゃないか～もうね、『犬＝細い犬』にまでなっているかもですょ。これぞ「ウィペット症候群」（実はブリーダーさんのブログタイトルなのです）ヤギで埋め尽くされた本日のぽーブログ。〆は私の後ろでつまらなさそ～にしているぽーの姿をどぞ[5] ぽーさん、散歩に行こうか～～",
+    "truncated": false,
+    "comments": []
+  },
+  {
+    "date": "2011.06.15",
+    "title": "経過良好笑顔満載。",
+    "tags": [
+      "ぽー",
+      "健康",
+      "ケガ",
+      "2011年6月"
+    ],
+    "images": [
+      "https://stat.ameba.jp/user_images/20110615/13/rinbelu/46/21/j/o0399030011291979522.jpg",
+      "https://stat.ameba.jp/user_images/20110615/13/rinbelu/fb/c6/j/o0400029911291979526.jpg",
+      "https://stat.ameba.jp/user_images/20110615/13/rinbelu/25/73/j/o0399028511291987834.jpg",
+      "https://stat.ameba.jp/user_images/20110615/13/rinbelu/e7/3a/j/o0399030011291987833.jpg",
+      "https://stat.ameba.jp/user_images/20110615/13/rinbelu/b8/63/j/o0399029211291979523.jpg",
+      "https://stat.ameba.jp/user_images/20110615/13/rinbelu/8d/e2/j/o0400030011291979524.jpg"
+    ],
+    "text": "塗薬＆抗生剤を変更して通院３日目。傷の具合も良いし、おなかも復活してきました～「走ること」「遊ぶこと」大好きぽー。けれどもさすが動物の本能か、自分の状態を解っているのか、ケガをしてからの数日は散歩も短めで帰ると言い出す状況デシタ。わんこに出会うと「遊ぼうょ～～」となるけれど全力疾走するとさらに傷口が開くので河川敷も砂浜も禁止。そろそろ体力を持て余し気味になってきたようです。なので今朝は少し長めの散歩をしてきました。[1] 傷口は１／３が開き、筋肉を縫った糸も見えている状況。皮膚がすでに乾き硬くなっているため縫い直しは不可能皮膚組織が再生し筋肉を覆い塞がるまでは走るの禁止なのだ。縫い目が解けたせいで治りも遅いのです「やはり軟膏のせいで傷口開いた可能性あるのでしょうか？」「多いにありえるなぁ。」「・・・正直、縫い方についてはどう思います？（聞いてしまった！）」「うーん、それは言えないなぁ。」あぁ、先生、ありがとうです。あの日に縫ってもらったこと自体は、あの時点では最善だったとかろうじて思えました[2] 今の病院は去年の秋にもケガでお世話になりマシタ。（そのうちブログに書く予定です）先日の日記にも書きましたがまだ100%信頼はできていません。が、納得のいく返答を頂いているおかげで、この病院に通っていてよかったと今のところ思えています。ケガや病気でお世話になるからこそ判っていくことかもなのですよねぇ。なるべくならお世話になりたくないけれど ところで、散歩中ずっと笑顔のぽーさん暑くて口が開いてるのもあるけど、なんだか嬉しそうやん～試しに歩いて来るぽーを連続撮影。[3] ふむふむ。[4] やっぱり笑顔じゃないかぁ～ぽーさん～～[5] ぽー～～～～[6] か、かわいすぎる・・・よしっ、１日でも早く治して走りに行こうっ",
+    "truncated": false,
+    "comments": []
+  },
+  {
+    "date": "2011.06.16",
+    "title": "Whippet in car.",
+    "tags": [
+      "ぽー",
+      "日常",
+      "グッズ",
+      "2011年6月"
+    ],
+    "images": [
+      "https://stat.ameba.jp/user_images/20110616/15/rinbelu/a9/32/j/o0400030011293962806.jpg",
+      "https://stat.ameba.jp/user_images/20110616/15/rinbelu/af/b9/j/o0400030011293969971.jpg",
+      "https://stat.ameba.jp/user_images/20110616/15/rinbelu/d8/74/j/o0400030011293961722.jpg",
+      "https://stat.ameba.jp/user_images/20110616/15/rinbelu/f2/23/j/o0400029811293961725.jpg",
+      "https://stat.ameba.jp/user_images/20110616/15/rinbelu/e8/ef/j/o0400030011293961723.jpg"
+    ],
+    "text": "今日のこと。先程までパソコンがぷちストライキ今日の更新を諦めかけていたところでした～。mac bookを使用しているのですが「クリック」が反応せずで色々検索した結果、原始的な方法で修復。「タッチパッド周囲を手でぺこぽこ押してみる」経年劣化などによる『歪み』が原因で、接触不良のような現象が起きてたらしいですょそれはさておき、今日もぽーは変わりなく・・というよりも雨降りのため、庭に出るのを嫌がりず～っと寝てマス[1] 突然ですが、相方の愛車はホンダのビート。すでに廃盤になった車ですが、軽自動車なので維持費も安く燃費も良い そして左側面にはこんなステッカー貼ってます[2] 「Whippet in car」しかし、この車の座席は運転席＆助手席のみ。エンジンは座席の裏側にあるため、トランクにはほとんど荷物が乗らない不憫な子そんな車に「Whippet in car」。やはり乗せておかないとね[3] これを試みたのは怪我をする前。そして空き地に車を停めて乗せています。だってね、乗るのイヤじゃないらしいけれどオープンにしていたら、[4] 飛び降りちゃうからなのです乗せたまま移動するときは窓を閉め私の膝の上。大人しくしてるけれど、重い＆キケンなため住宅周辺しかムリ信号待ちでふと隣の車を見ると、助手席で犬が笑っている。偶然、出会ってみたいなぁ～～～～[5]",
+    "truncated": false,
+    "comments": []
+  },
+  {
+    "date": "2011.06.17",
+    "title": "ぽーの抵抗。",
+    "tags": [
+      "ぽー",
+      "健康",
+      "おもしろ",
+      "2011年6月"
+    ],
+    "images": [
+      "https://stat.ameba.jp/user_images/20110617/13/rinbelu/e5/11/j/o0400030011295707257.jpg",
+      "https://stat.ameba.jp/user_images/20110617/13/rinbelu/35/e0/j/o0400030011295707258.jpg",
+      "https://stat.ameba.jp/user_images/20110617/13/rinbelu/3a/a3/j/o0400025411295707259.jpg"
+    ],
+    "text": "今日のこと。今朝は雨もあがりたっぷりと散歩ができました走れず体力持て余し気味のぽーですが、朝晩しっかり歩くと満足するらしい。というか、それは普通の散歩スタイルではないかのびのび走れる場所と、たくさんの遊び犬友達。なんと恵まれた環境にいることか[1] 怪我の経過は良好で、次回は日曜日デス「わんこがたくさんいて楽しいところ」だったはずの病院も今ではすっかり『イヤな場所』[2] 病院の玄関前での犬達の様子、皆それぞれありますよね～必死の形相で足を突っ張り抵抗を試みる子。うなだれとぼとぼ飼主の後をついて行く子などなど。潤んだ目で飼主を見つめながら、か細い声でぴぃ～～～と泣くのはぽー。「どうして？どうしてそんなヒドいことするの・・・？」と、言っているかのように。そんな訴えは聞き入れられるはずもなく、ひょいっと抱けあげられ病院内へ連行されちゃいます その控えめな抵抗以外は暴れることもなくおとなしいぽーさん。緊張はかわらないから呼吸は多少荒くなってしまうけれど火曜日から口輪もつけないようにしてもらいました。病院が平気だった頃は問題なかったけれど、今では口輪を外そうともがき逃げようとする。今までも先生たちを咬もうとしたり、ましてや威嚇することもないので外してもらったのです。すると多少の身動きはするものの、処置中もおとなしくガマンのぽー その効果か緊張具合もすこーし緩和されたかなぁ。ぽーさんあともう少しがんばれば、思いっきり走れるぞ～[3]",
+    "truncated": false,
+    "comments": []
+  },
+  {
+    "date": "2011.06.20",
+    "title": "抜糸もとい除糸。",
+    "tags": [
+      "ぽー",
+      "健康",
+      "ケガ",
+      "2011年6月"
+    ],
+    "images": [
+      "https://stat.ameba.jp/user_images/20110620/11/rinbelu/bb/22/j/o0299040011301851242.jpg",
+      "https://stat.ameba.jp/user_images/20110620/11/rinbelu/62/54/j/o0299042811301851241.jpg",
+      "https://stat.ameba.jp/user_images/20110620/11/rinbelu/fd/35/j/o0399030011301875120.jpg",
+      "https://stat.ameba.jp/user_images/20110620/11/rinbelu/34/8e/j/o0400030011301875121.jpg",
+      "https://stat.ameba.jp/user_images/20110620/11/rinbelu/25/01/j/o0400029911301883082.jpg"
+    ],
+    "text": "日曜のこと。ワタクシ野暮用にて留守のため相方とぽーの２人で病院へ。[1] いつもは玄関前で躊躇し私に強制連行されるぽーですが、相方と一緒で安心したのかすたすた病院内へ入ったようです しかし、自分の居場所に気がついた途端、すたこら逃げようとしたそうですが[2] この日ようやく抜糸・・・ではなく除糸になりました。様々な要因により傷口が開き、役目を果たしていなかった糸。このまま残しておいても皮膚再生のジャマになるため除去。同時に壊死した皮膚も丁寧に取り除いて頂き、傷口は見た目もかなりキレイになりました～とはいえまだ塞がっていないので写真は控えます縫った状態のままであれば治りも早かったのですが、皮膚の再生を待つ必要があるため完治まではまだしばらくガマン。それでも毎日、楽しくすごしておりますょ～ご近所のわんこ友達、陽太くん＆暖太くんと散歩をしたり。（この２人と一緒ならぽーも控えめ＆おとなしめなのだ）[3] 草むらに潜む何かに注目したり。（たぶんカナヘビ）[4] そして程よく満足したら、立ち止まり飼主を見つめ散歩終了のお知らせ[5] 雨の日はひたすら眠って体力温存。この際、梅雨明けとともにどかーんと復活しようかと、勝手に完治時期を決めてみる飼主なのでした～",
+    "truncated": false,
+    "comments": []
+  },
+  {
+    "date": "2011.06.21",
+    "title": "雨対策。",
+    "tags": [
+      "ぽー",
+      "グッズ",
+      "おもしろ",
+      "2011年6月"
+    ],
+    "images": [
+      "https://stat.ameba.jp/user_images/20110621/13/rinbelu/05/a0/j/o0400030011303888817.jpg",
+      "https://stat.ameba.jp/user_images/20110621/13/rinbelu/f9/2e/j/o0399027911303888818.jpg",
+      "https://stat.ameba.jp/user_images/20110621/13/rinbelu/41/3d/j/o0399026011303888819.jpg",
+      "https://stat.ameba.jp/user_images/20110621/13/rinbelu/58/77/j/o0399032111303888834.jpg",
+      "https://stat.ameba.jp/user_images/20110621/13/rinbelu/60/d2/j/o0400030211303912284.jpg",
+      "https://stat.ameba.jp/user_images/20110621/13/rinbelu/f0/c9/j/o0400029411303890150.jpg"
+    ],
+    "text": "今日のこと。つかの間の晴れ間に散歩へ行きましょう[1] それにしても今日はあっついですねぇ昨日は大雨＆雷、そして今日も雨が降ったりやんだり。雨に濡れるのを嫌うぽーさん。外でしかトイレをしなくなったぽーさん。つねに雨雲レーダーと睨めっこの飼主です雨の日はぽーとの会話が一日中「トイレする？我慢するなよぅ～」さすがに困ります、悩みます、心配なのだょ。そこで作りましたっ！！『レインコート』をを雨降りでも庭へ出るのか不明だけれども。これで濡れずに外でトイレできるのだ。さぁ、皆さんにお披露目ですょ～～[2] ・・・あの、ぽーさん？立ってほしいのですケド。寝たままじゃ、まるで黒いゴミ袋じゃないか[3] かぶり物、フードなどが嫌いなのですよねぇ仕方ないので外に連れ出してみマシタ。[4] あぁ、もうめっちゃ嫌そうな顔やし実はフードが嫌いなうえに、寸法合わせのため何度も脱ぎ着させられたぽー。[5] やはりいい加減うんざりしていたらしいぽーちゃん～～、せめてフツウの顔してくれないかなぁ[6] ・・・・・・さ、散歩に行きましょうか。というわけで、１枚目の画像にモドルレインコートの役目に気がついてくれたらよいのだけどなぁ～",
+    "truncated": false,
+    "comments": []
+  },
+  {
+    "date": "2011.06.22",
+    "title": "ぽーやさぐれる。",
+    "tags": [
+      "ぽー",
+      "日常",
+      "健康",
+      "2011年6月"
+    ],
+    "images": [
+      "https://stat.ameba.jp/user_images/20110622/11/rinbelu/75/b1/j/o0400030011305722766.jpg",
+      "https://stat.ameba.jp/user_images/20110622/11/rinbelu/da/43/j/o0400029311305741988.jpg",
+      "https://stat.ameba.jp/user_images/20110622/12/rinbelu/94/37/j/o0300034511305753781.jpg",
+      "https://stat.ameba.jp/user_images/20110622/11/rinbelu/b3/81/j/o0400030011305741987.jpg"
+    ],
+    "text": "怪我をしてからまるっと２週間。見た目にも皮膚の再生進んでいます。そしてそして先生から、「もうちょっとしたら走ってもよい」と亜鉛効果とぽー自身の治癒力で「もうちょっと」を早めるぞさてさて昨日のこと。外を眺めるのが好きなぽーの指定席。ここからは庭にくる鳥たちと訪問者が見えます。[1] 以前にも書きましたが（イヌとヒト）、見知らぬヒトには「わふっ」と一声吠えるのみ。エモノは追うが番犬の仕事は担当でないウィペット。のはずが、昨日はまるでチガウ子になっていました。太く低い声で連続して吠え、クッションから立上がり玄関先にまで行く始末かなり怖かったかもしれないですねぇ。まぁ訪問販売だったから良いのだけど・・２歳を目前にして何か芽生えたのだろうか、と思ったけれど理由は夕方の散歩で（たぶん）判明[2] 突如、クンクンと地面を嗅ぎながら早足で歩き始めるぽー。テンションも高くなり、いつもの３倍速くらいの動きヒート中の子でも見つけちゃったかしらあぁ・・・チガウ。この先に住んでいるのはホクトだ。ホクトとは生後８ヶ月のラブラドールぽーはとてつもなくホクトが大好き。そしてホクトは未去勢の男の子なのだ～[3] いつもとチガウ吠え方したのも、早足でホクトの足跡を追ったのも、走れない＆遊べないストレスだと思われる。しっかり散歩をした後はしばらく満足そうなのですけどねぇ。やはり本当のストレス発散にはなっていないよねぇ次回の診察は金曜日。走るのO.K.になればよいなぁ～～～[4]",
+    "truncated": false,
+    "comments": []
+  },
+  {
+    "date": "2011.06.23",
+    "title": "スペシャルワックス。",
+    "tags": [
+      "ぽー",
+      "日常",
+      "おもしろ",
+      "2011年6月"
+    ],
+    "images": [
+      "https://stat.ameba.jp/user_images/20110623/15/rinbelu/df/ff/j/o0299039411307854890.jpg",
+      "https://stat.ameba.jp/user_images/20110623/15/rinbelu/20/a5/j/o0400022511307854892.jpg",
+      "https://stat.ameba.jp/user_images/20110623/15/rinbelu/97/1c/j/o0400030011307854889.jpg",
+      "https://stat.ameba.jp/user_images/20110623/15/rinbelu/29/43/j/o0400030011307854891.jpg"
+    ],
+    "text": "今日のこと。久しぶりのすっきりとした青空。気持ちのよい天気です～[1] というより、アツイ我が家の床材はカラマツ。こんな日でもほどよく冷たくて気持ちがよいのだなので、ぽーと２人床でごろごろしてマス[2] あら、ぽーさん。その口元はちょっといただけないねぇ[3] ヨダレのワックスはいかがなものかと[4] あ、もしかして、ハグキも冷やしてるの？そんなわけないか",
+    "truncated": false,
+    "comments": []
+  },
+  {
+    "date": "2011.06.24",
+    "title": "☆通院終了☆",
+    "tags": [
+      "ぽー",
+      "健康",
+      "ケガ",
+      "2011年6月"
+    ],
+    "images": [
+      "https://stat.ameba.jp/user_images/20110624/12/rinbelu/38/02/j/o0300040011309533487.jpg",
+      "https://stat.ameba.jp/user_images/20110624/13/rinbelu/9b/2e/j/o0399030211309564310.jpg"
+    ],
+    "text": "今日のこと。本日の診察でケガ通院終了です～～この１週間、驚異のスピードで快復。まだ完全には塞がってないけれど、もうもう間もなくなのだ～～しかも２、３日様子を見て、良さげなら走ってよいらしいっ傷が塞がれば友達わんずとも遊べますょ～運動不足は長めの散歩で消化されているらしい。だけれども、イヌと遊ぶの大好きぽーですから。そのことでストレスが溜まりにたまっているようなのですょ昨日なんて５０m以上先にいる散歩中のわんこを発見。その距離からテンション上がり大声でその子を呼ぶぽー。バウスタイルになったり、跳んだりそわそわしたり・・[1] というか、あのわんこは知らない子だぞ。ほらぁ、飼主さんびっくりして振り返ったじゃないか挙句、私にむかってぴぃぴぃ泣き出す始末翻訳するとたぶんこんな感じ。「どうして？遊びたいのに、どうしてあそこに行かせてくれないのー」今までガマンしたのだ。あともう少しがんばろう。しっかり塞がらないまま遊んで、もしまた開いちゃうと大変だからねと、自分に言い聞かせる飼主なのです[2] 右腕の角度おかしくないデスカ？",
+    "truncated": false,
+    "comments": []
+  },
+  {
+    "date": "2011.06.27",
+    "title": "うひゃひゃ。",
+    "tags": [
+      "ぽー",
+      "健康",
+      "砂浜",
+      "2011年6月"
+    ],
+    "images": [
+      "https://stat.ameba.jp/user_images/20110627/12/rinbelu/78/ef/j/o0399026711315631866.jpg",
+      "https://stat.ameba.jp/user_images/20110627/12/rinbelu/f6/e7/j/o0399026111315631276.jpg",
+      "https://stat.ameba.jp/user_images/20110627/12/rinbelu/0d/dd/j/o0400024911315631867.jpg",
+      "https://stat.ameba.jp/user_images/20110627/12/rinbelu/a0/c9/j/o0399026711315631271.jpg",
+      "https://stat.ameba.jp/user_images/20110627/12/rinbelu/32/a3/j/o0400025611315631274.jpg",
+      "https://stat.ameba.jp/user_images/20110627/12/rinbelu/73/32/j/o0399025611315630681.jpg",
+      "https://stat.ameba.jp/user_images/20110627/12/rinbelu/87/d6/j/o0399026711315630682.jpg",
+      "https://stat.ameba.jp/user_images/20110627/12/rinbelu/82/e5/j/o0399027511315630675.jpg"
+    ],
+    "text": "今朝のこと。天気は曇り、風も心地よく吹いている皮膚の再生具合も完全快復まであと数mm。いいよね？もうええやろ～～～ということで、やってまいりましたっぽーがどこにいるかわかりますか～[1] 左下から斜めに走る黒い点はぽーの足跡なのだ砂浜に到着直後のぽーの様子、どぞ見てやってくださいませそしてさらに、全身に「楽しいっ」が溢れたぽーの姿をどぞ～[2] ぽーがっ！ぽーが走ってますよぉ～[3] ハーネスを着ているからずりずりもO.K.なのだ[4] もぉね嬉しすぎて、飼主は息切れしてます[5] いつも以上に高速のまま、笑顔で飼主に接近するぽー[6] 飼主もカメラも砂まみれ。もぉ、カメラが壊れるではないかぁ～～～[7] 友達と遊べる日まであともう少しなのだ[8]",
+    "truncated": false,
+    "comments": []
+  },
+  {
+    "date": "2011.06.28",
+    "title": "後姿。",
+    "tags": [
+      "ぽー",
+      "日常",
+      "おもしろ",
+      "2011年6月"
+    ],
+    "images": [
+      "https://stat.ameba.jp/user_images/20110628/13/rinbelu/8e/3d/j/o0400030011317675415.jpg",
+      "https://stat.ameba.jp/user_images/20110628/13/rinbelu/a6/80/j/o0400030011317661503.jpg",
+      "https://stat.ameba.jp/user_images/20110628/13/rinbelu/1e/d4/j/o0399030011317661504.jpg",
+      "https://stat.ameba.jp/user_images/20110628/13/rinbelu/63/cc/j/o0480028911317675416.jpg"
+    ],
+    "text": "今日も暑いですねぇ～いくつかあるぽーのお気に入りの場所のひとつ。ここは和室の窓と土間からの風が通るため涼しいのです[1] 庭にやってくる鳥や虫も見えるし、散歩中のわんこやヒトの気配もわかる場所。うとうとしてはその気配に起きてみたり[2] この後ろ姿にデジャブを感じ眺めること数分[3] あぁ、これだ～ゴッホ作 「後ろ姿の裸婦」[4] あぁ～すっきりしたっ",
+    "truncated": false,
+    "comments": []
+  },
+  {
+    "date": "2011.06.29",
+    "title": "追跡。",
+    "tags": [
+      "ぽー",
+      "お友達",
+      "動画",
+      "2011年6月"
+    ],
+    "images": [
+      "https://stat.ameba.jp/user_images/20110629/12/rinbelu/ff/58/j/o0400029411319412323.jpg",
+      "https://stat.ameba.jp/user_images/20110629/12/rinbelu/18/ae/j/o0399030011319412325.jpg",
+      "https://stat.ameba.jp/user_images/20110629/12/rinbelu/be/af/j/o0400030011319412324.jpg"
+    ],
+    "text": "今朝のこと。散歩に出発し数分後。ぽーのテンションがどど～っと上がり追跡モードに突入コレは、この状態は見たことがある。→ぽーやさぐれる。・・・ホクトだな。ぽーの大好きな彼がこの先にいるらしい。急ぐ後ろ足が、おしりが、耳が面白いのです。しかも小さくぴぃぴぃ泣いています（手ぶれヒドくてスミマセン）ケガもほぼ治ってるし今日は会いに行きましょうというわけで、久しぶりにはしゃいできました～[1] ぽーの表情でわかるかもですが、遊び後の写真でございますしかもホクトにかぶってるではないかホクちゃん、朝早くから遊んでくれてありがとね～[2] そしてこちら、まる～ぃ目のかわいい彼女はカリンちゃん[3] みんなご近所の散歩トモダチなのデスわんこに会うとはしゃぎすぎてしまうぽー。ケガが治るまでは、なるべくトモダチに会わないコースでの散歩でした。暑くて散歩時間が制限されるこの季節。同じような時刻に散歩する子が増えるこの季節。これからはさらに楽しい散歩の日々になりますょ～",
+    "truncated": false,
+    "comments": []
+  },
+  {
+    "date": "2011.06.29",
+    "title": "涼をとる。",
+    "tags": [
+      "ぽー",
+      "日常",
+      "おやつ",
+      "2011年6月"
+    ],
+    "images": [
+      "https://stat.ameba.jp/user_images/20110629/18/rinbelu/af/10/j/o0400030011319924297.jpg",
+      "https://stat.ameba.jp/user_images/20110629/18/rinbelu/6b/83/j/o0400030011319924296.jpg",
+      "https://stat.ameba.jp/user_images/20110629/18/rinbelu/07/30/j/o0400030011319933230.jpg"
+    ],
+    "text": "突然ですが、我家には軒があります。おかげで暑く強い夏の陽射しが屋内に入りにくい。しかも風がよく通るので比較的快適に過ごせますとはいうものの暑いですまだエアコンをつけるほどではない気温。けれども徐々にぽーの口が開いてくる。そんな時にぴったりなヘルシーおやつがあるのですそれは『氷』かき氷とかではなく製氷機から出しただけの氷。滑る氷を追いかけながらかじっていたり。[1] 妙な恰好で氷を満喫するぽー。そんな様子を眺めていると、暑さを若干忘れられる（かもしれない）[2] そしてぽーは落ち着き再び眠りに入るのです[3] さあて、この方法でいつまでごまかせるのだろうか",
+    "truncated": false,
+    "comments": []
+  }
+];
+
+(function() {
+  const seen = {};
+  entries.forEach(function(e) {
+    const key = e.date;
+    seen[key] = (seen[key] || 0) + 1;
+    e.id = 'e' + e.date.replace(/\./g, '-') + '-' + seen[key];
+  });
+})();
+
+
+// ---- render ----
+const allTags = [...new Set(entries.flatMap(e => e.tags))];
+let activeTags = new Set();
+let keyword = "";
+
+function highlightNums(text) {
+  return text.replace(/\[(\d+)\]/g, '<b>[$1]</b>');
+}
+
+function esc(s) {
+  return String(s == null ? "" : s).replace(/[&<>]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
+}
+
+function renderTagFilter() {
+  const el = document.getElementById('tagFilter');
+  el.innerHTML = allTags.map(t =>
+    `<button class="tag-btn${activeTags.has(t) ? ' active' : ''}" data-tag="${t}">${t}</button>`
+  ).join('');
+  el.querySelectorAll('.tag-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const tag = btn.dataset.tag;
+      if (activeTags.has(tag)) activeTags.delete(tag); else activeTags.add(tag);
+      renderTagFilter();
+      renderEntries();
+    });
+  });
+}
+
+function matches(entry) {
+  const tagOk = activeTags.size === 0 || entry.tags.some(t => activeTags.has(t));
+  const kw = keyword.trim();
+  const kwOk = kw === "" ||
+    entry.title.includes(kw) ||
+    entry.text.includes(kw) ||
+    entry.tags.some(t => t.includes(kw));
+  return tagOk && kwOk;
+}
+
+function renderEntries() {
+  const main = document.getElementById('main');
+  const filtered = entries.filter(matches);
+  document.getElementById('count').textContent = `${filtered.length} / ${entries.length} 件表示中`;
+  document.getElementById('noResults').style.display = filtered.length === 0 ? 'block' : 'none';
+
+  main.innerHTML = filtered.map(entry => `
+    <article class="entry" id="${entry.id}">
+      <div class="entry-head">
+        <span class="entry-title">${entry.title}</span>
+        <span class="entry-date">${entry.date}</span>
+      </div>
+      ${entry.images.length > 0 ? `
+      <div class="photo-grid">
+        ${entry.images.map((src, i) => `
+          <a href="${src}" target="_blank" rel="noopener">
+            <img src="${src}" loading="lazy" alt="${entry.title} 写真${i+1}">
+            <span class="num">${i+1}</span>
+          </a>
+        `).join('')}
+      </div>` : entry.photosLost ? `<p class="no-photo">（写真は掲載されていましたが、保存されていないため表示できません）</p>` : `<p class="no-photo">（この記事には写真がありません）</p>`}
+      ${entry.truncated ? `<p class="truncated-note">（＊続きは読めない）</p>` : ''}
+      <p class="entry-text">${highlightNums(entry.text)}</p>
+      <div class="tags">
+        ${entry.tags.map(t => `<button class="tag-pill" data-tag="${t}">${t}</button>`).join('')}
+      </div>
+      ${entry.comments && entry.comments.length > 0 ? `
+      <div class="comments">
+        <div class="comments-label">コメント（${entry.comments.length}件）</div>
+        ${entry.comments.map(c => `
+          <div class="comment">
+            <div class="comment-meta"><span class="author">${esc(c.author)}</span>${c.date ? ' ・ ' + esc(c.date) : ''}</div>
+            <div>${esc(c.text)}</div>
+          </div>
+        `).join('')}
+      </div>` : ''}
+    </article>
+  `).join('');
+
+  main.querySelectorAll('.tag-pill').forEach(btn => {
+    btn.addEventListener('click', () => {
+      activeTags = new Set([btn.dataset.tag]);
+      renderTagFilter();
+      renderEntries();
+      window.scrollTo({top:0, behavior:'smooth'});
+    });
+  });
+}
+
+document.getElementById('search').addEventListener('input', (e) => {
+  keyword = e.target.value;
+  renderEntries();
+});
+
+renderTagFilter();
+renderEntries();
+if (location.hash) {
+  const target = document.getElementById(location.hash.slice(1));
+  if (target) target.scrollIntoView({block: 'start'});
+}
+</script>
+
+</body>
+</html>

@@ -1,0 +1,794 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hey buddy, give me your paw! 絵日記帳 - 2011年2月</title>
+<style>
+  :root {
+    --bg: #faf6ef;
+    --card-bg: #ffffff;
+    --border: #e8dfd0;
+    --text: #4a4238;
+    --text-muted: #9a9082;
+    --accent: #c98a5e;
+    --accent-bg: #f5e6d8;
+    --accent-text: #8a5a35;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    padding: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: "Hiragino Kaku Gothic ProN", "Yu Gothic", "Meiryo", sans-serif;
+    line-height: 1.8;
+  }
+  header {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 32px 20px 16px;
+    text-align: center;
+  }
+  header h1 {
+    font-size: 22px;
+    font-weight: 500;
+    margin: 0 0 4px;
+    color: var(--text);
+  }
+  header p {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin: 0;
+  }
+  .controls {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 12px 20px 20px;
+    position: sticky;
+    top: 0;
+    background: var(--bg);
+    z-index: 10;
+  }
+  #search {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    font-size: 14px;
+    background: var(--card-bg);
+    color: var(--text);
+    margin-bottom: 10px;
+  }
+  .tag-filter {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .tag-btn {
+    font-size: 11px;
+    padding: 4px 12px;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    background: var(--card-bg);
+    color: var(--text-muted);
+    cursor: pointer;
+  }
+  .tag-btn.active {
+    background: var(--accent);
+    color: #fff;
+    border-color: var(--accent);
+  }
+  .count {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 0 20px 8px;
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+  main {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 0 20px 60px;
+  }
+  .entry {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 20px;
+    margin-bottom: 16px;
+  }
+  .entry-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+  .entry-title {
+    font-size: 16px;
+    font-weight: 500;
+  }
+  .entry-date {
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+  .photo-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+    gap: 6px;
+    margin-bottom: 12px;
+  }
+  .photo-grid a {
+    position: relative;
+    display: block;
+    aspect-ratio: 1;
+    overflow: hidden;
+    border-radius: 8px;
+    background: var(--accent-bg);
+  }
+  .photo-grid img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .photo-grid .num {
+    position: absolute;
+    bottom: 3px;
+    right: 4px;
+    font-size: 10px;
+    background: rgba(0,0,0,0.55);
+    color: #fff;
+    padding: 1px 5px;
+    border-radius: 8px;
+  }
+  .no-photo {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-bottom: 12px;
+  }
+  .truncated-note {
+    font-size: 12px;
+    color: var(--accent-text);
+    background: var(--accent-bg);
+    border-radius: 8px;
+    padding: 6px 10px;
+    margin: 0 0 12px;
+    display: inline-block;
+  }
+  .entry-text {
+    font-size: 14px;
+    line-height: 1.85;
+    margin: 0 0 12px;
+    white-space: pre-line;
+  }
+  .entry-text b {
+    color: var(--accent-text);
+    font-weight: 500;
+  }
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .tag-pill {
+    font-size: 11px;
+    padding: 2px 10px;
+    border-radius: 12px;
+    background: var(--accent-bg);
+    color: var(--accent-text);
+    cursor: pointer;
+    border: none;
+  }
+  .comments {
+    margin-top: 16px;
+    padding-top: 14px;
+    border-top: 1px dashed var(--border);
+  }
+  .comments-label {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+  }
+  .comment {
+    font-size: 13px;
+    line-height: 1.7;
+    margin-bottom: 12px;
+    padding-left: 10px;
+    border-left: 2px solid var(--accent-bg);
+  }
+  .comment-meta {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-bottom: 2px;
+  }
+  .comment-meta .author {
+    color: var(--accent-text);
+    font-weight: 500;
+  }
+  .no-results {
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 14px;
+    padding: 40px 0;
+    display: none;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Hey buddy, give me your paw! 絵日記帳</h1>
+  <p>ウィペットのぽー＆バドと暮らす日常あれこれ ― 2011年2月</p>
+</header>
+
+<div class="controls">
+  <input type="text" id="search" placeholder="キーワードで探す（例: 震災、ドッグラン、うみちゃん）">
+  <div class="tag-filter" id="tagFilter"></div>
+</div>
+<div class="count" id="count"></div>
+
+<main id="main"></main>
+<p class="no-results" id="noResults">該当する記事が見つかりません。</p>
+
+<script>
+const entries = [
+  {
+    "date": "2011.02.01",
+    "title": "Hey buddy!!",
+    "tags": [
+      "ぽー",
+      "ドッグラン",
+      "お友達",
+      "2011年2月"
+    ],
+    "images": [
+      "https://stat.ameba.jp/user_images/20110201/16/rinbelu/6e/25/j/o0400022411019573684.jpg",
+      "https://stat.ameba.jp/user_images/20110201/16/rinbelu/5b/1e/j/o0400030011019609382.jpg",
+      "https://stat.ameba.jp/user_images/20110201/17/rinbelu/7d/87/j/o0450033711019656453.jpg",
+      "https://stat.ameba.jp/user_images/20110201/16/rinbelu/ee/dc/j/o0400030011019574191.jpg",
+      "https://stat.ameba.jp/user_images/20110201/16/rinbelu/ec/64/j/o0400030011019573685.jpg",
+      "https://stat.ameba.jp/user_images/20110201/16/rinbelu/62/de/j/o0400030011019573686.jpg",
+      "https://stat.ameba.jp/user_images/20110201/17/rinbelu/43/d7/j/o0450033711019656454.jpg"
+    ],
+    "text": "今日も来ました、いつもの高速SAラン。[1] 残念ながらワンコ友達は誰も来ず。けれども来ました、ステキな遊び友達が。[2] そう、それはスーツ姿のおトモダチ。[3] 仕事帰りの友人に遭遇です。靴やズボンは土埃で真っ白。そしてぽーのハナも。[4] たくさん遊んでもらって、ごきげんぽー。帰宅後は所定の位置へ。そして・・・[5] またたく間に夢の中。[6] それにしても・・・・ドッグランにサラリーマンと細い犬。なんでしょう、このびみょーな違和感・・・[7]",
+    "truncated": false,
+    "comments": []
+  },
+  {
+    "date": "2011.02.03",
+    "title": "平和なのです。",
+    "tags": [
+      "ぽー",
+      "日常",
+      "2011年2月"
+    ],
+    "images": [
+      "https://stat.ameba.jp/user_images/20101117/08/rinbelu/9b/08/j/o0500037510864147595.jpg"
+    ],
+    "text": "空を見上げたり、遠くを見つめたり。[1] ぽーの真似をしてみたら、色んなオトとニオイを感じました。どうしよう、犬になってしまうかも。",
+    "truncated": false,
+    "comments": []
+  },
+  {
+    "date": "2011.02.04",
+    "title": "毛を逆立てる",
+    "tags": [
+      "ぽー",
+      "散歩",
+      "成長記録",
+      "2011年2月"
+    ],
+    "images": [
+      "https://stat.ameba.jp/user_images/20110204/12/rinbelu/bd/16/j/o0450042611025627202.jpg",
+      "https://stat.ameba.jp/user_images/20110204/11/rinbelu/2b/2d/j/o0450060011025617059.jpg",
+      "https://stat.ameba.jp/user_images/20110204/12/rinbelu/a1/f5/j/o0450060011025623303.jpg",
+      "https://stat.ameba.jp/user_images/20110204/12/rinbelu/29/ff/j/o0450060011025643680.jpg",
+      "https://stat.ameba.jp/user_images/20110204/12/rinbelu/d6/aa/j/o0450060011025626895.jpg"
+    ],
+    "text": "散歩中によく野生猿に遭遇するのですが、ぽーの反応が変化してきました。１歳になるまでは「遊ぼうょ～」１歳を過ぎた頃にはボス猿が威嚇してきた時だけ威嚇仕返し、あとは距離を保ちあまり興味を示さない。そして今月の１８日で１歳６ヶ月になる今。[1] 猿たちは果樹園のミカンを食べていたようです。この２頭を含め、全部で１０頭近くいたかも。ぽーはというとなんと、毛を逆立て時折吠えるまでの興奮状態。[2] 緊張で背中の毛が立つことはたまにありました。けれども今回は首筋の毛までが総立ち。興奮しているぽーには申し訳ないけれど、初めて見る状態にヨコからも記念撮影。[3] ぽーさん、まるで馬みたいやね。たてがみめちゃ短いけれど。記録に残せたので退散しましょう。少し離れると毛並みは元通り。[4] そして猿たちも再びミカン狩りを楽しんでいる様子。彼らは人や犬にも慣れているため、距離が保たれていれば逃げないんですよね～それにしても、ぽーさん。今回は威嚇されたわけでもなく、猿に気付いた段階でテンションが上がっていました。遊びたいモードではなく、明らかに攻撃姿勢。歯を剥くまでには至ってはいませんでしたが。ぽーの中で何が変ったのでしょう。１歳を過ぎて様々な変化が表れてきています。犬同士の態度にも変化を感じます。威嚇されても遊ぼうとしつこかった子犬時代。最近では威嚇されると相手によっては吠え返すことも。ぽーから先に威嚇することがないのでそれがちょっと安心。それでも気をつけないとね。これからもぽーの行動やサインを見逃さないように。そしてぽーの成長と変化を楽しむわけです。[5]",
+    "truncated": false,
+    "comments": []
+  },
+  {
+    "date": "2011.02.04",
+    "title": "無機物だからこそ",
+    "tags": [
+      "ぽー",
+      "日常",
+      "2011年2月"
+    ],
+    "images": [
+      "https://stat.ameba.jp/user_images/20110204/17/rinbelu/6e/57/j/o0450033711026112856.jpg",
+      "https://stat.ameba.jp/user_images/20110204/17/rinbelu/9e/71/j/o0450033711026112855.jpg",
+      "https://stat.ameba.jp/user_images/20110204/17/rinbelu/bd/1c/j/o0450033711026112854.jpg"
+    ],
+    "text": "溝や塀があると、覗きたくなる年頃のぽーでございます。突然びくつきへっぴり腰になりました。[1] びくびくしながら何かを見ていましたが、[2] 我慢できなくなり逃げてしまいマシタ。どうした、ぽーさん。先日の猿に見せた勇壮さはどこへ行ったの。風に揺れるビニールが怖いだなんて。[3]",
+    "truncated": false,
+    "comments": []
+  },
+  {
+    "date": "2011.02.07",
+    "title": "写真で語る",
+    "tags": [
+      "ぽー",
+      "写真",
+      "2011年2月"
+    ],
+    "images": [
+      "https://stat.ameba.jp/user_images/20110207/09/rinbelu/05/a1/j/o0450033711032164931.jpg",
+      "https://stat.ameba.jp/user_images/20110207/10/rinbelu/15/7f/j/o0450033711032192002.jpg",
+      "https://stat.ameba.jp/user_images/20110207/09/rinbelu/77/38/j/o0450060011032165277.jpg",
+      "https://stat.ameba.jp/user_images/20110207/09/rinbelu/4f/bd/j/o0449063411032165276.jpg",
+      "https://stat.ameba.jp/user_images/20110207/09/rinbelu/bf/07/j/o0450033711032164932.jpg"
+    ],
+    "text": "ごく最近になって知りました。コンパクトデジカメ →コンデジ デジタル一眼レフカメラ→デジイチ と、呼ぶそうですね～。世間の舟にはいつも乗り遅れる私ですが、一応どちらも所持しております。けれども軽量＆手軽さでiphone3GSが大活躍。設定変更のできないカメラで、走るぽーをいかにして撮るか。それもけっこう楽しいのです。さてさて、週末に揃って遊びに繰り出すのが日常の私たち。けれどもここしばらくは、どちらかがいない週末の日々。そして日曜日、ようやく揃って河川敷へと行って参りました。犬って嬉しいとき、スキップ調の歩き方になりますよね～車を降り歩き出しから弾む足運び。表情もなんだか明るいぽーさんです。[1] 走りも絶好調。[2] そういえば、いつも横か前からのアングルばかりですねぇ。では・・・[3][4] どないでしょう。走り出しのぽーのお尻。そして本日ラストの写真はやっぱりコレで。[5]",
+    "truncated": false,
+    "comments": []
+  },
+  {
+    "date": "2011.02.08",
+    "title": "地域貢献してみる",
+    "tags": [
+      "ぽー",
+      "地域",
+      "鹿肉",
+      "2011年2月"
+    ],
+    "images": [
+      "https://stat.ameba.jp/user_images/20110208/11/rinbelu/e4/13/j/o0400030011034280565.jpg",
+      "https://stat.ameba.jp/user_images/20110208/11/rinbelu/8b/b4/j/o0399053311034280566.jpg",
+      "https://stat.ameba.jp/user_images/20110208/11/rinbelu/31/62/j/o0449060111034318571.jpg"
+    ],
+    "text": "たまにはぽー以外の話題をしたいと思います。今日は『鹿』について。いや、だから鹿ですょ、ぽーのことではなくて。シカを頂いてきたのですょ。近所でよく出没するサルもそうですが、私たちの住む県は鳥獣による農作物被害が深刻です。サルたちは先日の果樹園でのミカン狩りのように、農作物を集団で収穫していきます。またシカは木の皮を食べるため、県の主要農産物である『ゆず』が被害を受けています。防護柵・モンキードッグの導入とともに、有害鳥獣の駆除が行われているわけです。そしてさらに駆除したシカを有効利用する。県の特産にしてしまおう！計画が持ち上がっているわけです。その一環で昨日「シカ肉料理普及試食会」なるものが行われました。ホテルや飲食店関係者がメインなのですが、県民代表として私も参加して参りました。鹿肉料理は和・洋・中の１２品目。試食会のため、かなり丁寧に加工されたのかも。たたきなども柔らかく全く臭みもありませんでした。[1] 実はですね～～人が多くてですね～肝心の料理写真がありません。[2] お話を伺ったところ、まだまだ課題は山積みだそうで。安全な鹿肉しか流通させられないため、数の確保も難しいようです。そのためまだ小売りは考えられていないそうです。あわよくば薫製などしてみたいなと考えていたのですが。さて・・・処理に失敗したシカ肉は臭みが出てしまいます。でも犬達は気にしないですよね？というより、ケモノ臭い方が好きかも。実際にシカ肉はペットフードとしても販売されていますよね～。通販を使わず県内で気軽に、しかも安価で鹿肉が手に入れば・・・ということで、人間用に向かなかった肉をペット用にいかがでしょう？と、提案してきました。はい、そうなのです。県民意識が強いかのようでしたが、やっぱりぽーのためなのですょ～でもね、シカ料理おいしかったです。[3]",
+    "truncated": false,
+    "comments": []
+  },
+  {
+    "date": "2011.02.09",
+    "title": "造る",
+    "tags": [
+      "ぽー",
+      "陶芸",
+      "お友達",
+      "2011年2月"
+    ],
+    "images": [
+      "https://stat.ameba.jp/user_images/20110209/21/rinbelu/23/c7/j/o0400026611037500481.jpg",
+      "https://stat.ameba.jp/user_images/20110209/21/rinbelu/d2/a3/j/o0449030011037500480.jpg"
+    ],
+    "text": "今日は我が家にて、陶芸が趣味の友人たちと陶器造り。ぽーも興味津々。[1] ぽーのハナがたくさんつきマシタ。仕上げはもちろん、ほぼまかせっぱなしデシタ。でもね、モノ作りはやはり面白いです。完成は２～３週間後。楽しみだなぁ～～出来上がったら、紹介するので見てやってくださいませ。[2]",
+    "truncated": false,
+    "comments": []
+  },
+  {
+    "date": "2011.02.11",
+    "title": "日々挑戦",
+    "tags": [
+      "ぽー",
+      "お泊まり",
+      "成長記録",
+      "2011年2月"
+    ],
+    "images": [
+      "https://stat.ameba.jp/user_images/20110211/21/rinbelu/64/c0/j/o0450033711041909996.jpg",
+      "https://stat.ameba.jp/user_images/20110211/20/rinbelu/39/8e/j/o0450033711041895041.jpg",
+      "https://stat.ameba.jp/user_images/20110211/21/rinbelu/08/fb/j/o0450060011041912237.jpg",
+      "https://stat.ameba.jp/user_images/20110211/21/rinbelu/91/d5/j/o0450060211041999160.jpg",
+      "https://stat.ameba.jp/user_images/20110211/21/rinbelu/46/f0/j/o0450032911042022669.jpg"
+    ],
+    "text": "誕生日を迎えた友人宅訪問のため、リボンをつけてみました。[1] あはは、ぽーさんかわいい～～さて、向った先はいつものぽー大好き友人宅。ぽーも慣れたもので大あくびをしたり、[2] この後に何が起きるかも知らずにリラックス。[3] ぽーさんこの後、置いてかれちゃいました。いや、まぁ、置いて来たのは私なのですけれどね。ぽーの初外泊体験は去年の秋。ブリーダーさんのところで、兄弟親戚と一緒にお泊まり。ご飯をあまり食べなかったということ以外は全く問題なしでした。そこで今回は、友人宅にて外泊体験ver2. というわけなのです。甘えん坊のぽーさん。今回はわんこ仲間はいません。けれども、遊びなれた友人宅。数時間の預かりもここで体験しています。さぁ、どうなるか・・・・私の帰宅後、送ってもらった写真。[4] 若干、哀愁感じる背中ですけれども。玄関で少し鼻声になったものの、居間に戻りこの様子。そして何より嬉しい大変化は『ご飯完食』友人の傍らにて眠るぽー。[5] ぴーぴー言い続けて近所迷惑しないだろうか。ご飯食べずで吐かないだろうか。色んな心配事がありましたが、まぁとりあえず大丈夫かな。彼らと仲良しだからなのか。ぽーが成長したからなのか。どちらにしても、万が一というときのため、どうしてもぽーを連れていけないときのための、私たちの心の準備運動にもなりました。友人達の夕食後、ソファで家長を追い出し悠々と寝ているそうです。ていうか、甘やかさなくてよいから～～",
+    "truncated": false,
+    "comments": []
+  },
+  {
+    "date": "2011.02.12",
+    "title": "おかえり。",
+    "tags": [
+      "ぽー",
+      "お泊まり",
+      "成長記録",
+      "2011年2月"
+    ],
+    "images": [
+      "https://stat.ameba.jp/user_images/20110212/16/rinbelu/d2/82/j/o0450060011043633758.jpg",
+      "https://stat.ameba.jp/user_images/20110212/16/rinbelu/e7/bb/j/o0450060011043668496.jpg",
+      "https://stat.ameba.jp/user_images/20110212/16/rinbelu/59/e6/j/o0450033711043668497.jpg"
+    ],
+    "text": "友人夫婦に送り届けてもらって、ぽーさん帰宅しました。鳴いたりもせず散歩中もお利口さん。今朝は１０時頃までくかくか寝ていたそうで。我が家では必ずぷち抵抗を試みる車。ところがなんとすんなり乗りこんだそうです。友人夫婦曰く、「ぽーが気を遣ってくれたんだょ～」おぉ、ぽーさん！空気読める子にまで成長したのね。・・・・・・・そうなの？ほんまに？さてさて、帰宅後のぽーの様子ですが、先ずはあくびをしましてですね～[1] そして、そして・・・[2] それでもって・・・[3] いつもとほぼ同じですね。いつもと違う体験をしてきたけれど、帰宅後はいつもと同じ行動になる。うむ。これが一番ほっとします。１歳になる前に預けたときはぴーぴー言い続けたぽー。今回は全く困らせなかったようです。彼らに慣れたというのもあるだろうけれど、たくましくなったんだね～友人宅での様子はコチラで見てやってくださぃ。落ち着いた表情してマス。",
+    "truncated": false,
+    "comments": []
+  },
+  {
+    "date": "2011.02.13",
+    "title": "楽しいは終わらないのだ。",
+    "tags": [
+      "ぽー",
+      "お出かけ",
+      "2011年2月"
+    ],
+    "images": [
+      "https://stat.ameba.jp/user_images/20110213/17/rinbelu/79/fe/j/o0450030011046185089.jpg",
+      "https://stat.ameba.jp/user_images/20110213/17/rinbelu/68/05/j/o0449027711046207065.jpg",
+      "https://stat.ameba.jp/user_images/20110213/17/rinbelu/99/c0/j/o0450030011046220579.jpg",
+      "https://stat.ameba.jp/user_images/20110213/18/rinbelu/43/aa/j/o0450030011046262970.jpg",
+      "https://stat.ameba.jp/user_images/20110213/18/rinbelu/32/cb/j/o0450030011046262971.jpg",
+      "https://stat.ameba.jp/user_images/20110213/18/rinbelu/d7/63/j/o0449029011046268239.jpg",
+      "https://stat.ameba.jp/user_images/20110213/18/rinbelu/d0/6c/j/o0450025611046275550.jpg"
+    ],
+    "text": "連休最後の日はやはり３人で遊びに行きましょう。雪や雨であまり遊べなかったこともあり、ぽーさんエンジン全開でございます。[1] そしてチョット怪しいマスク姿の相方。インフルエンザvirusとの闘いを終え、勝利のダンスを披露しております～[2] 実は、華麗なおもちゃ投げの瞬間。おもちゃも、ちょこっとフレーム内におさまっていますね。抗インフル薬のおかげで、すぐに高熱は引いたものの辛そうでした。もちろん、ぽーは隔離状態。ようやく遊べて２人とも嬉しいね～[3] そして適度に遊んだあとは、ウィペットならほぼ見られる芝生ぞりぞりタイム。[4][5] ご覧くださいませ。この大満足の表情を。[6] そしてそしてまた遊ぶ。[7] そんな終わらない連休最後の日でした～",
+    "truncated": false,
+    "comments": []
+  },
+  {
+    "date": "2011.02.14",
+    "title": "It's snowing!!",
+    "tags": [
+      "ぽー",
+      "雪",
+      "2011年2月"
+    ],
+    "images": [
+      "https://stat.ameba.jp/user_images/20110214/14/rinbelu/35/e7/j/o0449030011048290204.jpg",
+      "https://stat.ameba.jp/user_images/20110214/14/rinbelu/02/7b/j/o0449030011048290203.jpg",
+      "https://stat.ameba.jp/user_images/20110214/14/rinbelu/d6/90/j/o0449030011048290205.jpg",
+      "https://stat.ameba.jp/user_images/20110214/14/rinbelu/75/0d/j/o0449030011048300503.jpg",
+      "https://stat.ameba.jp/user_images/20110214/14/rinbelu/92/4d/j/o0449030011048300505.jpg",
+      "https://stat.ameba.jp/user_images/20110214/14/rinbelu/39/92/j/o0449030011048303878.jpg",
+      "https://stat.ameba.jp/user_images/20110214/14/rinbelu/76/2c/j/o0450030011048300504.jpg",
+      "https://stat.ameba.jp/user_images/20110214/14/rinbelu/73/40/j/o0450030011048303879.jpg",
+      "https://stat.ameba.jp/user_images/20110214/14/rinbelu/fd/ae/j/o0449030011048303880.jpg",
+      "https://stat.ameba.jp/user_images/20110214/14/rinbelu/7a/52/j/o0449030011048305381.jpg"
+    ],
+    "text": "午前中から降り出した雪。またガトーショコラの粉砂糖になるかと思いきや、しっかり積もってきましたょ。まだ降り続いているけれど・・・ぽーさん、お庭に出てみようか～～遂に初めての『しっかり積もった雪』体験だ！さぁ、どんな顔、どんな行動をするのでしょう。先ずは玄関先にて景色をしばし眺める。[1] そして、そろりと足を踏み出し、[2] 空を見上げ、[3] 匂いもかいでみる。[4] 雪にハナを突っ込んでみたり、[5] 雪を食べてみたり。[6] そうしたら、チョット楽しくなってきて、[7] テンションもさらにあがって、[8] ひゃっほ～ぃ[9] と、走り回るまわるまわる。[10] どうやら、寒さに弱いはずのウィペットも、『喜び庭駆け回る』ようですょ。",
+    "truncated": false,
+    "comments": []
+  },
+  {
+    "date": "2011.02.15",
+    "title": "瀬戸内気候と日本海側気候",
+    "tags": [
+      "ぽー",
+      "雪",
+      "2011年2月"
+    ],
+    "images": [
+      "https://stat.ameba.jp/user_images/20110215/10/rinbelu/34/b3/j/o0449046311050798774.jpg",
+      "https://stat.ameba.jp/user_images/20110215/10/rinbelu/bb/9d/j/o0449030011050791659.jpg",
+      "https://stat.ameba.jp/user_images/20110215/11/rinbelu/a8/1a/j/o0450030011050865781.jpg",
+      "https://stat.ameba.jp/user_images/20110215/11/rinbelu/8e/98/j/o0450034611050872021.jpg",
+      "https://stat.ameba.jp/user_images/20110215/11/rinbelu/19/33/j/o0449030011050865782.jpg"
+    ],
+    "text": "またたく間に雪は融け、見慣れた景色が戻ってまいりました。[1] って、大雪やんっ！！と思われた方、ごめんなさい。これは数年前、主人の実家での様子です。実はうちの相方さんは東北出身。関西出身の私が雪かきに挑戦し、雪の重みに悪戦苦闘している写真デス。かたやこちらは市内で積雪6cm。それでも2005年以来の観測値。雪には慣れている主人。ですが雪山に遊びに行くこともないため、スノータイヤもチェーンもありません。実家ではこんな感じで除雪車が大活躍。[2] でもこちらでは除雪車そのものがない。休むことなく降り続ける雪。午後に帰宅許可が降りたものの、はてさて帰って来れるのか。「（チェーン巻いてるだろうし）バスで帰って来る？」とメール送信。けれどもなんと、路線バスは全線運休・・・結局は、ノーマルタイヤでも全く問題なく無事帰宅。[3] まだ外は明るいのでもうひと遊び。[4] 雪をかけられヘン顔のぽーも披露。[5] 私たちが雪遊びを楽しんでいる頃。国道の大きな橋では、凍結防止剤を撒いていたところ機械が故障。その場で修理に追われていたそうです。故障の原因はわかりませんが、慣れない積雪に翻弄された四国の一日でした。",
+    "truncated": false,
+    "comments": []
+  },
+  {
+    "date": "2011.02.16",
+    "title": "今日のぽー",
+    "tags": [
+      "ぽー",
+      "日常",
+      "2011年2月"
+    ],
+    "images": [
+      "https://stat.ameba.jp/user_images/20110216/10/rinbelu/39/3b/j/o0500033311053181668.jpg"
+    ],
+    "text": "天気が良いので布団を干したいのだけれど・・・[1] ムリです～～",
+    "truncated": false,
+    "comments": []
+  },
+  {
+    "date": "2011.02.17",
+    "title": "「瞬間」を切り取る。",
+    "tags": [
+      "ぽー",
+      "写真",
+      "2011年2月"
+    ],
+    "images": [
+      "https://stat.ameba.jp/user_images/20110217/10/rinbelu/bb/44/j/o0499033411055365078.jpg",
+      "https://stat.ameba.jp/user_images/20110217/10/rinbelu/7e/20/j/o0500032811055365080.jpg",
+      "https://stat.ameba.jp/user_images/20110217/10/rinbelu/ed/e0/j/o0499033411055365079.jpg"
+    ],
+    "text": "まるで春のような陽気だった昨日のこと。羽毛布団で眠るのも良いけれど、外に行かなくちゃもったいない。暖かいけれどもまだ２月。とりあえずコートを着せて車へ乗り込む。けれども車の中は温室なみの暖かさ。「脱がしてくれなきゃ、吐いちゃうかも・・」そんなぽーの様子に慌ててコートをはぎ取り、着いた場所はいつもの河川敷。ぽーの表情はまたたくまに一変します。わかりやすいなぁ～～[1] とんでもなく速いスピードで走るぽー。連写して拡大すると意外な発見があるのです。さいきん使い始めた画像編集ソフト。練習を兼ねて加工してみました。まだまだ不出来ですのであしからず・・・まずはひとつめ。おもちゃをくわえて走っているのですが、途中で口を開けていたのですね～[2] そしてふたつめ。猛スピードで走りつつもカメラ目線。[3] いや、カメラではなくて私を見てるんだよね～・・・・・スミマセン。流石にちょっと恥ずかしくなりマシタ。",
+    "truncated": false,
+    "comments": []
+  },
+  {
+    "date": "2011.02.18",
+    "title": "おなかすきました",
+    "tags": [
+      "ぽー",
+      "ごはん",
+      "2011年2月"
+    ],
+    "images": [
+      "https://stat.ameba.jp/user_images/20110217/11/rinbelu/2e/66/j/o0500074811055421794.jpg",
+      "https://stat.ameba.jp/user_images/20110217/11/rinbelu/d2/09/j/o0500074811055430612.jpg",
+      "https://stat.ameba.jp/user_images/20110217/11/rinbelu/3e/e7/j/o0500074811055436382.jpg",
+      "https://stat.ameba.jp/user_images/20110217/12/rinbelu/e3/df/j/o0499074911055462695.jpg",
+      "https://stat.ameba.jp/user_images/20110218/08/rinbelu/ab/c0/j/o0500074811057350000.jpg"
+    ],
+    "text": "ぽーのゴハンは朝と夕方の２回。ご飯の時間が近くなる頃には、私の一挙一動を見逃すまいと視線ストーキング。それ以外はフード入れの蓋を開けたり、おやつを出さない限りはほぼ反応しません。（友人達にはアピールするけれども）そんなぽーですがご飯の時間以外に、「おなかすいたー！」と主張する時が稀にあるのです。そんなおなかをすかせたある日の様子。[1] あら、ぽーさん。そんな見つめちゃってどうしたの～[2] 洗い物してるだけだから、それは気のせいだと思うょ～[3] そうやね～えらいねぇ。オスワリしたら何かあるのかしらね～[4] むむむ・・・この飼い主、そんなに甘くはな あれ？[5] という感じでございます。いやいや、常に甘やかしてるわけではないのですょ。自ら主張してくるときは大抵、運動量がいつもより多かった日なのです。なのでそういう日は主張する前に、軽くおやつなど与えています。ですが、そのタイミングを外すと、こんな可愛い様子が見られるわけで。あぁ・・・昨日に引き続き、バ飼い主っぷり炸裂ですね～～",
+    "truncated": false,
+    "comments": []
+  },
+  {
+    "date": "2011.02.20",
+    "title": "好きなもの",
+    "tags": [
+      "ぽー",
+      "日常",
+      "2011年2月"
+    ],
+    "images": [
+      "https://stat.ameba.jp/user_images/20110220/11/rinbelu/93/15/j/o0500033311062294950.jpg",
+      "https://stat.ameba.jp/user_images/20110220/11/rinbelu/da/d7/j/o0449030011062294951.jpg",
+      "https://stat.ameba.jp/user_images/20110220/11/rinbelu/4c/79/j/o0500033311062304394.jpg"
+    ],
+    "text": "ぽーが真剣な表情で見ているもの。[1] それは、動物が出ているテレビ番組。[2] 映像何かわからないとか、イラストが足の長いニワトリのようだとか、そういうのは横に置いて・・・犬が出ている番組はもちろん大好き。フィギアスケート、サッカーも好んで見てます。テレビっ子なぽーなのです。[3]",
+    "truncated": false,
+    "comments": []
+  },
+  {
+    "date": "2011.02.21",
+    "title": "食べる＝生きる",
+    "tags": [
+      "ぽー",
+      "食",
+      "2011年2月"
+    ],
+    "images": [
+      "https://stat.ameba.jp/user_images/20110221/10/rinbelu/7d/6c/j/o0500074811064696359.jpg",
+      "https://stat.ameba.jp/user_images/20110221/10/rinbelu/50/67/j/o0500033311064696358.jpg"
+    ],
+    "text": "週末のこと。晩ご飯は『焼き肉』[1] これは何のお肉でしょう？[2] 答えは『猪』。ピンク色の豚肉と比べるとかなり赤いですね。猪肉はコラーゲン・ビタミンたっぷりなのですょ～しかも低気温の冬に野山を駆けまわった猪は、脂の質も上がっているのです。養殖でないお肉を食べられる。とても貴重で贅沢なことです。ナゼ、そんな天然猪肉が手元にあるのか。それは、あるハンターのお宅訪問をしてきたからなのです。魚釣りの『漁』は経験済みですが、『猟』なんてまったく縁のない事。なのでとても興味深く貴重な時間でした。興味を惹かれたのはやはり猟犬たちのこと。１２０kgのイノシシに挑む勇ましい様子から、猿に木の上から毛を引っ張られたりして遊ばれる話など。ぽーにも肉を与えてみようと話したところ、「生肉をやると鶏とかを襲うようになるぞ～」とアドバイス。い、いや、さすがにナマはやりません。そういえば、銀牙はじっさまに熊のナマ肉を食べさせられてたなぁ・・・リアル流れ星 銀デスネ。戦後に配給では賄えなかった『動物性タンパク』を補うため、家族を飢えさせないためにお父さまが始めた猟。それがハンターになったきっかけだそうです。子供の頃は住宅街などもなく、なんと家の前から鴨を撃っていたそうですょ。猟歴５０年以上。とてつもない殺生をしてきているなぁと苦笑するハンター。時が流れ、すっかりさま変わりした町並みや住人。家族を守るための猟から、有害鳥獣駆除など猟を行う目的も変化しています。レジャーのための猟までありますよね。野生動物と対峙してきた５０年間。それは『自然』ともその年数を向き合ってきたということ。５０年でどんな変化があったのだろうか。聞きたい知りたいことは尽きません。また遊びに行ってきま～す",
+    "truncated": false,
+    "comments": []
+  },
+  {
+    "date": "2011.02.21",
+    "title": "そこに居るということ。",
+    "tags": [
+      "ぽー",
+      "日常",
+      "2011年2月"
+    ],
+    "images": [
+      "https://stat.ameba.jp/user_images/20110221/11/rinbelu/58/2e/j/o0500074811064803941.jpg",
+      "https://stat.ameba.jp/user_images/20110221/11/rinbelu/1b/c6/j/o0500033311064803942.jpg"
+    ],
+    "text": "視線を感じてふと顔をあげてみる。どうやらずっと見られていたようです。[1] 側に寄って眺めていたら、眠ってしまいました。[2]",
+    "truncated": false,
+    "comments": []
+  },
+  {
+    "date": "2011.02.22",
+    "title": "これもぽー。",
+    "tags": [
+      "ぽー",
+      "ドッグラン",
+      "2011年2月"
+    ],
+    "images": [
+      "https://stat.ameba.jp/user_images/20110222/16/rinbelu/69/94/j/o0499029711067298892.jpg",
+      "https://stat.ameba.jp/user_images/20110222/16/rinbelu/f5/e6/j/o0499033311067299295.jpg",
+      "https://stat.ameba.jp/user_images/20110222/16/rinbelu/e1/7a/j/o0499036811067298891.jpg",
+      "https://stat.ameba.jp/user_images/20110222/16/rinbelu/c7/99/j/o0500033311067298890.jpg"
+    ],
+    "text": "昨日のこと。とても暖かい一日にりました。いつもの高速SAのラン。やはり平日のお昼だけあって、だぁ～れもいません。よしっ、私が相手だっ。たっぷりまったり遊ぶぞ～っ。[1] 私の１０倍以上は走らされ、あっという間に口が開くぽーさん。[2] 写真もたっぷり撮れました。ベストショット２枚、どぞ見てやってください。[3][4] 変なカオ特集でした～",
+    "truncated": false,
+    "comments": []
+  },
+  {
+    "date": "2011.02.24",
+    "title": "犬に使います（笑）",
+    "tags": [
+      "ぽー",
+      "日用品",
+      "2011年2月"
+    ],
+    "images": [
+      "https://stat.ameba.jp/user_images/20110222/10/rinbelu/50/3d/j/o0500033311066816307.jpg",
+      "https://stat.ameba.jp/user_images/20110222/10/rinbelu/a3/42/j/o0500037511066816308.jpg",
+      "https://stat.ameba.jp/user_images/20110224/09/rinbelu/43/c6/j/o0500033311071133966.jpg"
+    ],
+    "text": "生後３ヶ月の頃には、とても大きく感じたベッド。[1] 最近では車内にて使っています。が、どうもベッドが小さく窮屈そう。ぽーさん大きくなったのだねぇ。[2] 狭くても寝ていたら大丈夫だけれど、立つと不安定でとてもキケン。さて、どうしようか。大きいサイズの同じ商品を買うか。どうせならふかふかのクッションも欲しい。あ、・・・・そういうの、どこかで見た。布団もセットされたベッド。そうだ、あるではないか～～[3] ○松屋にて発見しマシタ。新生児を寝かせたまま運ぶバスケット。用途を知ったら店員さんもびっくりかしらね～寝心地も安定性も良さそうです。邪魔なパーツはあとで外そうね。好みもあってなるべくシンプルなものを選択。しかし、フリルとかどこかしらラブリーで・・・なんだろぅこのびみょーな違和感。でも、でも、かわいいではないか～～",
+    "truncated": false,
+    "comments": []
+  },
+  {
+    "date": "2011.02.24",
+    "title": "イヌ と ヒト",
+    "tags": [
+      "ぽー",
+      "思い出",
+      "リンとベル",
+      "2011年2月"
+    ],
+    "images": [
+      "https://stat.ameba.jp/user_images/20110224/10/rinbelu/d4/33/j/o0500074811071148426.jpg",
+      "https://stat.ameba.jp/user_images/20110224/10/rinbelu/84/f3/j/o0500037511071148427.jpg",
+      "https://stat.ameba.jp/user_images/20110222/10/rinbelu/4b/01/j/o0499035311066816306.jpg",
+      "https://stat.ameba.jp/user_images/20110222/11/rinbelu/71/6b/j/o0480064011066882131.jpg",
+      "https://stat.ameba.jp/user_images/20110222/11/rinbelu/47/98/j/o0500037511066882130.jpg"
+    ],
+    "text": "ぽーは外を眺めるのが好き。２階の窓からは道行くヒトや犬達を眺め、そして１階では宅配業者や来客などを見ています。[1] 不審者が来ないかを見張っていたり、なわばりを守るためとかではなく、それはただ『眺めている』だけ。[2] ごく稀に「わふっ」と一声吠えることがありますが、そうそれも（たぶん）言ってみただけ。そばに寄ってみれば「こんちは～」ですから。こんなぽーの様子を見ていて、思い出すのはリンとのある出来事。小学生の頃から一緒に暮らした犬たち。リンとベル。[3] 私が小学５年生、リンはもうすぐ２歳になる頃。登校前の早朝に散歩するのが日課だったある日。地面を嗅ぐリンを連れてぼ～っと歩いていると、見知らぬおじさんが向こうからやって来る。それはよくある光景、気に留めることもなくすれ違う。すれ違っていたはずが・・・私は上着の胸ぐらを掴み上げられていた。・・・・・何が起きたのか理解不能です。次の瞬間。リンがうなり声を上げおじさんに飛びかかる。驚いたおじさん、手を離しそのまま逃走。そして何事もなかったかのように、地面の匂い探索に戻るリン。それに安心していつもの散歩を続ける私。（ナゼ通報しなかった）「群れを守る行動」だったのでしょうか。行動の理由はなんにせよ、私は飼い犬に守られたのです。リンは庭での放し飼いで、家の周囲をよくパトロールする名番犬。いまから考えると、始終警戒していてはストレスも多かったかも。それでも１８年生きてくれました。ココだけの話ですが・・・彼らとは人知を超えた繋がりがあるのですょ。[4] 性格によるものか、犬種特性なのか番犬にはなれないぽーさん。でもね、ぽーはそれでよいのだ。ぽーのことは私たちが守るから。ぬくぬくのんびりとstress-freeな生活を送るのだ。[5] ううむー ぬくぬくやけど、これはちょっとチガウなぁ～",
+    "truncated": false,
+    "comments": []
+  },
+  {
+    "date": "2011.02.28",
+    "title": "ルーク と ぽー",
+    "tags": [
+      "ぽー",
+      "お友達",
+      "別れ",
+      "2011年2月"
+    ],
+    "images": [
+      "https://stat.ameba.jp/user_images/20110228/10/rinbelu/eb/17/j/o0500066611080179526.jpg",
+      "https://stat.ameba.jp/user_images/20110228/10/rinbelu/12/b9/j/o0500066611080179527.jpg",
+      "https://stat.ameba.jp/user_images/20110228/10/rinbelu/dc/c4/j/o0500033311080179528.jpg",
+      "https://stat.ameba.jp/user_images/20110228/11/rinbelu/9f/fa/j/o0499033311080209472.jpg",
+      "https://stat.ameba.jp/user_images/20110228/11/rinbelu/a2/52/j/o0500033311080232344.jpg",
+      "https://stat.ameba.jp/user_images/20110228/11/rinbelu/09/79/j/o0500033311080232343.jpg",
+      "https://stat.ameba.jp/user_images/20110228/11/rinbelu/33/ae/j/o0500033311080232345.jpg",
+      "https://stat.ameba.jp/user_images/20110228/11/rinbelu/be/ae/j/o0499036411080232616.jpg"
+    ],
+    "text": "今朝は出張に行く相方を高速バス乗り場へお見送り。いつもと違う朝の風景のためか、状況判断できていないようですね。[1] 帰宅後にぽーに聞いてみました。「相方はどこ行ったん？」[2] いつもより首がよく曲がってマス。さてさて、週末のこと。生後４ヶ月の頃に出会いそれからはずっと仲良し、貴重なご近所ウィペット友達のルークくん。彼らが遠方に越すと聞き、遊び溜めするため会いに行ってきました。[3] ウィペットを初めて飼い始めた者どうし。ご飯の食べ方に成長具合など、共感したり違いを楽しんだりと交友を深めてきました。今までのぽーとルークくんの様子はコチラで見てやってくださぃ。生まれた日が２週間違うだけの♂同士。どちらも未去勢ですがケンカもせず、ほんと仲が良いのですょ～[4] おっと、これではアヤシい関係ですね。今回は走って遊ぶよりもレスリングが多かった２人。[5][6] そしてマウントの取り合いも。１歳半を迎えた♂同士だからでしょうかねぇ。遊びたいからなのか、上下関係をつけたいのか。どちらにしてもケンカにはならないので、安心して犬の行動生態学が学べちゃいます。同犬種、♂同士＆同年齢という条件のため、ほんとこの２人の様子は勉強になるのですょ。２歳になり、大人になりそれでも仲良くともに成長。そんなぽーとルークを気軽に近くで見ていきたかったなぁ。しかしですねっ！新しい生活を始めるルークくんの飼い主さんを、心から応援しているのです。それにしても・・・かならず毎年２組ほどは仲良い友人達が、遠方に越して行ってしまうのですけれども。[7] それでも、ぽーのうひょうひょ性格は変わるはずもないので。また会える日を楽しみにしてるょ～[8]",
+    "truncated": false,
+    "comments": []
+  },
+  {
+    "date": "2011.02.28",
+    "title": "ぽー訴える。",
+    "tags": [
+      "ぽー",
+      "日常",
+      "2011年2月"
+    ],
+    "images": [
+      "https://stat.ameba.jp/user_images/20110228/13/rinbelu/6c/1e/j/o0500033311080362194.jpg",
+      "https://stat.ameba.jp/user_images/20110228/13/rinbelu/28/c7/j/o0500074811080362193.jpg",
+      "https://stat.ameba.jp/user_images/20110228/13/rinbelu/15/9a/j/o0500074811080362195.jpg",
+      "https://stat.ameba.jp/user_images/20110228/13/rinbelu/d8/5f/j/o0500074811080362431.jpg"
+    ],
+    "text": "[1][2][3][4] 写真撮ってないで、ごはんあげて～～という皆さんの声が聞こえマシタ。",
+    "truncated": false,
+    "comments": []
+  },
+  {
+    "date": "2011.02.28",
+    "title": "非常事態警報発令中☆",
+    "tags": [
+      "ぽー",
+      "日常",
+      "2011年2月"
+    ],
+    "images": [
+      "https://stat.ameba.jp/user_images/20110228/13/rinbelu/f2/a2/j/o0500037511080383545.jpg",
+      "https://stat.ameba.jp/user_images/20110228/13/rinbelu/e7/ba/j/o0500066611080383547.jpg",
+      "https://stat.ameba.jp/user_images/20110228/13/rinbelu/90/cc/j/o0500037511080383541.jpg"
+    ],
+    "text": "わずかに開いた襖のスキマ。ぽーが気にしている隙間。[1] この奥には「ウォークインクローゼット」があります。着替えなど外出の準備はいつもこの中で。そのため私たちがこの中に入ることは、ぽーにとって由々しき事態なわけなのです。[2] 置いて行かれないか、一緒に出掛けられるのか、襖の奥にいるヒトをじっと見張るぽーなのでした。[3]",
+    "truncated": false,
+    "comments": []
+  }
+];
+
+(function() {
+  const seen = {};
+  entries.forEach(function(e) {
+    const key = e.date;
+    seen[key] = (seen[key] || 0) + 1;
+    e.id = 'e' + e.date.replace(/\./g, '-') + '-' + seen[key];
+  });
+})();
+
+
+// ---- render ----
+const allTags = [...new Set(entries.flatMap(e => e.tags))];
+let activeTags = new Set();
+let keyword = "";
+
+function highlightNums(text) {
+  return text.replace(/\[(\d+)\]/g, '<b>[$1]</b>');
+}
+
+function esc(s) {
+  return String(s == null ? "" : s).replace(/[&<>]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
+}
+
+function renderTagFilter() {
+  const el = document.getElementById('tagFilter');
+  el.innerHTML = allTags.map(t =>
+    `<button class="tag-btn${activeTags.has(t) ? ' active' : ''}" data-tag="${t}">${t}</button>`
+  ).join('');
+  el.querySelectorAll('.tag-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const tag = btn.dataset.tag;
+      if (activeTags.has(tag)) activeTags.delete(tag); else activeTags.add(tag);
+      renderTagFilter();
+      renderEntries();
+    });
+  });
+}
+
+function matches(entry) {
+  const tagOk = activeTags.size === 0 || entry.tags.some(t => activeTags.has(t));
+  const kw = keyword.trim();
+  const kwOk = kw === "" ||
+    entry.title.includes(kw) ||
+    entry.text.includes(kw) ||
+    entry.tags.some(t => t.includes(kw));
+  return tagOk && kwOk;
+}
+
+function renderEntries() {
+  const main = document.getElementById('main');
+  const filtered = entries.filter(matches);
+  document.getElementById('count').textContent = `${filtered.length} / ${entries.length} 件表示中`;
+  document.getElementById('noResults').style.display = filtered.length === 0 ? 'block' : 'none';
+
+  main.innerHTML = filtered.map(entry => `
+    <article class="entry" id="${entry.id}">
+      <div class="entry-head">
+        <span class="entry-title">${entry.title}</span>
+        <span class="entry-date">${entry.date}</span>
+      </div>
+      ${entry.images.length > 0 ? `
+      <div class="photo-grid">
+        ${entry.images.map((src, i) => `
+          <a href="${src}" target="_blank" rel="noopener">
+            <img src="${src}" loading="lazy" alt="${entry.title} 写真${i+1}">
+            <span class="num">${i+1}</span>
+          </a>
+        `).join('')}
+      </div>` : entry.photosLost ? `<p class="no-photo">（写真は掲載されていましたが、保存されていないため表示できません）</p>` : `<p class="no-photo">（この記事には写真がありません）</p>`}
+      ${entry.truncated ? `<p class="truncated-note">（＊続きは読めない）</p>` : ''}
+      <p class="entry-text">${highlightNums(entry.text)}</p>
+      <div class="tags">
+        ${entry.tags.map(t => `<button class="tag-pill" data-tag="${t}">${t}</button>`).join('')}
+      </div>
+      ${entry.comments && entry.comments.length > 0 ? `
+      <div class="comments">
+        <div class="comments-label">コメント（${entry.comments.length}件）</div>
+        ${entry.comments.map(c => `
+          <div class="comment">
+            <div class="comment-meta"><span class="author">${esc(c.author)}</span>${c.date ? ' ・ ' + esc(c.date) : ''}</div>
+            <div>${esc(c.text)}</div>
+          </div>
+        `).join('')}
+      </div>` : ''}
+    </article>
+  `).join('');
+
+  main.querySelectorAll('.tag-pill').forEach(btn => {
+    btn.addEventListener('click', () => {
+      activeTags = new Set([btn.dataset.tag]);
+      renderTagFilter();
+      renderEntries();
+      window.scrollTo({top:0, behavior:'smooth'});
+    });
+  });
+}
+
+document.getElementById('search').addEventListener('input', (e) => {
+  keyword = e.target.value;
+  renderEntries();
+});
+
+renderTagFilter();
+renderEntries();
+if (location.hash) {
+  const target = document.getElementById(location.hash.slice(1));
+  if (target) target.scrollIntoView({block: 'start'});
+}
+</script>
+
+</body>
+</html>

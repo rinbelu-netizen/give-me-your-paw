@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hey buddy, give me your paw! 絵日記帳 - 2013年4月</title>
+<style>
+  :root {
+    --bg: #faf6ef;
+    --card-bg: #ffffff;
+    --border: #e8dfd0;
+    --text: #4a4238;
+    --text-muted: #9a9082;
+    --accent: #c98a5e;
+    --accent-bg: #f5e6d8;
+    --accent-text: #8a5a35;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    padding: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: "Hiragino Kaku Gothic ProN", "Yu Gothic", "Meiryo", sans-serif;
+    line-height: 1.8;
+  }
+  header {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 32px 20px 16px;
+    text-align: center;
+  }
+  header h1 {
+    font-size: 22px;
+    font-weight: 500;
+    margin: 0 0 4px;
+    color: var(--text);
+  }
+  header p {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin: 0;
+  }
+  .controls {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 12px 20px 20px;
+    position: sticky;
+    top: 0;
+    background: var(--bg);
+    z-index: 10;
+  }
+  #search {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    font-size: 14px;
+    background: var(--card-bg);
+    color: var(--text);
+    margin-bottom: 10px;
+  }
+  .tag-filter {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .tag-btn {
+    font-size: 11px;
+    padding: 4px 12px;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    background: var(--card-bg);
+    color: var(--text-muted);
+    cursor: pointer;
+  }
+  .tag-btn.active {
+    background: var(--accent);
+    color: #fff;
+    border-color: var(--accent);
+  }
+  .count {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 0 20px 8px;
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+  main {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 0 20px 60px;
+  }
+  .entry {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 20px;
+    margin-bottom: 16px;
+  }
+  .entry-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+  .entry-title {
+    font-size: 16px;
+    font-weight: 500;
+  }
+  .entry-date {
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+  .photo-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+    gap: 6px;
+    margin-bottom: 12px;
+  }
+  .photo-grid a {
+    position: relative;
+    display: block;
+    aspect-ratio: 1;
+    overflow: hidden;
+    border-radius: 8px;
+    background: var(--accent-bg);
+  }
+  .photo-grid img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .photo-grid .num {
+    position: absolute;
+    bottom: 3px;
+    right: 4px;
+    font-size: 10px;
+    background: rgba(0,0,0,0.55);
+    color: #fff;
+    padding: 1px 5px;
+    border-radius: 8px;
+  }
+  .no-photo {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-bottom: 12px;
+  }
+  .truncated-note {
+    font-size: 12px;
+    color: var(--accent-text);
+    background: var(--accent-bg);
+    border-radius: 8px;
+    padding: 6px 10px;
+    margin: 0 0 12px;
+    display: inline-block;
+  }
+  .entry-text {
+    font-size: 14px;
+    line-height: 1.85;
+    margin: 0 0 12px;
+    white-space: pre-line;
+  }
+  .entry-text b {
+    color: var(--accent-text);
+    font-weight: 500;
+  }
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .tag-pill {
+    font-size: 11px;
+    padding: 2px 10px;
+    border-radius: 12px;
+    background: var(--accent-bg);
+    color: var(--accent-text);
+    cursor: pointer;
+    border: none;
+  }
+  .comments {
+    margin-top: 16px;
+    padding-top: 14px;
+    border-top: 1px dashed var(--border);
+  }
+  .comments-label {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+  }
+  .comment {
+    font-size: 13px;
+    line-height: 1.7;
+    margin-bottom: 12px;
+    padding-left: 10px;
+    border-left: 2px solid var(--accent-bg);
+  }
+  .comment-meta {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-bottom: 2px;
+  }
+  .comment-meta .author {
+    color: var(--accent-text);
+    font-weight: 500;
+  }
+  .no-results {
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 14px;
+    padding: 40px 0;
+    display: none;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Hey buddy, give me your paw! 絵日記帳</h1>
+  <p>ウィペットのぽー＆バドと暮らす日常あれこれ ― 2013年4月</p>
+</header>
+
+<div class="controls">
+  <input type="text" id="search" placeholder="キーワードで探す（例: 震災、ドッグラン、うみちゃん）">
+  <div class="tag-filter" id="tagFilter"></div>
+</div>
+<div class="count" id="count"></div>
+
+<main id="main"></main>
+<p class="no-results" id="noResults">該当する記事が見つかりません。</p>
+
+<script>
+const entries = [
+  {
+    "date": "2013.04.04",
+    "title": "同行JJ。",
+    "tags": [
+      "ぽー",
+      "バド",
+      "お友達",
+      "おでかけ",
+      "2013年4月"
+    ],
+    "images": [
+      "https://stat.ameba.jp/user_images/20130404/14/rinbelu/aa/84/j/o0399028012487375229.jpg",
+      "https://stat.ameba.jp/user_images/20130404/14/rinbelu/88/fb/j/o0399027412487378440.jpg",
+      "https://stat.ameba.jp/user_images/20130404/15/rinbelu/ad/b3/j/o0400026012487399457.jpg",
+      "https://stat.ameba.jp/user_images/20130404/15/rinbelu/80/68/j/o0399026112487399458.jpg",
+      "https://stat.ameba.jp/user_images/20130404/15/rinbelu/53/82/j/o0350044812487414496.jpg",
+      "https://stat.ameba.jp/user_images/20130404/15/rinbelu/ed/67/j/o0399026212487414497.jpg",
+      "https://stat.ameba.jp/user_images/20130404/15/rinbelu/26/24/j/o0400026612487442712.jpg",
+      "https://stat.ameba.jp/user_images/20130404/15/rinbelu/4c/9e/j/o0400026612487442711.jpg",
+      "https://stat.ameba.jp/user_images/20130404/15/rinbelu/b2/97/j/o0399026312487442713.jpg",
+      "https://stat.ameba.jp/user_images/20130404/15/rinbelu/f2/cd/j/o0399026412487442710.jpg",
+      "https://stat.ameba.jp/user_images/20130404/16/rinbelu/b4/b6/j/o0400026612487474020.jpg"
+    ],
+    "text": "曇り空だった、4月２日。\nお天道様のごキゲンを伺いながら繰りだす砂浜。\nぽバドにとってはいつもの砂浜散歩。\nだけれども、この日は特別な散歩になりました。\nなんと、なんと。砂浜には４頭のウィペット。[1]\n四国旅行をしていた、Jack & John兄弟が、\n旅の最終日に会いに来てくれたのだ～\n兄弟それぞれにお揃いの服を着て、\n「赤ウィペット 青ウィペット」が見慣れた砂浜にて戯れる。[2]\nあかうぃぺっと、あおうぃぺっと。\n言いにくいんだけど、こっそり気に入ってたりする。。\n同胎兄弟なJJ兄弟。\nバドよりちょうど半年若い、１歳４ヶ月だそうな。\n去勢済♂なJJ兄弟。年齢差もあることだし、\n緩みっぱのでへでへ顔のぽーを想像していたら。。\nJackに向かって。。[3]\nお次ぎはJohnに向かって。。。[4]\nイヌとは飼主の想像を（良い意味で）裏切ってくれるものなのダ。\nどちらかというと、バドの方がマウントしたりをしていたり。\nぽーの興味あるものが常に気になるバドくん。\nしつこさにうんざりしたJohnに叱られ、逃げてたのもバドらしい。\nそんなバドの相手をしてくれたのは、JJ家のお兄ちゃん。\n大喜びで走る追いかける、フリスビー大好きバド。[5]\n面倒くさがりな飼主だからね～\nフリスビーは車に常備しているのに遊んでもらえてないもんね。（⇧つまり、要するに、車から降ろしてないだけという。）\nぜひぜひ、またバドに投げてやってチョウダイ～[6]\nイヌが集まれば、飼主がしておきたいこと。\nそれは、「記念撮影」。\n難しい被写体としてよく言われるのが、動物と子供なわけで。\nそれがまたイヌ４頭ともなるとなおさらなわけで。\nJackさぁーん！どこ見てるのかな～。[7]\nいや。ぽー、それは後でいいから。[8]\n顔と足元に「もう、飽きたょ～」感をたっぷり表現するぽー。[9]\nというわけで、少し遊ばせてから再挑戦。\nなんとか一瞬だけど、撮れたぞ～～[10]\nJJ家のみなさま、とーっても忙しい行程の中、\nぽバドに時間を作っていただいてありがとうございました～。\nJack & John 、そしてJJお兄ちゃん、\n長旅で疲れていたのに遊んでくれてありがとねぇ。\n本日、ラストの写真は「楽しんでるじぇー」なJohnで〆っ[11]",
+    "truncated": false,
+    "comments": []
+  },
+  {
+    "date": "2013.04.05",
+    "title": "伝わってますか？",
+    "tags": [
+      "ぽー",
+      "日常",
+      "おもしろ",
+      "2013年4月"
+    ],
+    "images": [
+      "https://stat.ameba.jp/user_images/20130401/21/rinbelu/a5/f8/j/o0400030412483670638.jpg",
+      "https://stat.ameba.jp/user_images/20130401/21/rinbelu/b3/7d/j/o0399030712483670640.jpg",
+      "https://stat.ameba.jp/user_images/20130405/13/rinbelu/31/c8/j/o0400030012488703048.jpg",
+      "https://stat.ameba.jp/user_images/20130405/13/rinbelu/b2/b3/j/o0400030012488703047.jpg"
+    ],
+    "text": "部屋の隅にある机が私の作業場。\nこうしてブログを書いていたり、ごそごそ内職をしていたり。\n熱中していると、背中に注がれる熱いまなざし。\nそんなとき、真後ろを振り返ってみると、\n必ずぽーがこんな感じでテレパシーを送っているのです。[1]\nうんうん。ぽーの言いたい事はわかってるょ。\nでも、もうちょい待って。\nぽーの伝えたいことは、その時々によってチガウ。\n「天気が良いので散歩に行きませんか？」\n「トイレしたいので庭に出してください。」\n「ヒマ！」 etc...\nそうこうしているうちに、\n次は真横からぴしぴしと感じるテレパシー波。[2]\nぽーさん、さっきより近づいたね～\nいつもより運動量が多かった日なんかは、\n「ちょっと小腹がすいたんですけど」\nなんてこともあったりします。\nわわわ・・・か、かなり迫ってきてたっ！！[3]\nイヌたちの伝えたいことは、\n一緒に暮らす年数に比例してわかるようになるわけで。\n夏になればぽーも４歳。\n１日を過ごす度、そして１年、２年・・・\n以心伝心の度合いが高まるわけで。\n歳を取るのはちょっと寂しいけれど、歳を重ねるのは楽しみなのよね。\nうわ、近っ！！\nはぃ、お待たせ。では、参りましょうか～。[4]",
+    "truncated": false,
+    "comments": []
+  },
+  {
+    "date": "2013.04.06",
+    "title": "ひみつへいき。",
+    "tags": [
+      "ぽー",
+      "バド",
+      "うめ",
+      "動画",
+      "2013年4月"
+    ],
+    "images": [
+      "https://stat.ameba.jp/user_images/20130406/12/rinbelu/23/17/j/o0350048012489958244.jpg",
+      "https://stat.ameba.jp/user_images/20130406/12/rinbelu/43/d6/j/o0400030012489958246.jpg",
+      "https://stat.ameba.jp/user_images/20130406/12/rinbelu/f6/23/j/o0400029212489958245.jpg",
+      "https://stat.ameba.jp/user_images/20130406/12/rinbelu/45/5e/j/o0400030012489958247.jpg",
+      "https://stat.ameba.jp/user_images/20130406/16/rinbelu/19/bf/j/o0350046612490251375.jpg",
+      "https://stat.ameba.jp/user_images/20130406/16/rinbelu/cd/86/j/o0400030012490270649.jpg"
+    ],
+    "text": "ども、ぽーです。\nちょっと、うめの様子を覗きに行ってきます。[1]\n遊んだあとかなぁ、すやすや寝ているようです。\nさすがぼくたちの妹ですね。遊んで寝る、これ基本ですから。\nなんと、歯が生え変わってきたそうですよ。ぼくは奥歯や犬歯が抜けるころ、ご飯が食べにくくなったんですよねー\nバドは平気だったらしいけど、うめはどうかな？[2]\nあ、起きました。\nさすがぼくたちの妹ですね。難しい顔をしながら新聞を・・・\n齧ってます、ね。[3]\n（梅の写真？！）\nそして、さらに・・あーっ！\nそれは、あかん！うめ、だめだよー\nん？うめママが秘密兵器を使うそうです。\nなんでしょうか？？\nなんと。いたずら大王だったうめがお利口になりました。\nとっても集中しています！！\n秘密兵器とは、\nうめがぼくたちと暮らしていたときの動画でした！[4]\n満足したら、うめママの腕枕で寝始めましたよ。\n「用事ができないよ～」 なーんて言いながら、うめママもうとうと。[5]\nでは、そろそろぼくも帰ることにします。\nただいまー！\nmickyの腕枕でバドが寝てた。。。面白い顔になってるなぁ。\nバド、どいてー。次はぼくの順番だからね。[6]\n「あぁ～困ったなぁ。用事ができないよぉぉぉ～」",
+    "truncated": false,
+    "comments": []
+  },
+  {
+    "date": "2013.04.10",
+    "title": "砂浜を駆けるもの。",
+    "tags": [
+      "ぽー",
+      "バド",
+      "おでかけ",
+      "天候",
+      "2013年4月"
+    ],
+    "images": [
+      "https://stat.ameba.jp/user_images/20130410/09/rinbelu/eb/2d/j/o0400026612495113564.jpg",
+      "https://stat.ameba.jp/user_images/20130410/09/rinbelu/6c/12/j/o0400028112495113567.jpg",
+      "https://stat.ameba.jp/user_images/20130410/09/rinbelu/72/b9/j/o0400025812495113565.jpg",
+      "https://stat.ameba.jp/user_images/20130410/09/rinbelu/4f/db/j/o0400026612495117322.jpg",
+      "https://stat.ameba.jp/user_images/20130410/09/rinbelu/7f/9a/j/o0400026612495113566.jpg",
+      "https://stat.ameba.jp/user_images/20130410/09/rinbelu/cc/a0/j/o0400025712495120095.jpg",
+      "https://stat.ameba.jp/user_images/20130410/09/rinbelu/95/89/j/o0399025912495120832.jpg",
+      "https://stat.ameba.jp/user_images/20130410/09/rinbelu/94/a6/j/o0400025612495117323.jpg"
+    ],
+    "text": "全国的に大荒れの天気だった週末。\n雨は止み、晴れ間もみえ始めた日曜日。\nたっつーも居るし、みなで砂浜散歩だ～\nというわけで、全員揃うとやっぱ楽しいぞ。\nテンションも上がり、青い空にまで届きそう。[1]\nどうしたことか？\nたっつーがフードを頭からかぶり、身を縮こまらせている。[2]\nそれもそのはず。\nこれはたっつーが怪しい行動をしているのではなく、\nはしゃいでいる２頭＆１人がオカシイのである。\n晴れてはいるが、決して良い天候とは言えない状況なのだ。\nだってね、風で飛ばされた大量の砂が・・・[3]\n海の上までも走り抜けるほどの強風が吹いてるんだもの。[4]\n後から調べたところ、風速16m/sだとか。\n時速だと57.6km/h・・・・わおっ！[5]\nこんな日に海岸に近寄ってはいけませんね、はい。\n波高も1mは超えていたかも。\nちなみに沖縄では台風なみの大荒れだったそうなー[6]\n海岸では強い風が吹くことが多いけれど、\n流石にあまりのヒドい状況で早々に撤収することに。[7]\n外で遊ぶときは、やっぱ天候を確認しないとね～[8]",
+    "truncated": false,
+    "comments": []
+  },
+  {
+    "date": "2013.04.12",
+    "title": "居るだけで。",
+    "tags": [
+      "ぽー",
+      "バド",
+      "お友達",
+      "おでかけ",
+      "2013年4月"
+    ],
+    "images": [
+      "https://stat.ameba.jp/user_images/20130412/13/rinbelu/92/bc/j/o0399027412497474953.jpg",
+      "https://stat.ameba.jp/user_images/20130412/13/rinbelu/07/d6/j/o0399025612497474947.jpg",
+      "https://stat.ameba.jp/user_images/20130412/13/rinbelu/1c/62/j/o0400026612497485461.jpg",
+      "https://stat.ameba.jp/user_images/20130412/13/rinbelu/ed/e5/j/o0400026612497474948.jpg",
+      "https://stat.ameba.jp/user_images/20130412/20/rinbelu/cb/8a/j/o0399026712497907847.jpg",
+      "https://stat.ameba.jp/user_images/20130412/21/rinbelu/50/fd/j/o0400026612498000767.jpg",
+      "https://stat.ameba.jp/user_images/20130412/21/rinbelu/2c/38/j/o0400025312498012547.jpg",
+      "https://stat.ameba.jp/user_images/20130412/21/rinbelu/26/4b/j/o0400026912498012546.jpg",
+      "https://stat.ameba.jp/user_images/20130412/22/rinbelu/4a/bb/j/o0400026612498018777.jpg",
+      "https://stat.ameba.jp/user_images/20130412/22/rinbelu/fb/2e/j/o0399027412498041032.jpg"
+    ],
+    "text": "中途半端に終えることになった週末の海岸散歩。\nよーし、たっつーは居ないけれどリベンジだ～\nというわけで、\n陽太（ひなた）＆暖太（はるた）兄弟を誘ってみる。砂浜だし、ヒナハル家が一緒だし。で、大はしゃぎなぽバド。[1]\n一方、ヒナハル兄弟はと言うと・・\nいつもぽバドに転がされるからね～\nそれが、砂浜でなんて嫌な予感しかしないよね。でも・・ねぇ、陽太。ちょっとだけでも、一緒に遊んでみる？[2]\n本家のアテレコを真似てみました～。（どうでしょ？ぽくなってる？）\nヒナハルの喋り、好きなんですよぅ♪\nビションふぅヘアを風になびかせながら、ぽバドをじっと見つめる暖太。もこもこが気持ち良かったぞ～[3]\n砂浜では必ずもじょるのが、ぽーのマイルール。[4]　しかもやたらと、ヒナハルママの側を選んでもじょる。\nどう？と、目線ばっちり。[5]（もしや、もじょもじょを誘ってた？）\nさてさて、お次ぎはバドの番。\n甘えついでに、膝上のヒナハルごと押し倒し、[6]\nなんや、よくわからんことになっとります。[7]\n一緒に居るだけで、楽しい。これ、最高じゃないデスカ。[8]\nたっぷり（ぽバドが）遊んだ後は、\nカフェ・クライミングにてランチタイム～\nおやきに釘付けなヒナハル兄弟をこっそり撮ってみる。あ、暖太にバレた。[9]\nなんやかやで、ぽーを迎えた頃からのお付き合いなヒナハル家。\nまた一緒に散歩（もどき）をしようね～[10]",
+    "truncated": false,
+    "comments": []
+  },
+  {
+    "date": "2013.04.16",
+    "title": "証拠は確実に。",
+    "tags": [
+      "バド",
+      "いたずら",
+      "日常",
+      "2013年4月"
+    ],
+    "images": [
+      "https://stat.ameba.jp/user_images/20130416/13/rinbelu/a4/74/j/o0400030012502585501.jpg",
+      "https://stat.ameba.jp/user_images/20130416/13/rinbelu/f9/3e/j/o0400030012502585502.jpg",
+      "https://stat.ameba.jp/user_images/20130416/13/rinbelu/27/1c/j/o0400030012502585500.jpg"
+    ],
+    "text": "ふと玄関を見ると床にあったモノ。\nそれはぽバドのブツを取るために愛用している落とし紙。\n箱から出され、ボロボロになったちり紙。[1]\nねぇ、バドくん。これ、どうしてここにあるのか知ってる？\nついでに誰がしたのか知ってる？[2]\nそいでもって、バドくん。\nこれは、なぁに？[3]\n左足で紙をおさえて、咬んでは投げ、ちぎっては投げ・・・\n詳細な行動までバレてしまうのが、\nバドくおりてぃー",
+    "truncated": false,
+    "comments": []
+  },
+  {
+    "date": "2013.04.18",
+    "title": "そのあと。",
+    "tags": [
+      "ぽー",
+      "バド",
+      "散歩",
+      "おもしろ",
+      "2013年4月"
+    ],
+    "images": [
+      "https://stat.ameba.jp/user_images/20130416/21/rinbelu/0d/fe/j/o0399029712503028359.jpg",
+      "https://stat.ameba.jp/user_images/20130416/21/rinbelu/ff/7b/j/o0400030012503028361.jpg",
+      "https://stat.ameba.jp/user_images/20130416/21/rinbelu/2c/43/j/o0400029512503028360.jpg",
+      "https://stat.ameba.jp/user_images/20130416/21/rinbelu/ca/25/j/o0400028312503028362.jpg",
+      "https://stat.ameba.jp/user_images/20130418/14/rinbelu/f2/9e/j/o0400029512504889970.jpg"
+    ],
+    "text": "数ある散歩ルートのうちのひとつ。\n鴨の集まる川沿いをのんびりぷらぷら歩いていたある日。[1]\nいつもより鴨の警戒心がなく、\nいつまでも川岸で羽根を休めてるなぁーなんて、考えていたら・・\n私の背後から、勢いよくケモノが飛び出してきた。[2]\n案の定、しっかりと川の中へはまりマス。[3]\nバドは相変わらずだなぁ～と、思ったアナタ！！\n惜しいっ！　（・・・というか、誰なのか一目瞭然かな～）\n慎重なぽーだって、本能に従いやっちゃうんです。（小動物や、鳥を追いかける本能、ね。）\nだけれども、ぽバドでチガウのはそのあとの行動。ずぶ濡れ効果でテンションmaxになるのが、バド。\nそして、ぽーの場合は。。。[4]\n「しまったー・・・やってしもうたー。。。」と、\nそろりそろりと後退しながら川面から退避。\nぽバドそれぞれで、こんなにも行動がチガウのです。\nチガウといえば、そういえば。\n鉢植えの飾りが、\n抜かれては鉢のそばにちょこんと置かれている。\nそんなフシギ現象が続いていた我が家。\nある日、飼主は見た。\n飾りをそっと抜いて床に置く、ぽーの姿を。\n分かりやすく証拠を残すバドと、\nこっそり控えめないたずらをするぽー。\nさぁ、今日はどんなぽバドを見せてくれるのか。[5]",
+    "truncated": false,
+    "comments": []
+  }
+];
+
+(function() {
+  const seen = {};
+  entries.forEach(function(e) {
+    const key = e.date;
+    seen[key] = (seen[key] || 0) + 1;
+    e.id = 'e' + e.date.replace(/\./g, '-') + '-' + seen[key];
+  });
+})();
+
+
+// ---- render ----
+const allTags = [...new Set(entries.flatMap(e => e.tags))];
+let activeTags = new Set();
+let keyword = "";
+
+function highlightNums(text) {
+  return text.replace(/\[(\d+)\]/g, '<b>[$1]</b>');
+}
+
+function esc(s) {
+  return String(s == null ? "" : s).replace(/[&<>]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
+}
+
+function renderTagFilter() {
+  const el = document.getElementById('tagFilter');
+  el.innerHTML = allTags.map(t =>
+    `<button class="tag-btn${activeTags.has(t) ? ' active' : ''}" data-tag="${t}">${t}</button>`
+  ).join('');
+  el.querySelectorAll('.tag-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const tag = btn.dataset.tag;
+      if (activeTags.has(tag)) activeTags.delete(tag); else activeTags.add(tag);
+      renderTagFilter();
+      renderEntries();
+    });
+  });
+}
+
+function matches(entry) {
+  const tagOk = activeTags.size === 0 || entry.tags.some(t => activeTags.has(t));
+  const kw = keyword.trim();
+  const kwOk = kw === "" ||
+    entry.title.includes(kw) ||
+    entry.text.includes(kw) ||
+    entry.tags.some(t => t.includes(kw));
+  return tagOk && kwOk;
+}
+
+function renderEntries() {
+  const main = document.getElementById('main');
+  const filtered = entries.filter(matches);
+  document.getElementById('count').textContent = `${filtered.length} / ${entries.length} 件表示中`;
+  document.getElementById('noResults').style.display = filtered.length === 0 ? 'block' : 'none';
+
+  main.innerHTML = filtered.map(entry => `
+    <article class="entry" id="${entry.id}">
+      <div class="entry-head">
+        <span class="entry-title">${entry.title}</span>
+        <span class="entry-date">${entry.date}</span>
+      </div>
+      ${entry.images.length > 0 ? `
+      <div class="photo-grid">
+        ${entry.images.map((src, i) => `
+          <a href="${src}" target="_blank" rel="noopener">
+            <img src="${src}" loading="lazy" alt="${entry.title} 写真${i+1}">
+            <span class="num">${i+1}</span>
+          </a>
+        `).join('')}
+      </div>` : entry.photosLost ? `<p class="no-photo">（写真は掲載されていましたが、保存されていないため表示できません）</p>` : `<p class="no-photo">（この記事には写真がありません）</p>`}
+      ${entry.truncated ? `<p class="truncated-note">（＊続きは読めない）</p>` : ''}
+      <p class="entry-text">${highlightNums(entry.text)}</p>
+      <div class="tags">
+        ${entry.tags.map(t => `<button class="tag-pill" data-tag="${t}">${t}</button>`).join('')}
+      </div>
+      ${entry.comments && entry.comments.length > 0 ? `
+      <div class="comments">
+        <div class="comments-label">コメント（${entry.comments.length}件）</div>
+        ${entry.comments.map(c => `
+          <div class="comment">
+            <div class="comment-meta"><span class="author">${esc(c.author)}</span>${c.date ? ' ・ ' + esc(c.date) : ''}</div>
+            <div>${esc(c.text)}</div>
+          </div>
+        `).join('')}
+      </div>` : ''}
+    </article>
+  `).join('');
+
+  main.querySelectorAll('.tag-pill').forEach(btn => {
+    btn.addEventListener('click', () => {
+      activeTags = new Set([btn.dataset.tag]);
+      renderTagFilter();
+      renderEntries();
+      window.scrollTo({top:0, behavior:'smooth'});
+    });
+  });
+}
+
+document.getElementById('search').addEventListener('input', (e) => {
+  keyword = e.target.value;
+  renderEntries();
+});
+
+renderTagFilter();
+renderEntries();
+if (location.hash) {
+  const target = document.getElementById(location.hash.slice(1));
+  if (target) target.scrollIntoView({block: 'start'});
+}
+</script>
+
+</body>
+</html>

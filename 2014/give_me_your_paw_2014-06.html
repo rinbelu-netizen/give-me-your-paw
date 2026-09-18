@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hey buddy, give me your paw! 絵日記帳 - 2014年6月</title>
+<style>
+  :root {
+    --bg: #faf6ef;
+    --card-bg: #ffffff;
+    --border: #e8dfd0;
+    --text: #4a4238;
+    --text-muted: #9a9082;
+    --accent: #c98a5e;
+    --accent-bg: #f5e6d8;
+    --accent-text: #8a5a35;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    padding: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: "Hiragino Kaku Gothic ProN", "Yu Gothic", "Meiryo", sans-serif;
+    line-height: 1.8;
+  }
+  header {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 32px 20px 16px;
+    text-align: center;
+  }
+  header h1 {
+    font-size: 22px;
+    font-weight: 500;
+    margin: 0 0 4px;
+    color: var(--text);
+  }
+  header p {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin: 0;
+  }
+  .controls {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 12px 20px 20px;
+    position: sticky;
+    top: 0;
+    background: var(--bg);
+    z-index: 10;
+  }
+  #search {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    font-size: 14px;
+    background: var(--card-bg);
+    color: var(--text);
+    margin-bottom: 10px;
+  }
+  .tag-filter {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .tag-btn {
+    font-size: 11px;
+    padding: 4px 12px;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    background: var(--card-bg);
+    color: var(--text-muted);
+    cursor: pointer;
+  }
+  .tag-btn.active {
+    background: var(--accent);
+    color: #fff;
+    border-color: var(--accent);
+  }
+  .count {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 0 20px 8px;
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+  main {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 0 20px 60px;
+  }
+  .entry {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 20px;
+    margin-bottom: 16px;
+  }
+  .entry-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+  .entry-title {
+    font-size: 16px;
+    font-weight: 500;
+  }
+  .entry-date {
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+  .photo-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+    gap: 6px;
+    margin-bottom: 12px;
+  }
+  .photo-grid a {
+    position: relative;
+    display: block;
+    aspect-ratio: 1;
+    overflow: hidden;
+    border-radius: 8px;
+    background: var(--accent-bg);
+  }
+  .photo-grid img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .photo-grid .num {
+    position: absolute;
+    bottom: 3px;
+    right: 4px;
+    font-size: 10px;
+    background: rgba(0,0,0,0.55);
+    color: #fff;
+    padding: 1px 5px;
+    border-radius: 8px;
+  }
+  .no-photo {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-bottom: 12px;
+  }
+  .truncated-note {
+    font-size: 12px;
+    color: var(--accent-text);
+    background: var(--accent-bg);
+    border-radius: 8px;
+    padding: 6px 10px;
+    margin: 0 0 12px;
+    display: inline-block;
+  }
+  .entry-text {
+    font-size: 14px;
+    line-height: 1.85;
+    margin: 0 0 12px;
+    white-space: pre-line;
+  }
+  .entry-text b {
+    color: var(--accent-text);
+    font-weight: 500;
+  }
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .tag-pill {
+    font-size: 11px;
+    padding: 2px 10px;
+    border-radius: 12px;
+    background: var(--accent-bg);
+    color: var(--accent-text);
+    cursor: pointer;
+    border: none;
+  }
+  .comments {
+    margin-top: 16px;
+    padding-top: 14px;
+    border-top: 1px dashed var(--border);
+  }
+  .comments-label {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+  }
+  .comment {
+    font-size: 13px;
+    line-height: 1.7;
+    margin-bottom: 12px;
+    padding-left: 10px;
+    border-left: 2px solid var(--accent-bg);
+  }
+  .comment-meta {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-bottom: 2px;
+  }
+  .comment-meta .author {
+    color: var(--accent-text);
+    font-weight: 500;
+  }
+  .no-results {
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 14px;
+    padding: 40px 0;
+    display: none;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Hey buddy, give me your paw! 絵日記帳</h1>
+  <p>ウィペットのぽー＆バド（＆うめ）と暮らす日常あれこれ ― 2014年6月 ※so-netブログ・archive.orgより復元</p>
+</header>
+
+<div class="controls">
+  <input type="text" id="search" placeholder="キーワードで探す（例: 震災、ドッグラン、うみちゃん）">
+  <div class="tag-filter" id="tagFilter"></div>
+</div>
+<div class="count" id="count"></div>
+
+<main id="main"></main>
+<p class="no-results" id="noResults">該当する記事が見つかりません。</p>
+
+<script>
+const entries = [
+  {
+    "date": "2014.06.02",
+    "title": "足柄運動会2014夏ー後編。",
+    "tags": [
+      "足柄運動会",
+      "2014年6月"
+    ],
+    "images": [],
+    "text": "さてさて、午前の競技が終わればいよいよランチターイム♪\nずらりと並べたテーブルは、持ち寄りゴハンで賑やかに。イヌたちは良い香りに興味津々、飼主たちはお箸も会話もススム。そんなテーブルの脇では、ロン＆レイチェルがまったりと♪\nカレー待ちの行列に、小学校の給食を思い出したりなんかして♪（行列の中ほどではディルトワママがピースサイン〜）\n飼主たちのお腹は満たされてなんだかまったりムード。と、繋がれっぱなしで、ぽバドはヒマヒマ（笑\nもうちょっと待っててね。ランチ後のチャリティコーシングはなんと1番だからねっ♪\nいつものように、スタートはたっつーに任せて私はゴール付近へ。\n前回の冬の運動会では２頭同時に走らせることにして、ラキつば父さんに素敵な写真を撮って頂いておりまして♪（沢山の写真をいつもありがとうございますー！）\nうむ。ぽーはルアーを見ているけれど、バドはカメラ目線なのネ（笑\n今回のコーシングでは１頭ずつで。先ずは、バドから走らせてみようかのー。\nさて、バドくん。やはり全くルアーを見ておらず。というよりも、ルアーの前を走っていたような気がしたのだけれど（笑しかも途中で走るのを止めてしまったけれど、楽しそうではないか〜♪\n一方、ぽーはスタート時に暴れ、走り出してすぐ反復横跳びのような動き。さらにいつも以上にルアーに集中して走るという興奮ぶり・・・だったのだけれど、ぽーもまたバドと同じく途中でstop。\n水分不足だったり、興奮し過ぎだったり、妙な動きだったりと、様々なことが重なり足がつったか、かるーくひねったか何かしたらしく。（その後は全く何の問題もナシですのでご心配なくですー）\nそんな状態ではあったけれど、楽しそうではないか〜♪（あら？ルアー見てないやーん笑）\nラキつば父さんの素敵な写真と、イヌたちはこちら〜♪⇨うちのラッキー♂&つばめ♀\n昼休憩時にはチャリティコーシングの他に、爪切り・バザーなども行われ、それらが終わればいよいよ午後の競技がスタート。\nまずは『パン食い競走』の決勝戦。\n午前の競争で１着だったメンバーで走りますょー。で、見てみてー。決勝戦、赤チームメンバーの比率をっ♪\nそして、さらに、なんとなんと。たっつーが決勝戦での１着をgetしましたん〜！！賞品の到着は７月頃かしらん。大喜び、大はしゃぎでブログにUPする予定でっす♪\nさて、午後の競技２番目は『借り犬競争』。\nこの時点では最高得点だった、赤チームの私たちから始めマス。白チームのイヌたちの名が書かれた紙を順に箱の中から引き、フェンスに繋がれている中からそのコを連れて来ればポイントに。\n白チームのみなさんってばねぇ〜♪よく似たビオラと櫻に、お揃いの服を着せてミスリードを誘ってみたり。ロンにはザフラのスヌードを着せてミスリード、というよりも・・・めっちゃ可愛かったんですケド〜♪（残念なことに写真が無い！なので、ほめろぐをぜひ見てね〜♪⇨ほめろぐ）\n空き時間のたびに、みなで白チームのタープへと赴いて。イヌたちの名前と顔を確認したりしたから大丈夫だもんねー！\n・・・大丈夫なつもり、だったのだけれどネ。こんなことを言い訳にしちゃいけないんだけどネ・・・トイマンチェスターテリアのみなさんの見分けがつきましぇん。(次回はもっともっとトイマンたちと交流するぞぅ♪）\nそんなわけで、散々な結果に終わった赤チーム。続いては黄チームが私たち赤のイヌたちを選びますょー。\n大きさから（色も？）、多分ほぼサービス問題かもなぽー＆バド。しかも黄チームには、ぽバドのことをよく知るほめ家とルークレイル家が居る。\nけれども、他のメンバーにはそれほど知られていないはずだもんねー。さらに今回は、午後からトーテム＆ホピが参加してるもんねー♪\nしかも、異母兄弟のバドとホピはけっこう似てると思うの。どうデスカ？\nだから彼らとぽバドのカラーやリードを交換して。トテホピ父にバドを預け、私がトーテム＆ホピのリードを持ちフェンスに繋ぐ。\nそんな苦肉の策が効いたのかどうか、バドの代わりに間違えてトーテムが連れて来られたり、なんてこともあったけれど。\n23頭のイヌを並べていたはずなのだけれども。制限時間がやってきて、終わってみればこの通り。\n黄チーム凄い！！なんて、思っていたら、このあと白チームが黄色のイヌを全て正解するという快挙まで！\n僅差ではあったけれど、リードしていたはずがこの結果！\n残る競技は『選抜リレー』と『ピンポン玉運び』。\n赤チームみなでチカラを合わせて、取りかえすぞー！！あれこれ作戦立てて次の競技に挑みまっす。\nと、いうわけでもう少し続くー\n本日の〆写真。じゃれ合うアニュー＆永遠ちゃんの１歳＆２歳コンビ、と、そんな彼女たちを暖かく見守る４歳トーテムで♪",
+    "photosLost": true,
+    "truncated": false,
+    "comments": []
+  },
+  {
+    "date": "2014.06.05",
+    "title": "足柄運動会2014夏ー完結編。",
+    "tags": [
+      "足柄運動会",
+      "バド",
+      "2014年6月"
+    ],
+    "images": [],
+    "text": "前半までは調子良く首位をキープしていた赤チーム。ところが、いつの間にやらまさかの最下位に。こうなったら残る２競技で挽回するしかありませぬ。\nというわけで、先ずは『選抜リレー』。\nなんとしてでも赤チームに勝利をっ！\nそこで俊足ウィペットたちのチカラを借りることに。第一走者のクロバブ父はバドを、第二走者のクロバブ母はアニューを連れて走るじぇ！（ちなみに俊足なイヌを飼う鈍足な飼主の担当は、もちろん応援！）\nクロッキー＆バブルス家のバブルス〜♪（クロッキーの写真を撮れていなかったー）\nところで、なぜバドを選んだのかといいますと。ぽーの方がヒトに合わせて走るのだけれど、「やーめた」という気ままサンが登場する可能性が拭えない。そこで、私の元へ来たさに必死で走る可能性100%なバドにしてみた訳です。\nまもなく３歳を迎えるけれど、ぽー以上に甘えん坊で様々なことにおいて経験不足なバド。これも良い経験になるなぁとなんだか嬉しい飼主たち。\n案の定、クロバブ父にリードをひかれたバドは、状況をまったく飲み込めていない様子。（もちろん、リレーとか分かるはずもないけどさっ）\nクロバブ父＆バドの名コンビの行方は？！\nなんとなーく緊張しているバドに、話しかけたり撫でてくれたりなクロバブ父さん。軽く走る練習もしてみたりするうちにバドも楽しくなってきて。\nよーし、これで信頼関係もばっちりョ♪あとは走るのみ！（バド、張り切って行ってきなさーい！）\n選手陣、それぞれのスタート位置にイヌを連れて並びます。二番手の母に向けて、バトンの渡し方などを入念に確認するクロバブ父。\nスタートの合図に、赤・白・黄ともに勢いよく走り出すっ！！\n以下、連続写真をラキつば父さんのブログより拝借してきマシタ。\nクロバブ父さーん！バドーっ！がんばれー！！がんば・・・アレ？\nあーΣ(ﾟдﾟ;)\nあーーっ！\n隣で走っていたカラーも驚いて見ちゃうほどの豪快なこけっぷり！！\nクロバブ父さんのメガネも吹っ飛んじゃうほどでして。それなのに、クロバブ家のご家族揃ってバドの心配をしてくれて。\nというか・・実はですねぇ。。。スタート後に、バドがひょいっとクロバブ父さんの前に出たのですよ。それで踏まないよう気をつけてくれた結果、転んでしまったとオモウの。。。\nそんな様子も含め、実は動画もあったりしちゃうのです。（＊音量注意！私が叫んでてウルサいんです・・）\nそんなこんなでリレーの1着は逃したけれど、クロバブ父の体を張ったアクシデントでさらに結束力が固まる赤チーム！\n最終競技は『ピンポン玉運び』。\nここでなんと！午前より玉の数が増やされ、一つも落とす事なく最速で運べば逆転の可能性がでてきたゾ！\nスタート地点に並んだ私とたっつー。やっぱ、最初が肝心だもんねっ！気合いを入れていくぞぉ〜〜！！\n・・・はい。初っ端なから、１個落とした。地味〜〜に、ピンポン玉を１個落としました。\nあーどうせなら派手にぶちまけりゃ・・・\nと、そんなこんなで最終結果はこんな具合に。（白チーム、優勝おめでとです〜）\n勝っても、負けても楽しい足柄運動会っ！ランのオーナーさんからサプライズの野菜プレゼントもあったりして。３位の私たち赤チームもしっかり美味しい賞品を頂いちゃいマシタ♪\n閉会式が終わり、みなでイヌたちの落とし物を回収し解散！荷物を積んだりお話をして、さて帰ろうか・・と思ったけれども。\n会場のラン内のヒトやイヌの数も減ってきたことだし、ぽバドを軽く走らせてから帰ることに。その選択がまたまた嬉しい展開に♪\nココ・ベル・ジャスミンと遊んだじぇ〜♪（ココの写真がないー。しかも走ってるところも容量切れで撮れてないー）\nジャスミンがバウスタイルで遊びに誘ってくれたりもして。４頭でドドドと走る最後尾に、ミニピンのレッドも走ったりもしたりして。ぽバドも私たちもとっても嬉し楽しな運動会の〆となりマシタ！\nそんなこんなで、開始前からも終わってからも楽しいこと尽くしな運動会。\n準備も当日の進行も、そして終わってからのあれこれも。想像しただけでもとっても忙しく大変に違いなく。だからこそ、いつもほんとうにありがとう。\nそして参加したみなさま、同じ赤チームのみなさま。楽しい時間をありがとうございました！また冬に、もっと楽しくもっとさらに盛り上がりましょね〜♪",
+    "photosLost": true,
+    "truncated": false,
+    "comments": []
+  },
+  {
+    "date": "2014.06.23",
+    "title": "これもホントです。",
+    "tags": [
+      "ぽー",
+      "バド",
+      "日常",
+      "2014年6月"
+    ],
+    "images": [],
+    "photosLost": true,
+    "text": "「ぽーはイヌの本能がないのちゃうの〜　　　　　野生では生きられないねぇ〜( ´艸｀)ﾑﾌﾟﾌﾟ」\nチョットー！ぽーってば、そんなことを言われちゃってるわょ〜前回の記事であまりにも無防備な姿をさらけてしまったものネ。　　　　　　（誰のせいやねんてねぇ。(*￣∇￣*)ｴﾍﾍ）\nなーんて、実はその感想は母から届いたものなんですけどネ。まぁ、私の実家ですでに大概気の抜けた姿を見られてるのですけどねん♪\nぽーの名誉挽回（？）のためにも、サイトハウンド（視覚獣猟犬）らしい、イヌらしいところを紹介しちゃいましょかねぇ〜。(=￣∇￣=) ﾆｨ\nそれは散歩中によくある出来事で。とくに木々の多い公園などを歩いている時によくあることで。\nサイトハウンド（視覚獣猟犬）だけれども、視覚よりも嗅覚を働かせることの多いバドが『何か』に気がついたようデス。\n続きはこちら〜↓\nそんなバドの反応に、サイトハウンド（視覚獣猟犬）らしく、視覚そして、聴覚に頼りながら『その何か』を探すぽー。\nサイトハウンドではないし、嗅覚・聴覚ともに鈍い飼主は、視覚と第六感で『その何か』をぽバドと一緒に探しマス。(☆Д☆)ｷﾗﾘｰﾝ!!\nそして、私とバドがほぼ同時に、『何か』をはっけーん！！(ﾉ*ﾟ▽ﾟ)ﾉｵｵｵｯ♪\nそんなバドの反応に、もちろんぽーもこんな様子。\nその後しばらくは、その公園を抜けるまでは。耳・目・鼻センサーをフル稼働させながら、ふがふが言いながら歩きマス。\nね？サイトハウンドらしいデショ？イヌらしいデショ？　d(*ﾟ∀ﾟ*)ﾈｯ♪\nちなみに次の写真も、同じようにリスの気配に気をやるぽバドの様子です。\nいやいや〜ホントなんですょ。\n遊んだ直後だからね、チョットだけバドがおかしなことになってはいますけれども。真剣にリスを探してるんだってばさー",
+    "truncated": false,
+    "comments": []
+  },
+  {
+    "date": "2014.06.27",
+    "title": "健やか６月。",
+    "tags": [
+      "ぽー",
+      "バド",
+      "病院",
+      "2014年6月"
+    ],
+    "images": [],
+    "photosLost": true,
+    "text": "来年の６月は健康第一で乗り切りるじぇーっ！！\n何を今から１年も先の目標を立てているのかと言いますと。わたくし先々週に未だ咳の残る厄介な風邪をひきまして、その週末からはたっつーにしっかり伝染してしまいまして。\nそしてさらにこの月曜からはぽバドともにお腹を壊し、体調不良月間となったためでありますデス。\n軽症だったぽーはすでにすっきり完治。バドもほぼ８割程度まで快復し、今日はおもちゃを投げてくるほどに調子も良くなっておりマス♪\nいやいや、それはまだムリねー。台所に張付く元気が出たのはとっても嬉しいけどねん♪\n横浜に来てから初の通院。しかも病気知らずのバドの通院。そんなわけなので、かる〜くそれらをここに記録。（絶対、長くなるよねー。しかも食事中の方、スミマセヌー）\n続きはこちらから〜↓\n月曜日頃から粘膜混じりのナンベンになったぽバド。\nあぁ、大腸からきてるわね。きっと食べ過ぎの消化不良だわね。\n原因にあれこれと思い当たる節がある飼主は、即座にお腹壊した時用の特別療法食をぽバドに開始。ほんとは絶食させて腸を休めるのが良いとは知っているけれど、なにせ空腹になるとすぐに胆汁を吐いてしまうもんね。\nだからお粥やすりおろしりんご、お腹に良いハーブなど、その時の状態に合わせたものをごく少量ずつ数回にわけて与えております。　（今回は友人に教えてもらった食材も使ってミタ！ありがとね〜♪）\n翌日の火曜。ぽーは回復の兆しが見え始めたものの、バドの調子がよろしくない。\n痛むのか、腹部に違和感があるのか。私が立ち仕事をしているとウロウロしたり、啼いて訴えてきたり。しかし座って用事をしていると隣で落ち着いて眠ったりなんてことも。\nうーむ・・波がありそのタイミングが合っただけなのか、それとも甘えていたり安心できるからなのか。\nなにせ私にとってもバドにとっても、一緒に暮らし始めて初の病気。とにかく、しっかりよく観察してサインを見逃さないようにしないとネ。（正確には以前にもお腹壊したこともあるけれど、　　一回きりのハイベンですっきり治ったので悩まずだったのデス）\n幸いにも食欲はしっかりあるし、元気もあるのでもう少し様子を見ることに。が、夜には血が混じるようになり、夜中にはしっかりケツベンに。（辛そうなんだけど、あいかわらずこんな調子なバド。まぁ、暑かったのよネー。）\n水曜の朝を迎えて直ぐに、６時に回収したてのベンを持ち病院へ。　（向かったのは、診察時にはイヌを預けちゃういつものトコロ）実はその時にはほんのすこーし回復傾向にあったけれど病院へ。\n病院苦手なぽーとは違ってバドはそうでもなく、伏せてのんびりな待合室。飼主から離される診察時には、今まではぽバド揃ってワンワン啼いていたけれども。今回はバド独りきり、さてどうかしらと思っていたら・・・\n「はぁう〜ふぅぅぅーえ〜ん」と、か細い弱気な声が一度聞こえただけデシタ。\nさてさて、検査の結果は。熱もなく細菌感染もしておらず、やはり消化不良などによる大腸炎とのこと。念のための抗生剤の注射と整腸剤や大腸炎用の薬などの処方。ハイベン回数も多くケツベンも出ていたため、点滴で水分補給を受けることに。\nこの場合の点滴とは『皮下点滴』というものらしく。私もバドもこれまた初体験。\n「点滴」と聞き、静脈しか考えていなかったので処置の早さに先ずびっくり。背中から注入された輸液は300mlほど。肩周りに溜まったぷょぷょたぷたぷは、これからのんびり吸収されていくそうな。\n自宅に戻った頃には、重力に従い脇腹近くまで降りてきているたぷたぷ。\n夕方には1/3ほどの量に減り、胸の下でたぷたぷっと。そしてこの頃には薬も効いてきたのか、熟睡できるようになったらしく顔色も良くなってきて。（表情というべきかしら）\n木曜の朝にはケツベンや泥状ベンはすっかり消えチワワサイズの細さと形になり。昨晩はさらにかなりぐっすりと眠れたらしく。（私もね〜ヽ(´▽｀)ノﾜｰｲ♪）今日はしっかりとつまめるブツになったじぇ〜♪\n調子はかなり良さそうなので、夕方にはぽバド揃って少しだけ長めの散歩。溝に住んでるネコを探してみたり、道草を食べてみたり。\nうむ。やっぱ、バドはその表情、その行動なのよネ〜。(*´∇｀*)\nというわけで、来年の６月もこれからも健やかに暮らすぞー！\n＜覚書＞診察料　　　　　　　　　　　　　　　　　　　　　¥　500\n身体検査(体重・体温・視診・聴診・触診)　　　　　　　　¥1,500\n便検査(直接法)　　　　　　　　　　　　　　　　　　　　¥　800\n　　(浮遊法)　　　　　　　　　　　　　　　　　　　　　¥1,000\n皮下点滴(250~500ml)　　　　　　　　　　　　　　　　　¥3,000\n皮下・筋肉注射(15~20kg)　　　　　　　　　　　　　　　¥1,750\nX2処方料　　　　　　　　　　　　　　　　　　　　　　　¥　800\n調剤料　　　　　　　　　　　　　　　　　　　　　　　　¥　500\n内服薬(ビオイムバスター・リーダイ・スラマX５日分)　　　¥2,520\n合計(内税¥1,129)　　　　　　　　　　　　　　　　　　¥15,249\n支払い(保険適用)　　　　　　　　　　　　　　　　　　　¥7,624\n・・・か、家計のためにも健やかに暮らすぞー！！",
+    "truncated": false,
+    "comments": []
+  }
+];
+
+(function() {
+  const seen = {};
+  entries.forEach(function(e) {
+    const key = e.date;
+    seen[key] = (seen[key] || 0) + 1;
+    e.id = 'e' + e.date.replace(/\./g, '-') + '-' + seen[key];
+  });
+})();
+
+
+// ---- render ----
+const allTags = [...new Set(entries.flatMap(e => e.tags))];
+let activeTags = new Set();
+let keyword = "";
+
+function highlightNums(text) {
+  return text.replace(/\[(\d+)\]/g, '<b>[$1]</b>');
+}
+
+function esc(s) {
+  return String(s == null ? "" : s).replace(/[&<>]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
+}
+
+function renderTagFilter() {
+  const el = document.getElementById('tagFilter');
+  el.innerHTML = allTags.map(t =>
+    `<button class="tag-btn${activeTags.has(t) ? ' active' : ''}" data-tag="${t}">${t}</button>`
+  ).join('');
+  el.querySelectorAll('.tag-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const tag = btn.dataset.tag;
+      if (activeTags.has(tag)) activeTags.delete(tag); else activeTags.add(tag);
+      renderTagFilter();
+      renderEntries();
+    });
+  });
+}
+
+function matches(entry) {
+  const tagOk = activeTags.size === 0 || entry.tags.some(t => activeTags.has(t));
+  const kw = keyword.trim();
+  const kwOk = kw === "" ||
+    entry.title.includes(kw) ||
+    entry.text.includes(kw) ||
+    entry.tags.some(t => t.includes(kw));
+  return tagOk && kwOk;
+}
+
+function renderEntries() {
+  const main = document.getElementById('main');
+  const filtered = entries.filter(matches);
+  document.getElementById('count').textContent = `${filtered.length} / ${entries.length} 件表示中`;
+  document.getElementById('noResults').style.display = filtered.length === 0 ? 'block' : 'none';
+
+  main.innerHTML = filtered.map(entry => `
+    <article class="entry" id="${entry.id}">
+      <div class="entry-head">
+        <span class="entry-title">${entry.title}</span>
+        <span class="entry-date">${entry.date}</span>
+      </div>
+      ${entry.images.length > 0 ? `
+      <div class="photo-grid">
+        ${entry.images.map((src, i) => `
+          <a href="${src}" target="_blank" rel="noopener">
+            <img src="${src}" loading="lazy" alt="${entry.title} 写真${i+1}">
+            <span class="num">${i+1}</span>
+          </a>
+        `).join('')}
+      </div>` : entry.photosLost ? `<p class="no-photo">（写真は掲載されていましたが、保存されていないため表示できません）</p>` : `<p class="no-photo">（この記事には写真がありません）</p>`}
+      ${entry.truncated ? `<p class="truncated-note">（＊続きは読めない）</p>` : ''}
+      <p class="entry-text">${highlightNums(entry.text)}</p>
+      <div class="tags">
+        ${entry.tags.map(t => `<button class="tag-pill" data-tag="${t}">${t}</button>`).join('')}
+      </div>
+      ${entry.comments && entry.comments.length > 0 ? `
+      <div class="comments">
+        <div class="comments-label">コメント（${entry.comments.length}件）</div>
+        ${entry.comments.map(c => `
+          <div class="comment">
+            <div class="comment-meta"><span class="author">${esc(c.author)}</span>${c.date ? ' ・ ' + esc(c.date) : ''}</div>
+            <div>${esc(c.text)}</div>
+          </div>
+        `).join('')}
+      </div>` : ''}
+    </article>
+  `).join('');
+
+  main.querySelectorAll('.tag-pill').forEach(btn => {
+    btn.addEventListener('click', () => {
+      activeTags = new Set([btn.dataset.tag]);
+      renderTagFilter();
+      renderEntries();
+      window.scrollTo({top:0, behavior:'smooth'});
+    });
+  });
+}
+
+document.getElementById('search').addEventListener('input', (e) => {
+  keyword = e.target.value;
+  renderEntries();
+});
+
+renderTagFilter();
+renderEntries();
+if (location.hash) {
+  const target = document.getElementById(location.hash.slice(1));
+  if (target) target.scrollIntoView({block: 'start'});
+}
+</script>
+
+</body>
+</html>

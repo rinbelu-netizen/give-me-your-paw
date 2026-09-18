@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hey buddy, give me your paw! 絵日記帳 - 2010年7月</title>
+<style>
+  :root {
+    --bg: #faf6ef;
+    --card-bg: #ffffff;
+    --border: #e8dfd0;
+    --text: #4a4238;
+    --text-muted: #9a9082;
+    --accent: #c98a5e;
+    --accent-bg: #f5e6d8;
+    --accent-text: #8a5a35;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    padding: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: "Hiragino Kaku Gothic ProN", "Yu Gothic", "Meiryo", sans-serif;
+    line-height: 1.8;
+  }
+  header {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 32px 20px 16px;
+    text-align: center;
+  }
+  header h1 {
+    font-size: 22px;
+    font-weight: 500;
+    margin: 0 0 4px;
+    color: var(--text);
+  }
+  header p {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin: 0;
+  }
+  .controls {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 12px 20px 20px;
+    position: sticky;
+    top: 0;
+    background: var(--bg);
+    z-index: 10;
+  }
+  #search {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    font-size: 14px;
+    background: var(--card-bg);
+    color: var(--text);
+    margin-bottom: 10px;
+  }
+  .tag-filter {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .tag-btn {
+    font-size: 11px;
+    padding: 4px 12px;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    background: var(--card-bg);
+    color: var(--text-muted);
+    cursor: pointer;
+  }
+  .tag-btn.active {
+    background: var(--accent);
+    color: #fff;
+    border-color: var(--accent);
+  }
+  .count {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 0 20px 8px;
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+  main {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 0 20px 60px;
+  }
+  .entry {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 20px;
+    margin-bottom: 16px;
+  }
+  .entry-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+  .entry-title {
+    font-size: 16px;
+    font-weight: 500;
+  }
+  .entry-date {
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+  .photo-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+    gap: 6px;
+    margin-bottom: 12px;
+  }
+  .photo-grid a {
+    position: relative;
+    display: block;
+    aspect-ratio: 1;
+    overflow: hidden;
+    border-radius: 8px;
+    background: var(--accent-bg);
+  }
+  .photo-grid img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .photo-grid .num {
+    position: absolute;
+    bottom: 3px;
+    right: 4px;
+    font-size: 10px;
+    background: rgba(0,0,0,0.55);
+    color: #fff;
+    padding: 1px 5px;
+    border-radius: 8px;
+  }
+  .no-photo {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-bottom: 12px;
+  }
+  .truncated-note {
+    font-size: 12px;
+    color: var(--accent-text);
+    background: var(--accent-bg);
+    border-radius: 8px;
+    padding: 6px 10px;
+    margin: 0 0 12px;
+    display: inline-block;
+  }
+  .entry-text {
+    font-size: 14px;
+    line-height: 1.85;
+    margin: 0 0 12px;
+    white-space: pre-line;
+  }
+  .entry-text b {
+    color: var(--accent-text);
+    font-weight: 500;
+  }
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .tag-pill {
+    font-size: 11px;
+    padding: 2px 10px;
+    border-radius: 12px;
+    background: var(--accent-bg);
+    color: var(--accent-text);
+    cursor: pointer;
+    border: none;
+  }
+  .comments {
+    margin-top: 16px;
+    padding-top: 14px;
+    border-top: 1px dashed var(--border);
+  }
+  .comments-label {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+  }
+  .comment {
+    font-size: 13px;
+    line-height: 1.7;
+    margin-bottom: 12px;
+    padding-left: 10px;
+    border-left: 2px solid var(--accent-bg);
+  }
+  .comment-meta {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-bottom: 2px;
+  }
+  .comment-meta .author {
+    color: var(--accent-text);
+    font-weight: 500;
+  }
+  .no-results {
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 14px;
+    padding: 40px 0;
+    display: none;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Hey buddy, give me your paw! 絵日記帳</h1>
+  <p>ウィペットのぽー＆バドと暮らす日常あれこれ ― 2010年7月</p>
+</header>
+
+<div class="controls">
+  <input type="text" id="search" placeholder="キーワードで探す（例: 震災、ドッグラン、うみちゃん）">
+  <div class="tag-filter" id="tagFilter"></div>
+</div>
+<div class="count" id="count"></div>
+
+<main id="main"></main>
+<p class="no-results" id="noResults">該当する記事が見つかりません。</p>
+
+<script>
+const entries = [
+  {
+    "date": "2010.07.05",
+    "title": "すたーと",
+    "tags": [
+      "ぽー",
+      "はじめの記事",
+      "2010年7月"
+    ],
+    "images": [
+      "https://stat.ameba.jp/user_images/20100705/21/rinbelu/71/a3/j/o0768102410625192481.jpg"
+    ],
+    "text": "本名：popper。愛称：ぽー。2009年8月生まれ。「お手」は教えていないので、できない。[1] 徒然なるままに、時々更新。give me your paw、スタート。",
+    "truncated": false,
+    "comments": []
+  },
+  {
+    "date": "2010.07.06",
+    "title": "ぷちレトリーバー気分",
+    "tags": [
+      "ぽー",
+      "お出かけ",
+      "海",
+      "2010年7月"
+    ],
+    "images": [
+      "https://stat.ameba.jp/user_images/20100706/09/rinbelu/ee/6e/j/o0610044610625828714.jpg",
+      "https://stat.ameba.jp/user_images/20100706/09/rinbelu/01/a1/j/o0799050710625828715.jpg",
+      "https://stat.ameba.jp/user_images/20100706/09/rinbelu/78/17/j/o0800044910625831747.jpg",
+      "https://stat.ameba.jp/user_images/20100706/09/rinbelu/44/cc/j/o0800106610625828716.jpg"
+    ],
+    "text": "日曜日の朝の出来事。海で出会ったふじ吉くん＆あんなちゃんの兄妹犬（ダルメシアンと洋犬のミックス）は泳ぎがとても上手で、投げられたおもちゃも取りに行くほど。そんな2頭を見て、ぽーも海にダイブ。[1] おもちゃをしっかりキャッチしたものの、なぜか引き返さずそのまま沖へ向かって泳いでいく。結局1mほど進んだところでおもちゃを離し、あたふたと戻ってきた。[2] おもちゃをくわえたままでは泳げなかったようで、手放したおもちゃはあんなちゃんが無事回収。浜を走る楽しさに、海で泳ぐ楽しさも覚えた1日。[3] 口の中も砂だらけ。[4]",
+    "truncated": false,
+    "comments": []
+  },
+  {
+    "date": "2010.07.07",
+    "title": "容れ物は同じ",
+    "tags": [
+      "ぽー",
+      "成長記録",
+      "2010年7月"
+    ],
+    "images": [
+      "https://stat.ameba.jp/user_images/20100707/16/rinbelu/c0/45/j/o0500033310627833914.jpg",
+      "https://stat.ameba.jp/user_images/20100707/16/rinbelu/bf/74/j/o0800060010627835125.jpg",
+      "https://stat.ameba.jp/user_images/20100707/16/rinbelu/93/bd/j/o0500074810627833915.jpg"
+    ],
+    "text": "ぽーが我が家に来て6日目、2ヶ月と少し、体重6.2kg。[1] ぽーが我が家に来て5ヶ月目、7ヶ月と少し、体重16kg。狭っ。[2] ついでにぽーが我が家に来て2日目、体重5.7kg。[3] 表情は変わらないなぁ。",
+    "truncated": false,
+    "comments": []
+  },
+  {
+    "date": "2010.07.08",
+    "title": "膝を抱えて悩む犬",
+    "tags": [
+      "ぽー",
+      "車",
+      "2010年7月"
+    ],
+    "images": [
+      "https://stat.ameba.jp/user_images/20100708/15/rinbelu/eb/c1/j/o0500037510629407469.jpg"
+    ],
+    "text": "見たことありますか。私はあります。それは、こんな感じでした。[1] 車に近づくのも嫌がっていた頃の、後部座席でのぽーです。今では自分から乗り込むようになった。ドッグランや友達に会えたり、車に乗るとちょっといいことあるかもと、気付いてくれたのかな。自宅車庫に停めた車の中で、一緒に遊んだことが懐かしい。と言っても、今年1月頃の写真です。",
+    "truncated": false,
+    "comments": []
+  },
+  {
+    "date": "2010.07.08",
+    "title": "わんだほー",
+    "tags": [
+      "ぽー",
+      "お散歩グッズ",
+      "2010年7月"
+    ],
+    "images": [
+      "https://stat.ameba.jp/user_images/20100708/09/rinbelu/e4/73/j/o0299018910629056366.jpg",
+      "https://stat.ameba.jp/user_images/20100708/09/rinbelu/35/f0/j/o0300016610629060268.jpg",
+      "https://stat.ameba.jp/user_images/20100708/09/rinbelu/be/7e/j/o0300018710629060820.jpg",
+      "https://stat.ameba.jp/user_images/20100708/09/rinbelu/ba/eb/j/o0300040010629060825.jpg",
+      "https://stat.ameba.jp/user_images/20100708/15/rinbelu/a7/e0/j/o0375050010629408307.jpg"
+    ],
+    "text": "友人に教えてもらった、ワンダフルなアイテム「ワンダフン」。[1] 1.ビニール袋とトイレットペーパーをセット。[2] 2.愛犬のおしりの下にそっと差し入れ、ブツをget。[3] 3.柄先のリングを引き、きゅっと閉じて確保。[4] 4.トイレに流せば、愛犬もニッコリ。[5] という商品です。2回以上投下するぽーの散歩には超便利アイテム。しかも、回数が増える毎にやわらかくなるので、回収が非常に困難になるんですよね。でも、これなら掃除も気にせず簡単回収。おしりの下に置かれるのを嫌がらない子なら、とってもおすすめ。サイズは大・小あって、ぽーは大を使用。大きい子用ですが、回数が多いのでこれで十分。気になる方は、「名古屋モウルド」で検索。あくまでも個人的なおすすめです。",
+    "truncated": false,
+    "comments": []
+  },
+  {
+    "date": "2010.07.09",
+    "title": "謎は深まるばかり",
+    "tags": [
+      "ぽー",
+      "お散歩",
+      "2010年7月"
+    ],
+    "images": [
+      "https://stat.ameba.jp/user_images/20100709/13/rinbelu/3a/ea/j/o0360048010630765318.jpg",
+      "https://stat.ameba.jp/user_images/20100709/13/rinbelu/17/80/j/o0480064010630765317.jpg"
+    ],
+    "text": "昨日のこと。早朝の散歩を終えた主人が「妙な看板があったよ」と教えてくれた。わくわくしつつ、夕方の散歩で確認に行く。おぉ、これですね。[1] 「下現場」って、何のこっちゃ。って、あれ。「・・ゲンブツ・・・下現物」。もしかしてその竹2本はどなたかが、マムシと闘った名残だったのでしょうか。マムシの現物はいずこへ。ぽーにとっては、そんなことより散歩が優先ですよね。[2]",
+    "truncated": false,
+    "comments": []
+  },
+  {
+    "date": "2010.07.14",
+    "title": "やればできる",
+    "tags": [
+      "ぽー",
+      "しつけ",
+      "留守番",
+      "2010年7月"
+    ],
+    "images": [
+      "https://stat.ameba.jp/user_images/20100714/15/rinbelu/8c/43/j/o0500033310639027689.jpg",
+      "https://stat.ameba.jp/user_images/20100708/15/rinbelu/20/9b/j/o0500066610629407468.jpg"
+    ],
+    "text": "ぽーが我が家に来て、2週間のある日。私達の人間ドック受診のため、初の長時間留守番を経験した。昼間は私がたいてい居るし、ブリーダー宅では兄妹親戚たくさんいたので、その時が生まれて初めての独りきり。よっぽどストレスだったのか、その日は夜から数時間毎におなかが緩くなっていた。これがトラウマになったのか、おなかを壊すことはなくなったものの留守番が大嫌い。出かける準備をしていると「置いてったら恨むよ」という顔。[1] （これはこれでかわいい）帰宅後には扉の前で待ち構え、おおはしゃぎ。（これはたまらなくかわいい）そんな様子に嫌な予感と不安を覚え、ビデオを設置してみた。そこには1時間毎に窓の方へ向かっては泣く姿が。これはいかん。いわゆる「犬の分離不安症」ではないか。「分離不安症」とは、飼い主が留守の準備を始めると不安になり落ち着きがなくなる、留守中は不安が強くなり物を壊すなどの問題行動をとる、といった症状。物は壊さないけれど、留守中ずっとストレスフルだなんて辛すぎる。ひどくなると精神安定剤を処方される場合もあるとか。一連の行動をかわいいなんて思っている場合ではない。とにかく「留守番」が嫌な特別な状況でないようにしなければならない。ということで、外出の1時間前には準備を終えソファでくつろぐ（いつもより早起きが必要）。庭に少し出ては戻り、留守番が特別でない事のように装う（どうみても不審者）。帰宅後に喜んでいても、褒めない、相手にしない（こんなになついてくれてるのに）。などの方法を続けた結果、見事に変貌。[2] 準備をしていてもしらんぷり。留守中は寝てるかおもちゃで遊ぶ。帰宅後は、ベッドで寝たままあくびでお出迎え。これで安心して留守番をさせられる。・・・ちょっと寂しい。タイトルの「やればできる」は、ぽーではなく私たち『飼い主』のことなのでした。",
+    "truncated": false,
+    "comments": []
+  },
+  {
+    "date": "2010.07.16",
+    "title": "Big smile!!",
+    "tags": [
+      "ぽー",
+      "お散歩",
+      "2010年7月"
+    ],
+    "images": [
+      "https://stat.ameba.jp/user_images/20100716/10/rinbelu/f2/da/j/o0600080010641872811.jpg",
+      "https://stat.ameba.jp/user_images/20100716/10/rinbelu/0c/f3/j/o0499050510641872810.jpg"
+    ],
+    "text": "昨日の夕方、3日ぶりに雨が上がり散歩に行けた。[1] 友達にもたくさん会えて、ご機嫌のぽー。そんな様子にわたしも嬉しくて、一緒に池の周りを走ってしまった。[2] ぽーのおかげでダイエット成功中です。",
+    "truncated": false,
+    "comments": []
+  },
+  {
+    "date": "2010.07.17",
+    "title": "ここ掘れ わんわん",
+    "tags": [
+      "ぽー",
+      "海",
+      "2010年7月"
+    ],
+    "images": [
+      "https://stat.ameba.jp/user_images/20100717/11/rinbelu/92/29/j/o0800044910643450086.jpg",
+      "https://stat.ameba.jp/user_images/20100717/11/rinbelu/09/e5/j/o0499028110643450087.jpg"
+    ],
+    "text": "掘り掘り。[1] ちょっ、カメラ壊れるっ。[2] 連休は海日和だ。",
+    "truncated": false,
+    "comments": []
+  },
+  {
+    "date": "2010.07.19",
+    "title": "秘密基地",
+    "tags": [
+      "ぽー",
+      "2010年7月"
+    ],
+    "images": [
+      "https://stat.ameba.jp/user_images/20100719/14/rinbelu/f6/e1/j/o0400030010647379753.jpg"
+    ],
+    "text": "長雨で湿気った布団を干したり、雑草抜いたり充実した連休最後の日。ありゃ？そういえば、ぽーがいない。朝からほったらかしにしてたわ。どこに行ったのかしら。居ました。こんなところで拗ねてた。[1]",
+    "truncated": false,
+    "comments": []
+  },
+  {
+    "date": "2010.07.20",
+    "title": "若造パワー☆",
+    "tags": [
+      "ぽー",
+      "お出かけ",
+      "2010年7月"
+    ],
+    "images": [
+      "https://stat.ameba.jp/user_images/20100720/14/rinbelu/80/c0/j/o0799051910649156918.jpg",
+      "https://stat.ameba.jp/user_images/20100720/14/rinbelu/fd/6c/j/o0799053410649156939.jpg"
+    ],
+    "text": "週末のこと。海へ行くには暑すぎるので、遊び相手探しにドッグカフェへ行ってきた。看板犬はボーダーコリー。運動量、サイズともに良い遊び相手になってくれるかも。ところが、件の彼女には全く相手にされず、みな落ち着いた大人ばかり。しかもタイミング悪く、遊び好きな子は留守だった。ぽーさん、さらに遊びたい気持ちがつのり、独りハイテンション。[1] ようやくホームズ兄さんに、ちょこっと遊んでもらえた。[2]",
+    "truncated": false,
+    "comments": []
+  },
+  {
+    "date": "2010.07.21",
+    "title": "熱中症予防",
+    "tags": [
+      "ぽー",
+      "夏",
+      "2010年7月"
+    ],
+    "images": [
+      "https://stat.ameba.jp/user_images/20100720/20/rinbelu/d1/2f/j/o0500037510649705478.jpg"
+    ],
+    "text": "1.横に座りみつめる。2.正面にまわり目を合わせはぁはぁ言う（暑そうな感じで）。3.エアコンをつけてもらう。4.ソファに戻り寝る。5.エアコンを消される。6.起き上がりしばらく考える。7.1番に戻る。[1] 『ボクのためだけではないんですよ』",
+    "truncated": false,
+    "comments": []
+  },
+  {
+    "date": "2010.07.21",
+    "title": "popperなワケ",
+    "tags": [
+      "ぽー",
+      "名前の由来",
+      "2010年7月"
+    ],
+    "images": [
+      "https://stat.ameba.jp/user_images/20100708/15/rinbelu/2d/cb/j/o0500037510629407470.jpg",
+      "https://stat.ameba.jp/user_images/20100708/15/rinbelu/f9/d4/j/o0499037110629410154.jpg"
+    ],
+    "text": "ぽーの本名は『popper』。ブリーダーさんがつけてくれていた仮の名前から、ぽーに会う前から「ぽー」と呼んでいた。名前は最初に「ぽ」がつくのにしよう。でも結局、決まらないまま我が家に迎えた日の深夜。ぽーが居る部屋からぽんっぽんっと、なにやら軽快な音が。そう、ぽーがサークルから出ようと垂直飛びをしている音だった。[1] 『出たい』 私たち、顔を見合わせ『名前は popper だね』。「popper」には缶ビールの意味もあるそうで、ビール好きの私たちにぴったり。この日以来それでも、ずっと『ぽー』と呼ばれているぽー。本名が「popper」だなんて、たぶん絶対知らない。名前を決めてから8ヶ月が経過。試しに呼んでみた。「ぽっぱー！」[2] 『ん？』",
+    "truncated": false,
+    "comments": []
+  },
+  {
+    "date": "2010.07.22",
+    "title": "太陽な兄弟",
+    "tags": [
+      "ぽー",
+      "お友達",
+      "2010年7月"
+    ],
+    "images": [
+      "https://stat.ameba.jp/user_images/20100722/09/rinbelu/28/1a/j/o0500038210652277078.jpg",
+      "https://stat.ameba.jp/user_images/20100722/09/rinbelu/23/6d/j/o0499061610652277619.jpg",
+      "https://stat.ameba.jp/user_images/20100722/09/rinbelu/05/7a/j/o0499066410652277618.jpg"
+    ],
+    "text": "散歩友達の陽太くん＆暖太くん兄弟。[1] 彼らとの出会いは感動の連続だった。体格差のせいか怖がらせてしまうことがあるので、小さな子に出会った時はまず距離をおくことにしている。2人に出会った時も、20mほど手前で立ち止まってみた。すると、とてつもなく可愛い声。にゃあ、そんな声で呼ばれたら、行くしかないじゃない。[2] 『あれ？』 そう、彼らは自分たちより大きい子が好きな、素敵な兄弟だった。[3] 今でも会う度に、ぽーを熱く抱きしめてくれる。",
+    "truncated": false,
+    "comments": []
+  },
+  {
+    "date": "2010.07.23",
+    "title": "２８℃ ５５％",
+    "tags": [
+      "ぽー",
+      "2010年7月"
+    ],
+    "images": [
+      "https://stat.ameba.jp/user_images/20100723/10/rinbelu/91/f0/j/o0640048010653990214.jpg",
+      "https://stat.ameba.jp/user_images/20100723/10/rinbelu/3a/fd/j/o0600080010653987841.jpg",
+      "https://stat.ameba.jp/user_images/20100723/10/rinbelu/65/b3/j/o0768102410653986517.jpg"
+    ],
+    "text": "口元が笑ってるみたいだなぁ。[1] さらに接近。[2] 目元まで笑ってた。[3]",
+    "truncated": false,
+    "comments": []
+  },
+  {
+    "date": "2010.07.23",
+    "title": "油断大敵",
+    "tags": [
+      "ぽー",
+      "健康",
+      "マダニ",
+      "2010年7月"
+    ],
+    "images": [
+      "https://stat.ameba.jp/user_images/20100708/10/rinbelu/11/1a/j/o0299018910629067960.jpg"
+    ],
+    "text": "小さな事件が起きたので本日2回目の更新。ぽーをいつものように撫で回していると、何やら首筋に動くものが。なんと、体長1mmほどのマダニだった。[1] これの何が事件かというと、私たちの住む地域ではマダニが媒介するバベシア症という病気の報告例が多いため。実際に近所の子が亡くなり、また闘病生活をしている子の話もたくさん聞く。非常に重い貧血などを引き起こし、たとえ助かったとしても原因であるバベシア原虫の活動を抑えるのみなので、ずっと再発の恐怖と闘いながら生活をすることになる。外で走りまわることが好きなぽーなので、フロントラインという予防薬を投与している。ダニが体についてから吸血を始めるまでに殺してしまえという薬。（殺虫剤を体に浸透させるというのにも抵抗はあったんですけどねぇ）やはり予防薬をしていることから、安心感は増した。けれども、あのマダニがそのうち死んでいたとしても、体についているのを目にするとぞっとする。毎日のボディチェックは欠かせない。みなさま、外で遊ばせる時とくに山や草むらなどは気をつけてあげてください。",
+    "truncated": false,
+    "comments": []
+  },
+  {
+    "date": "2010.07.26",
+    "title": "ケモノらしさ",
+    "tags": [
+      "ぽー",
+      "成長記録",
+      "2010年7月"
+    ],
+    "images": [
+      "https://stat.ameba.jp/user_images/20100726/11/rinbelu/9f/c4/j/o0800060010659137758.jpg",
+      "https://stat.ameba.jp/user_images/20100726/11/rinbelu/4f/57/j/o0800106610659137759.jpg"
+    ],
+    "text": "ぽーさん、1歳まであと24日。体とともに歯も立派になって、すっかりケモノ。（ここだけ見ればね）[1] 生後4ヶ月頃に歯の抜け替わりが始まった。歯が足りないことや痛さのためか、食欲が落ち成長期なのに体重も減り心配になった私たち。けれどその頃、兄弟犬たちも同じように歯が生え変わり食欲が落ちていた。離れた土地に暮らしながら、同じ変化をみせて成長している兄弟たち。ほっとしたと同時に、可笑しさでブリーダーさんと笑い合ったのが懐かしい。これは当時の貴重な1枚。前歯ないし、犬歯もまだ乳歯。[2] 貴重と言えば、主人がぽーと遊んでいた時のこと。ぽーが「わんっ」と哭いた瞬間、口から白いものがポロリ。なんと奥歯の臼歯が飛び出して来たそうな。くしゃみで入れ歯飛び出すコントみたい。そんな貴重な瞬間、私は見れずでちょっと悔しい。",
+    "truncated": false,
+    "comments": []
+  },
+  {
+    "date": "2010.07.27",
+    "title": "散歩＝走る・遊ぶ",
+    "tags": [
+      "ぽー",
+      "お散歩",
+      "2010年7月"
+    ],
+    "images": [
+      "https://stat.ameba.jp/user_images/20100727/09/rinbelu/0a/45/j/o0800104410660742477.jpg",
+      "https://stat.ameba.jp/user_images/20100727/09/rinbelu/9d/53/j/o0640048010660741363.jpg"
+    ],
+    "text": "ぽーは『whippet（ウィペット）』という犬種。この犬種はかなりの運動量が必要。というより、走ったり遊んだりが大好き。犬同士で遊んだり、砂浜や広場で走っているときはとっても嬉しそうな顔をする。[1] 普段の散歩にもやっぱりフリーで走らせてあげたい。ウィペットオーナーなら、みんながそう考えてるかも。我が家ではそんな悩みは皆無。なぜならぽーの遊び場所はこんなところだから。[2] ここは家から歩いて10分の果樹園。オーナーさんの了承も得ているので、思いっきりここで走ってる。田舎、ばんざい。",
+    "truncated": false,
+    "comments": []
+  },
+  {
+    "date": "2010.07.27",
+    "title": "三つ巴",
+    "tags": [
+      "ぽー",
+      "家",
+      "2010年7月"
+    ],
+    "images": [
+      "https://stat.ameba.jp/user_images/20100727/13/rinbelu/28/65/j/o0600080010660985860.jpg",
+      "https://stat.ameba.jp/user_images/20100727/13/rinbelu/0c/1b/j/o0519058610660987863.jpg"
+    ],
+    "text": "マッサージチェアが届いた。主人と取り合いになるなぁと想像していたら、思わぬところに強敵が出現。[1] そう、柔らかいところ好きなんだよね。リモコンコードが気になるので、一旦どいてもらってタオルを敷いた。[2] 何ですの、その格好は。",
+    "truncated": false,
+    "comments": []
+  },
+  {
+    "date": "2010.07.29",
+    "title": "家計には優しい・・・かもしれない",
+    "tags": [
+      "ぽー",
+      "おもちゃ",
+      "2010年7月"
+    ],
+    "images": [
+      "https://stat.ameba.jp/user_images/20100729/13/rinbelu/44/74/j/o0799053410664367638.jpg",
+      "https://stat.ameba.jp/user_images/20100729/13/rinbelu/02/63/j/o0499066610664375592.jpg",
+      "https://stat.ameba.jp/user_images/20100720/20/rinbelu/c2/4b/j/o0500066610649705494.jpg"
+    ],
+    "text": "ぽーの好きなおもちゃ、No.1はペットボトル。ボールやぬいぐるみよりも、これが好き。[1]『生後3ヶ月』今では鼻の届くところにうっかり置いてると、勝手に持って行ってしまう。[2]『生後11ヶ月』でも今はこんな歯（ケモノらしさ参照）。以前はしばらく遊べていたが、現在は数秒で破壊。カケラを食べてしまいそうであまり遊ばせたくない。そこで登場、最近のおもちゃNo.1はこれ。[3] 大きいものほどテンションも上がり、安上がりなおもちゃで大満足の様子。但し、燃えるゴミ増えました。",
+    "truncated": false,
+    "comments": []
+  },
+  {
+    "date": "2010.07.30",
+    "title": "重力のなすがまま",
+    "tags": [
+      "ぽー",
+      "夏",
+      "2010年7月"
+    ],
+    "images": [
+      "https://stat.ameba.jp/user_images/20100730/10/rinbelu/4b/07/j/o0798059710665749009.jpg",
+      "https://stat.ameba.jp/user_images/20100730/10/rinbelu/ba/c9/j/o0739102410665749010.jpg"
+    ],
+    "text": "ぽーさん、はみ出てるよ。[1]『ん？』 いや、何がって「舌」がもれてますよ。[2]『暑いし、ええのん』",
+    "truncated": false,
+    "comments": []
+  },
+  {
+    "date": "2010.07.30",
+    "title": "エモノ以上ナカマ未満",
+    "tags": [
+      "ぽー",
+      "猫",
+      "家族",
+      "2010年7月"
+    ],
+    "images": [
+      "https://stat.ameba.jp/user_images/20100730/15/rinbelu/f4/37/j/o0500037510666140197.jpg",
+      "https://stat.ameba.jp/user_images/20100730/15/rinbelu/26/fc/j/o0299020010666140198.jpg",
+      "https://stat.ameba.jp/user_images/20100730/15/rinbelu/91/b1/j/o0299020010666140196.jpg"
+    ],
+    "text": "ぽーは『whippet（ウィペット）』という犬種。小動物を見ると突然走りだし、追いかけてしまう性質がある。ぽーも散歩中にネコや鳩に出会うと興味津々。私の実家には猫三兄妹がいる。初めての対面は、ぽー生後5ヶ月、ネコ達もまだ1歳未満。心配していたケンカも起きず、どちらかというと猫達と遊びたがるぽー。それから数回の対面を経て現在。側でくつろいだり。[1] ちょっかいかけられたり。[2] 遊んだり。[3] 三人三様、それなりに仲良くなってきた。ネコ達の名前は上から、レタス・ゴンタ・パセリ。",
+    "truncated": false,
+    "comments": []
+  }
+];
+
+(function() {
+  const seen = {};
+  entries.forEach(function(e) {
+    const key = e.date;
+    seen[key] = (seen[key] || 0) + 1;
+    e.id = 'e' + e.date.replace(/\./g, '-') + '-' + seen[key];
+  });
+})();
+
+
+// ---- render ----
+const allTags = [...new Set(entries.flatMap(e => e.tags))];
+let activeTags = new Set();
+let keyword = "";
+
+function highlightNums(text) {
+  return text.replace(/\[(\d+)\]/g, '<b>[$1]</b>');
+}
+
+function esc(s) {
+  return String(s == null ? "" : s).replace(/[&<>]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
+}
+
+function renderTagFilter() {
+  const el = document.getElementById('tagFilter');
+  el.innerHTML = allTags.map(t =>
+    `<button class="tag-btn${activeTags.has(t) ? ' active' : ''}" data-tag="${t}">${t}</button>`
+  ).join('');
+  el.querySelectorAll('.tag-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const tag = btn.dataset.tag;
+      if (activeTags.has(tag)) activeTags.delete(tag); else activeTags.add(tag);
+      renderTagFilter();
+      renderEntries();
+    });
+  });
+}
+
+function matches(entry) {
+  const tagOk = activeTags.size === 0 || entry.tags.some(t => activeTags.has(t));
+  const kw = keyword.trim();
+  const kwOk = kw === "" ||
+    entry.title.includes(kw) ||
+    entry.text.includes(kw) ||
+    entry.tags.some(t => t.includes(kw));
+  return tagOk && kwOk;
+}
+
+function renderEntries() {
+  const main = document.getElementById('main');
+  const filtered = entries.filter(matches);
+  document.getElementById('count').textContent = `${filtered.length} / ${entries.length} 件表示中`;
+  document.getElementById('noResults').style.display = filtered.length === 0 ? 'block' : 'none';
+
+  main.innerHTML = filtered.map(entry => `
+    <article class="entry" id="${entry.id}">
+      <div class="entry-head">
+        <span class="entry-title">${entry.title}</span>
+        <span class="entry-date">${entry.date}</span>
+      </div>
+      ${entry.images.length > 0 ? `
+      <div class="photo-grid">
+        ${entry.images.map((src, i) => `
+          <a href="${src}" target="_blank" rel="noopener">
+            <img src="${src}" loading="lazy" alt="${entry.title} 写真${i+1}">
+            <span class="num">${i+1}</span>
+          </a>
+        `).join('')}
+      </div>` : entry.photosLost ? `<p class="no-photo">（写真は掲載されていましたが、保存されていないため表示できません）</p>` : `<p class="no-photo">（この記事には写真がありません）</p>`}
+      ${entry.truncated ? `<p class="truncated-note">（＊続きは読めない）</p>` : ''}
+      <p class="entry-text">${highlightNums(entry.text)}</p>
+      <div class="tags">
+        ${entry.tags.map(t => `<button class="tag-pill" data-tag="${t}">${t}</button>`).join('')}
+      </div>
+      ${entry.comments && entry.comments.length > 0 ? `
+      <div class="comments">
+        <div class="comments-label">コメント（${entry.comments.length}件）</div>
+        ${entry.comments.map(c => `
+          <div class="comment">
+            <div class="comment-meta"><span class="author">${esc(c.author)}</span>${c.date ? ' ・ ' + esc(c.date) : ''}</div>
+            <div>${esc(c.text)}</div>
+          </div>
+        `).join('')}
+      </div>` : ''}
+    </article>
+  `).join('');
+
+  main.querySelectorAll('.tag-pill').forEach(btn => {
+    btn.addEventListener('click', () => {
+      activeTags = new Set([btn.dataset.tag]);
+      renderTagFilter();
+      renderEntries();
+      window.scrollTo({top:0, behavior:'smooth'});
+    });
+  });
+}
+
+document.getElementById('search').addEventListener('input', (e) => {
+  keyword = e.target.value;
+  renderEntries();
+});
+
+renderTagFilter();
+renderEntries();
+if (location.hash) {
+  const target = document.getElementById(location.hash.slice(1));
+  if (target) target.scrollIntoView({block: 'start'});
+}
+</script>
+
+</body>
+</html>

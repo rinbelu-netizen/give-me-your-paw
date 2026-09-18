@@ -1,0 +1,833 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hey buddy, give me your paw! 絵日記帳 - 2010年10月</title>
+<style>
+  :root {
+    --bg: #faf6ef;
+    --card-bg: #ffffff;
+    --border: #e8dfd0;
+    --text: #4a4238;
+    --text-muted: #9a9082;
+    --accent: #c98a5e;
+    --accent-bg: #f5e6d8;
+    --accent-text: #8a5a35;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    padding: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: "Hiragino Kaku Gothic ProN", "Yu Gothic", "Meiryo", sans-serif;
+    line-height: 1.8;
+  }
+  header {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 32px 20px 16px;
+    text-align: center;
+  }
+  header h1 {
+    font-size: 22px;
+    font-weight: 500;
+    margin: 0 0 4px;
+    color: var(--text);
+  }
+  header p {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin: 0;
+  }
+  .controls {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 12px 20px 20px;
+    position: sticky;
+    top: 0;
+    background: var(--bg);
+    z-index: 10;
+  }
+  #search {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    font-size: 14px;
+    background: var(--card-bg);
+    color: var(--text);
+    margin-bottom: 10px;
+  }
+  .tag-filter {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .tag-btn {
+    font-size: 11px;
+    padding: 4px 12px;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    background: var(--card-bg);
+    color: var(--text-muted);
+    cursor: pointer;
+  }
+  .tag-btn.active {
+    background: var(--accent);
+    color: #fff;
+    border-color: var(--accent);
+  }
+  .count {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 0 20px 8px;
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+  main {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 0 20px 60px;
+  }
+  .entry {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 20px;
+    margin-bottom: 16px;
+  }
+  .entry-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+  .entry-title {
+    font-size: 16px;
+    font-weight: 500;
+  }
+  .entry-date {
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+  .photo-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+    gap: 6px;
+    margin-bottom: 12px;
+  }
+  .photo-grid a {
+    position: relative;
+    display: block;
+    aspect-ratio: 1;
+    overflow: hidden;
+    border-radius: 8px;
+    background: var(--accent-bg);
+  }
+  .photo-grid img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .photo-grid .num {
+    position: absolute;
+    bottom: 3px;
+    right: 4px;
+    font-size: 10px;
+    background: rgba(0,0,0,0.55);
+    color: #fff;
+    padding: 1px 5px;
+    border-radius: 8px;
+  }
+  .no-photo {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-bottom: 12px;
+  }
+  .truncated-note {
+    font-size: 12px;
+    color: var(--accent-text);
+    background: var(--accent-bg);
+    border-radius: 8px;
+    padding: 6px 10px;
+    margin: 0 0 12px;
+    display: inline-block;
+  }
+  .entry-text {
+    font-size: 14px;
+    line-height: 1.85;
+    margin: 0 0 12px;
+    white-space: pre-line;
+  }
+  .entry-text b {
+    color: var(--accent-text);
+    font-weight: 500;
+  }
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .tag-pill {
+    font-size: 11px;
+    padding: 2px 10px;
+    border-radius: 12px;
+    background: var(--accent-bg);
+    color: var(--accent-text);
+    cursor: pointer;
+    border: none;
+  }
+  .comments {
+    margin-top: 16px;
+    padding-top: 14px;
+    border-top: 1px dashed var(--border);
+  }
+  .comments-label {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+  }
+  .comment {
+    font-size: 13px;
+    line-height: 1.7;
+    margin-bottom: 12px;
+    padding-left: 10px;
+    border-left: 2px solid var(--accent-bg);
+  }
+  .comment-meta {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-bottom: 2px;
+  }
+  .comment-meta .author {
+    color: var(--accent-text);
+    font-weight: 500;
+  }
+  .no-results {
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 14px;
+    padding: 40px 0;
+    display: none;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Hey buddy, give me your paw! 絵日記帳</h1>
+  <p>ウィペットのぽー＆バドと暮らす日常あれこれ ― 2010年10月</p>
+</header>
+
+<div class="controls">
+  <input type="text" id="search" placeholder="キーワードで探す（例: 震災、ドッグラン、うみちゃん）">
+  <div class="tag-filter" id="tagFilter"></div>
+</div>
+<div class="count" id="count"></div>
+
+<main id="main"></main>
+<p class="no-results" id="noResults">該当する記事が見つかりません。</p>
+
+<script>
+const entries = [
+  {
+    "date": "2010.10.01",
+    "title": "友人宅なぅ",
+    "tags": [
+      "ぽー",
+      "お出かけ",
+      "お友達",
+      "2010年10月"
+    ],
+    "images": [
+      "https://stat.ameba.jp/user_images/20101001/14/rinbelu/a4/58/j/o0768102410777139032.jpg"
+    ],
+    "text": "友人宅にてランチです♪[1] ぽー大好きの友人夫婦。とくにこちらのご主人、もぉぽーにべた惚れしてくれてるんです♪( ´▽｀) 帰宅後に「ぽぉぉぉぉ～～(T△T)」と叫びながら、このソファに突っ伏してくれるのを期待していま～す（＾◇＾）",
+    "truncated": false,
+    "comments": []
+  },
+  {
+    "date": "2010.10.02",
+    "title": "９月２０日 里帰り旅〜４日目",
+    "tags": [
+      "ぽー",
+      "旅行",
+      "2010年10月"
+    ],
+    "images": [
+      "https://stat.ameba.jp/user_images/20100929/09/rinbelu/b9/9c/j/o0500037510773457065.jpg",
+      "https://stat.ameba.jp/user_images/20100929/09/rinbelu/15/81/j/o0499077210773457984.jpg",
+      "https://stat.ameba.jp/user_images/20100929/09/rinbelu/a7/44/j/o0500074810773458680.jpg"
+    ],
+    "text": "１９日～２２日までは、青森の実家にてのんびり滞在です。宿もいいですけれど、やはり家が落ち着きますねぇ。ぽーもあっという間に慣れておなかを見せて寝たり、義父からソファを取り上げたりしてくつろいでいます。四国で日中が３０℃のころ、青森では２０℃前後。雨が降ったり止んだりでしたが、とっても快適な気温。すっかり秋に模様替した道を散歩。（ぽーさん変なカオになっていますが）[1] そして私たちはちょこっと足を伸ばして、「立佞武多の館」へ行ってきました。「ねぷた」や「ねぶた」と言えば、青森ねぶたが有名ですよね～それぞれの地域によって、山車の土台や大きさなど様々で掛け声なども違うそうです。立佞武多は背が高いことで有名で、なんと高さ２０m以上！！掛け声は「ヤッテマレ」、やってしまえ～という意味だそうです。[2] ね、大きいでしょ？[3] こちらは上から撮影。マタギをモチーフにしていて、見えませんが熊を背負ってます。展示されている山車は実際の祭りで運行され、しかも３年毎に造り換えるそうです。昔のねぷたも写真で紹介されているのですが、顔の造作などがちょっと下手だったりするのも面白いです。帰省しつつ観光も楽しむ里帰り旅。翌日は『ぽー野生に返る』の巻です。",
+    "truncated": false,
+    "comments": []
+  },
+  {
+    "date": "2010.10.04",
+    "title": "９月２１日 里帰り旅〜５日目",
+    "tags": [
+      "ぽー",
+      "旅行",
+      "2010年10月"
+    ],
+    "images": [
+      "https://stat.ameba.jp/user_images/20100929/09/rinbelu/de/12/j/o0500074810773457983.jpg",
+      "https://stat.ameba.jp/user_images/20101004/10/rinbelu/1e/e3/j/o0500033310782489369.jpg",
+      "https://stat.ameba.jp/user_images/20101004/10/rinbelu/40/9b/j/o0500033310782489370.jpg",
+      "https://stat.ameba.jp/user_images/20100929/09/rinbelu/11/fc/j/o0500033310773457982.jpg",
+      "https://stat.ameba.jp/user_images/20100929/09/rinbelu/bc/ad/j/o0500033310773457066.jpg",
+      "https://stat.ameba.jp/user_images/20100929/09/rinbelu/a8/f1/j/o0499032810773458682.jpg",
+      "https://stat.ameba.jp/user_images/20101004/10/rinbelu/81/b4/j/o0500033310782489368.jpg"
+    ],
+    "text": "この日ぽーの散歩に向った場所は、岩木山麓の公園。雨が降ったり止んだりの里帰り旅でしたが、この日は雨の途切れる時間帯がけっこう多い。そして件の公園はペットもO.K.のキャンプ場で、広い芝生に約1,000本の桜が植えられています。こんな面白いカタチの木もありました。[1] この公園、広さはなんと3.8ha！！・・・ヘクタール。換算したところ、38,000㎡または11,495坪・・・うーん、広すぎてよくわからない。よく比較対象になる東京ドームは46,755 m2だそうです。おぉ、桜林公園めっちゃ広いんじゃないですか？（ちなみに東京ドーム、行ったことないです）雨模様のせいか人の気配なし。ならば・・・ちょっとだけ失礼して。。。後はもう、ご存知の通り走る。[2] 走る。[3] 走る。[4] 走る。[5] 見ているこちらも楽しくなるくらいの走りっぷりでした～こんなに広い場所で走ったのは初めてです。ここに居る間、雨が降らなかったのもほんとラッキー。そして、『ラッキー』と言えば・・・家族でご飯中、瓶ビールを飲んでいるときに義弟が「これって稀に違うラベルがあるんだっけ？」そこでビール好き主人が返答したのが、『ラッキーエビス』について。右手に釣り竿、左手に鯛を持つ恵比寿さま。数百本に１本、右脇の魚籠に鯛が入ってるものがあるそうなんです。へぇ～そんなのあるんやぁ～と、何気なしに側の瓶をくるっと回すと・・・鯛が入ってる！！なんという偶然、なんというタイミング。皆で盛り上がったのは言うまでもありません。[6] ぽーも一緒に記念撮影。翌朝、青森を発ち新潟の温泉宿へ向います。ぽーとの初めてづくしの里帰り旅。なんだか後半も楽しくなる予感です。[7]",
+    "truncated": false,
+    "comments": []
+  },
+  {
+    "date": "2010.10.05",
+    "title": "季節を感じる",
+    "tags": [
+      "ぽー",
+      "2010年10月"
+    ],
+    "images": [
+      "https://stat.ameba.jp/user_images/20101005/09/rinbelu/5e/9d/j/o0500066610784161142.jpg",
+      "https://stat.ameba.jp/user_images/20101005/09/rinbelu/63/e7/j/o0500037510784160873.jpg",
+      "https://stat.ameba.jp/user_images/20101005/09/rinbelu/74/8a/j/o0500066610784160872.jpg",
+      "https://stat.ameba.jp/user_images/20101005/09/rinbelu/67/ac/j/o0500066610784160874.jpg"
+    ],
+    "text": "[1] 空の雲や木々の様子で季節の移り変わりを感じる。もう一つ我が家での指標は、ぽーです。ぽーがお陽さまを求めて移動するようになってきました。今朝の撮れたて画像[2] 先日の友人宅でもこの通り。[3] このソファ、ふかふかで余計に気持ちよいんでしょうね～夕方の散歩もこんなに影が長くなりました。[4] う～ん、困ったなぁ～朝からぽーを眺めていると、まった～りして用事ができないなぁ～～う～、えーと・・・なんて怖いカオなのだ。でもじつはこれ、熟睡して白目になってるだけですのでご安心を。",
+    "truncated": false,
+    "comments": []
+  },
+  {
+    "date": "2010.10.06",
+    "title": "ぽーの日常",
+    "tags": [
+      "ぽー",
+      "お友達",
+      "お散歩",
+      "2010年10月"
+    ],
+    "images": [
+      "https://stat.ameba.jp/user_images/20101006/09/rinbelu/a9/7e/j/o0500066410785810611.jpg",
+      "https://stat.ameba.jp/user_images/20101006/09/rinbelu/18/ef/j/o0500066410785810612.jpg",
+      "https://stat.ameba.jp/user_images/20101006/09/rinbelu/31/45/j/o0500037510785810613.jpg",
+      "https://stat.ameba.jp/user_images/20101006/09/rinbelu/eb/4e/j/o0500037410785810940.jpg"
+    ],
+    "text": "今朝も外を眺めるぽーさん[1] そして「散歩いけますょ？」と誘われマシタ[2] ブログ更新したら行くから、ちょい待ちね。あ・・・１人で一階に降りて行ってしもうた。えーとですね、昨日はとても楽しい散歩になりました。この子はご近所のネムちゃんです。[3] 会うといつも遊びたそうにしていた２人。里帰り前に一度遊んだのですが、それきり会えずで昨日は久しぶりの再会でした。[4] ２人とも駆け回り、レスリングをして大はしゃぎ。あまりの喜びように、私も始終笑い声がもれてます。以前はうっかり彼女のリードが離れると、大喜びで駆け出し捕まえるのが大変だったとか。けれどこの場所でよく遊ばせるようになってから、呼び戻しがきくようになったそうです。ぽーは未だに友達わんこが一緒のとき、言うこときかなくなりがちなんですよね～これからも時々、こうして遊べそうです。よかったねぇ～ぽーさん。犬同士で遊んでいる姿って、ほんと楽しい。おっと、再びぽーが呼びに来ました。ではでは、散歩に行ってまいりまーす。",
+    "truncated": false,
+    "comments": []
+  },
+  {
+    "date": "2010.10.07",
+    "title": "９月２２日 里帰り旅〜６日目",
+    "tags": [
+      "ぽー",
+      "旅行",
+      "2010年10月"
+    ],
+    "images": [
+      "https://stat.ameba.jp/user_images/20101004/11/rinbelu/47/f2/j/o0500037510782552053.jpg",
+      "https://stat.ameba.jp/user_images/20101004/11/rinbelu/8a/5e/j/o0500033310782552052.jpg",
+      "https://stat.ameba.jp/user_images/20101004/11/rinbelu/fa/6d/j/o0500074810782552724.jpg",
+      "https://stat.ameba.jp/user_images/20101004/11/rinbelu/25/f6/j/o0500033310782552723.jpg",
+      "https://stat.ameba.jp/user_images/20101004/12/rinbelu/d9/ab/j/o0500033310782622260.jpg",
+      "https://stat.ameba.jp/user_images/20101004/11/rinbelu/f4/68/j/o0500033310782552725.jpg"
+    ],
+    "text": "予定走行距離 550km。目的地 新潟 咲花温泉。宿 阿賀のめぐみ 望川閣。今回の旅の成果か車にすっかり慣れたぽーですが、３日間の実家滞在がとても快適だったようです。荷物を積み終えてぽーを乗せると、再び始まる長距離ドライブに気がついたのか、この表情にこんな格好。[1] もしくは「帰りたくないなぁ～」かもしれません。たしかに３日間の帰省はちょっと短かったなぁ・・・後ろ髪を引かれつつ、向う先は新潟 咲花温泉。源泉かけ流し、弱アルカリの硫黄泉。部屋数２０のうち、２部屋のみペットO.K.の温泉宿。青森から四国までは、全行程を車で３日かけて帰ります。ならば、初日はやっぱ『温泉』でのんびりしないとね～太平洋フェリーで仙台→名古屋も考えました。しかしペットルームの予約制がなく先着順になります。噂ではこちらの会社の方がペットへの対応が良いとか。けれどもしペットルームの利用ができないと、２２時間弱を車両甲板で過ごすことになります。同じ車内ならばぽーさん、一緒に長距離ドライブを楽しもうか。そして、いよいよ「ペットと泊まれる宿」初挑戦です。ロビーではさすがにきょろきょろ不審な動き。部屋は５０８号室。エレベーターに乗るのも初めてだなぁ・・・とか思う間もなく、すんなり乗るぽーさん。私たちと一緒なら怖いものなしのようです。気になる部屋は、なんと二間続きの和室。[2] 前日にもシーズーくんが泊まったそうですが、匂いも全くしないしとてもきれいです。ぽーにはわかるらしく、くんくんやっていましたけれど（笑部屋にバスはなくシャワートイレのみですが、無くても大丈夫。だってとっても良いお湯でしたから。しかも夜も朝も、大浴場貸し切り状態で幸せでした～交代でお風呂に行っている間、主人はぽーと周辺探検。すぐそばの咲花温泉駅にはなんと、SLが停車します。翌日10:45停車予定、これは待たなければ。[3] 線路横には思わず散歩したくなる道も続いています。雨が相変わらず降ったりやんだりですけれど、犬連れには嬉しい環境。[4] 宿といえば、気になるのが食事。写真の品以外に、茶碗蒸し、あさりのわっぱ飯、デザートがついていました。もぉ、おなかいっぱいになりましたょ～[5] 配膳をしてもらっている間、ぽーは大人しくそばのクッションで我慢です。不服そうな顔が何かを物語っていますが（笑[6] 吠えないしおとなしいしお利口だね～と、仲居さんから褒めて頂きました。ふふふ・・・実はウィペットはあまり吠えない犬種ですもんね～吠えない喧嘩しないぽーのこの性格、ランやカフェでもほんと助かっています。だからこそ初めての宿泊でも、こういう宿を選べました。いやぁ、楽しいなぁ～翌日は汽車を待ち、その後は岐阜 ひるがの高原へ向います。走行距離も今までで一番短いので、少し余裕をもつ私たち。それが雨で色々と予定変更になるんですよね～その話はまた改めて・・・",
+    "truncated": false,
+    "comments": []
+  },
+  {
+    "date": "2010.10.08",
+    "title": "９月２３日 里帰り旅〜７日目（汽車待ち編）",
+    "tags": [
+      "ぽー",
+      "旅行",
+      "2010年10月"
+    ],
+    "images": [
+      "https://stat.ameba.jp/user_images/20101004/13/rinbelu/71/77/j/o0499032010782663166.jpg",
+      "https://stat.ameba.jp/user_images/20101004/13/rinbelu/16/3b/j/o0500033310782663714.jpg",
+      "https://stat.ameba.jp/user_images/20101004/13/rinbelu/25/a8/j/o0500033310782663167.jpg",
+      "https://stat.ameba.jp/user_images/20101004/13/rinbelu/b6/86/j/o0500033310782663168.jpg",
+      "https://stat.ameba.jp/user_images/20101004/13/rinbelu/02/22/j/o0500033310782663716.jpg",
+      "https://stat.ameba.jp/user_images/20101004/13/rinbelu/4e/ca/j/o0500033310782663710.jpg",
+      "https://stat.ameba.jp/user_images/20101004/13/rinbelu/b3/3e/j/o0500033310782664325.jpg",
+      "https://stat.ameba.jp/user_images/20101004/13/rinbelu/71/25/j/o0500033310782664324.jpg"
+    ],
+    "text": "予定走行距離 397km。目的地 岐阜 ひるがの高原。宿 和み舎 ひるがの。雨に煙る山を眺めつつ読書にふける・・・[1] ように見えるかもですが、雑誌を楽しんでます（笑朝食は大広間なのですが、追加料金で部屋食に変更。留守番中に私の実家の壁を破いた前科のあるぽー。ましてやまだ一泊しかしていない宿でとなると。試しに少しだけ２人で部屋を出てみました。が、すぐそばに居るのがばれて実験にならず。チェックアウトを済ませ、汽車の時刻までロビーにてお茶タイム。[2] 雨が降っているので散歩もできず、ぽーさん暇そう。[3] あら？何かに気がついた。[4] 首を伸ばして覗く、ぽーさん。[5] ソファの影に主人が隠れてマシタ。こんな感じで遊んでいる間に、雨も少し小降りに。そろそろ駅に向かいましょうか。[6] 時刻が近づくにつれ、人も増えてきました。[7] パパに抱っこされた男の子が「こわい～～」と呟いています。なのでちょっと離れたところに移動。離れ際、聞こえたパパの声。「大丈夫だょ。トーマスが来るんだょ」おっと、ぽーのことじゃなかったのね（笑それにしても、なかなか汽車が来ません。到着時刻もすでに過ぎている・・・これは、もしかして。そう、運行中止なのでした。ざんねんーざんねんだーと２人で呟きながら出発すると、なんと川が濁流になっているではないですか。[8] 運行中止の原因はわからないままですが、もしかしたらこの大雨が理由かも。一晩で水かさの増した川に驚きつつ、すぐそばのICから高速道路に乗り込みました。宿泊先のひるがの高原も雨モヨウ。のんびり休憩入れつつ走っても１７時までには到着できるかな。自炊が必要な宿のため買物なども必要だけれど、時間には余裕がありそぅ・・・・。To be continued！",
+    "truncated": false,
+    "comments": []
+  },
+  {
+    "date": "2010.10.09",
+    "title": "９月２３日 里帰り旅〜７日目（ひるがの編）",
+    "tags": [
+      "ぽー",
+      "旅行",
+      "2010年10月"
+    ],
+    "images": [
+      "https://stat.ameba.jp/user_images/20101005/13/rinbelu/22/b7/j/o0369033810784357607.jpg",
+      "https://stat.ameba.jp/user_images/20101005/13/rinbelu/e6/fd/j/o0500066610784417389.jpg",
+      "https://stat.ameba.jp/user_images/20101005/14/rinbelu/13/cf/j/o0500033310784444062.jpg",
+      "https://stat.ameba.jp/user_images/20101005/14/rinbelu/1d/22/j/o0499032410784444065.jpg",
+      "https://stat.ameba.jp/user_images/20101005/14/rinbelu/de/96/j/o0500033310784444507.jpg",
+      "https://stat.ameba.jp/user_images/20101005/14/rinbelu/c4/78/j/o0500033310784444508.jpg",
+      "https://stat.ameba.jp/user_images/20101005/14/rinbelu/a1/f6/j/o0500033310784444064.jpg",
+      "https://stat.ameba.jp/user_images/20101005/14/rinbelu/f9/89/j/o0500032010784462315.jpg"
+    ],
+    "text": "予定走行距離 397km。目的地 岐阜 ひるがの高原。宿 和み舎 ひるがの。宿泊先のひるがの高原も雨モヨウ。汽車待ちで出発が予定より遅れたけれど、のんびり休憩入れつつ走っても１７時までには到着できるかな。自炊が必要な宿のため買物も必要。でも時間には余裕がありそぅ・・・・。そう、もっと「余裕」あるはずだったんですょ。高速に乗りしばらくして現れた掲示板。[1] ん～雨に霞んでよく見えないなぁ～というより、見たくない現実。170kmほど先で雨のため通行止らしぃ。糸魚川ー朝日の３０km区間で、糸魚川を先頭に２kmほど渋滞。別ルートも考えましたが、どちらにしても遠回り。雨が止む気配もないので解除も難しそう。「時間の余裕」もあるのでそのまま進むことにしました。渋滞区間もさほど伸びていないまま糸魚川に到着。そして強制的に一般道へ。一般道走行は３０kmほどですが、海沿い＆交通量増加で体力も消耗します。わたしもぽーも夢の中・・・[2] １５時を若干まわったところで、朝日ICから再び高速へ。高速に乗ってすぐの入善SAで小休止。どこからともなくJARTICの放送が流れました。「雨のため通行止になっていた糸魚川ー朝日区間、１５時に解除されました」やはり、そうですか～。雨が少し前から止んだもの。朝日ICの入口に車が並んでたし。まぁでも降りてすぐ解除されるよりはイタくない。汽車や高速、雨に翻弄されたこの日。約１時間毎の休憩マイルールを守りながらも、なんとか１９時までに無事到着しました。翌朝に撮影したものですが、外観はこんな感じ。[3] こちらのお宿は「コンセプトコテージ」スタイル。私たちが宿泊したのは『和モダン』。他に囲炉裏のある『古民家』などもあるようです。１０人まで泊まれるように寝具や食器も揃っていて、ビールサーバーまであるので、生樽頼めば大宴会できちゃう。写真の左手には４畳の和室、奥に洗面所と半露天風呂。２階にはロフトと８畳和室。ふつーに一軒家ですね～[4] 各棟にあるテラスでBBQもできます。[5] 部屋はキレイですし、鍵までかわいい。[6] そしてこの時の気温は９℃。[7] ひるがのB級グルメ「けいちゃん」＆ひるがの野菜で、おなかを満たして温まりましょう。[8] ちょっと面白可愛かったのがぽーさん。この日はおやつをあげると、ぴょんぴょん小躍りして喜びました。いつもはそんな風に喜ばないんですょ。仲居さんなどもいない、一軒家の宿が良かったのか。ようやく車から降りられたからなのか。理由はわからないけれど、始終嬉しそう。明日はとうとう最終日。８日間の長旅でしたが、終わるとなると寂しい。『一緒に旅をすると、ぽーとの絆が深まる気がするなぁ』これ帰宅後に呟いた主人のコトバ。たしかにそうかも。明日も長距離ドライブです。おうちにつくまでが旅ですょ。",
+    "truncated": false,
+    "comments": []
+  },
+  {
+    "date": "2010.10.10",
+    "title": "スペシャルゲストがやって来た！",
+    "tags": [
+      "ぽー",
+      "お友達",
+      "2010年10月"
+    ],
+    "images": [
+      "https://stat.ameba.jp/user_images/20101010/09/rinbelu/13/6d/j/o0500033310792642257.jpg",
+      "https://stat.ameba.jp/user_images/20101010/09/rinbelu/e3/0c/j/o0500074810792640388.jpg",
+      "https://stat.ameba.jp/user_images/20101010/09/rinbelu/dc/43/j/o0500033310792639877.jpg",
+      "https://stat.ameba.jp/user_images/20101010/09/rinbelu/63/77/j/o0500033310792639878.jpg",
+      "https://stat.ameba.jp/user_images/20101010/09/rinbelu/d0/39/j/o0500033310792639876.jpg",
+      "https://stat.ameba.jp/user_images/20101010/09/rinbelu/cf/1a/j/o0500033310792640387.jpg",
+      "https://stat.ameba.jp/user_images/20101010/09/rinbelu/36/6f/j/o0500033310792640906.jpg",
+      "https://stat.ameba.jp/user_images/20101010/09/rinbelu/52/b3/j/o0500033310792640905.jpg",
+      "https://stat.ameba.jp/user_images/20101010/09/rinbelu/6a/4f/j/o0500033310792642256.jpg"
+    ],
+    "text": "雨降りスタートの連休ですが、そんな天気を吹っ飛ばすスペシャルゲストが来てくれました。紹介しましょう。まずはこの子、ルークくん５歳。[1] ぽーとは異父兄弟で、パパはあの私が大好きなハマー。黒い耳や首後ろの模様、顔などなんとなく似ているところが多くて・・・やっぱり好きだなぁ～～（もちろん、ぽーが一番ですょ）そして、レイルくん。正真正銘ぽーの兄弟なのです～[2] 雨降りのため前半は家の中でわふわふ。[3] どうでしょう、ぽーとレイルくん似てます？[4] 兄弟の記憶が残っているのか、とってもよく遊ぶ。[5] 後半は雨も小降りになったので、高速SAのランへ移動。[6] そしてそして、最近ネタになりつつあるぽーの大きさですが・・・彼らの体格差はこんな感じです～[7] ところでぽーさんってば、レイルくん大好き度がどんどんヒートアップしまして・・・ルークくんとぽーとで、レイルくんの取り合いに発展。レイルくんがしばしば仲裁に入る始末でした。[8] 体は一番大きいぽーですが、別れ際には今まで聞いたことのないくらいの大泣き。本人は知らないけれど、また会えるんだょ。それにしても、ウィペット二頭飼いめちゃ羨ましい。犬舎に里帰りしたときも思いましたが、同じ犬種がいるとコツも判って飼い易さもUPしそう。もちろん大変さもUpでしょうけれど。それよりなにより、走る姿が最高なんですよね～[9]",
+    "truncated": false,
+    "comments": []
+  },
+  {
+    "date": "2010.10.11",
+    "title": "９月２４日 里帰り旅〜最終日",
+    "tags": [
+      "ぽー",
+      "旅行",
+      "2010年10月"
+    ],
+    "images": [
+      "https://stat.ameba.jp/user_images/20101005/15/rinbelu/62/5d/j/o0500033310784506749.jpg",
+      "https://stat.ameba.jp/user_images/20101005/15/rinbelu/68/3a/j/o0500033310784507313.jpg",
+      "https://stat.ameba.jp/user_images/20101005/15/rinbelu/d0/26/j/o0500033310784516363.jpg",
+      "https://stat.ameba.jp/user_images/20101005/15/rinbelu/52/76/j/o0500033310784517404.jpg",
+      "https://stat.ameba.jp/user_images/20101005/15/rinbelu/a9/e4/j/o0500033310784507726.jpg",
+      "https://stat.ameba.jp/user_images/20101005/15/rinbelu/f0/3f/j/o0499091710784507315.jpg",
+      "https://stat.ameba.jp/user_images/20101005/15/rinbelu/06/2c/j/o0500033310784507314.jpg",
+      "https://stat.ameba.jp/user_images/20101005/15/rinbelu/37/73/j/o0500033310784507727.jpg",
+      "https://stat.ameba.jp/user_images/20101005/15/rinbelu/61/88/j/o0500037510784506748.jpg",
+      "https://stat.ameba.jp/user_images/20101005/15/rinbelu/73/8a/j/o0500037510784506747.jpg"
+    ],
+    "text": "予定走行距離 420km。目的地 我が家。宿 我が家。ついに迎えた最終日。家に帰るだけだからこそ時間の束縛がない。ということで帰りのルートはほんの少し遠回りをして、一昨年開通したばかりの新名神高速道を通ってみます。と、その前に現在地はまだ『ひるがの高原』。チェックアウトまで、周辺散策にでかけましょう。[1] 左側にずらっと並ぶ建物。全て「和み舎」さんのコテージ。来年春にはドッグラン完成予定だそうです。さらに再利用したい理由が増えました～ぽーが凝視する先には牛たちがいます。[2][3] 写真右奥が和み舎のコテージ群。牧草地や空地も多いですが、私有地ですのでもちろん立入禁止。でも別荘地のため静かで車もほとんど通らず、のんびり散歩するにはとても良い環境です。[4] １０時にコテージの鍵を返し、ひるがの高原へ再び戻る。時間の制限がないって良いですね～。目的は、ひるがの高原にあるドッグカフェ「フレンドハウスひるがの」[5] コテージもやっていて、猫も宿泊可能。なので私の実家の家族とも来れちゃいます。店内は外観同様ロッジ風で良い雰囲気。[6] 写真も撮っていただきました。どこかわかります？最下段のラスト、ほそーく写ってます（笑[7] お茶のあとは併設のドッグランでひとっ走り。草が生えているけれど、けっこう広い。２００坪くらいあるかもです。[8] のんびり燃料補給したところで、行きますか～旅を続けたくてミスガイドを試みますが、主人は騙されること無く走り続けます（運転好きですしね～）一方、ぽーは家に帰れる予感がするのか、はたまた遊べて楽しかったのか、なんだかしあわせ顔で睡眠中。[9] そして旅の〆はやはりここ、淡路SA。うしろに本州とつながる橋が見えます。[10] 四国に住みはじめて感じるようになった、この橋を渡るとどこまでも行けそうな感覚。まぁ実際にけっこう長距離移動しましたけれど。長編旅日記になりましたけれど。ぽーと暮らし始めてもうすぐ１年。まだまだこれからぽーと一緒に、「挑戦」「再挑戦」していきます。どうぞまたお付き合いくださいませ～",
+    "truncated": false,
+    "comments": []
+  },
+  {
+    "date": "2010.10.12",
+    "title": "スペシャルゲストがやって来た！vol.2",
+    "tags": [
+      "ぽー",
+      "お友達",
+      "誕生日",
+      "2010年10月"
+    ],
+    "images": [
+      "https://stat.ameba.jp/user_images/20101012/20/rinbelu/9f/cb/j/o0500033310797655752.jpg",
+      "https://stat.ameba.jp/user_images/20101012/20/rinbelu/23/8a/j/o0500033310797649406.jpg",
+      "https://stat.ameba.jp/user_images/20101012/20/rinbelu/23/e7/j/o0500027310797652340.jpg",
+      "https://stat.ameba.jp/user_images/20101012/20/rinbelu/85/c1/j/o0499032510797649407.jpg",
+      "https://stat.ameba.jp/user_images/20101012/20/rinbelu/e6/86/j/o0500033310797649405.jpg",
+      "https://stat.ameba.jp/user_images/20101012/20/rinbelu/e2/ed/j/o0500033310797652339.jpg",
+      "https://stat.ameba.jp/user_images/20101012/20/rinbelu/cc/5f/j/o0500033310797652341.jpg",
+      "https://stat.ameba.jp/user_images/20101012/20/rinbelu/35/02/j/o0500033310797653703.jpg",
+      "https://stat.ameba.jp/user_images/20101012/20/rinbelu/2d/2c/j/o0500033310797653696.jpg",
+      "https://stat.ameba.jp/user_images/20101012/20/rinbelu/1c/e2/j/o0500033310797653699.jpg",
+      "https://stat.ameba.jp/user_images/20101006/09/rinbelu/9c/58/j/o0500037510785810941.jpg"
+    ],
+    "text": "連休最終日のこと。ルークくん＆レイルくんが再び来てくれました。そしてさらにゲストがもう１人。８歳になるループくんです。[1] 彼はぽーのおじいちゃんハマーの兄弟になります。生まれ年はハマーよりちょっと早いのかな。今日は一昨日と違って、とっても良い天気。ウィペット４頭揃ったところで散歩に行きましょうか～[2] この住宅街をウィだらけで歩けるなんて～～ご近所のみなさん～ほそーぃ犬が４頭も闊歩してますょ～同じ犬種といえども、みな骨格、柄、サイズ、性格ほんと様々です。４頭の中で一番小さいループくんの体重は１２kg。足も細くて色白でめちゃかわいい。彼こそがウィペットの標準サイズなのだそうですょ。[3] いつもぽーが遊んでいる果樹園にて、一番若いレイルくんとぽーでかけっこ。[4] やはり兄弟だけあって、顔が似てますねぇ。[5] いつも一緒のこの２人。そばにいるとやはり落ち着くみたい。[6] 散歩のあとは我が家の庭にて歓談タイム。８月に１歳を迎えたレイルくんとぽーへ、ループ家からケーキのプレゼントが～[7] ぽーさん、小麦粉ケーキ初体験です。[8] レイルくんも大喜び。[9] そして２人でなかよく。[10] 楽しい時間はまたたく間に過ぎてお別れの時間に。彼らが車に乗り込むのを見てからは、ず～っとひゃんひゃん鳴き続けるぽー。リードを離したら車を追いかけて行きそうな雰囲気で、フェリーに乗ったときより悲痛な声でした。さて、その後のぽーはというと・・・ちいさな声でぴーと呟いては寝返りをうち、はぅ～とため息を吐いては寝返りをうち、そのままいじけながら眠りにつきました。[11] 近いうちに会いに行こうね～",
+    "truncated": false,
+    "comments": []
+  },
+  {
+    "date": "2010.10.14",
+    "title": "楽しい＞＞＞＞・・・＞＞＞＞＞汚れる",
+    "tags": [
+      "ぽー",
+      "お友達",
+      "お散歩",
+      "2010年10月"
+    ],
+    "images": [
+      "https://stat.ameba.jp/user_images/20101014/18/rinbelu/5c/a1/j/o0500037510800942205.jpg",
+      "https://stat.ameba.jp/user_images/20101014/18/rinbelu/dd/ca/j/o0500037510800942209.jpg",
+      "https://stat.ameba.jp/user_images/20101014/18/rinbelu/22/a5/j/o0500037510800942206.jpg",
+      "https://stat.ameba.jp/user_images/20101014/18/rinbelu/ab/c7/j/o0500037510800949766.jpg",
+      "https://stat.ameba.jp/user_images/20101014/18/rinbelu/38/03/j/o0500037510800942850.jpg",
+      "https://stat.ameba.jp/user_images/20101014/18/rinbelu/b2/51/j/o0500066610800942849.jpg"
+    ],
+    "text": "今日の夕方もネムちゃんと遊んできました～[1] たくさん走って、レスリングして・・・[2] ２人ともどろんちょです。ネムちゃんは腐ったかぼちゃにすりすり。[3] ちょっ、ぽー何する気っ。[4] やーめーてー。[5] あ～ぁ、鼻も口の中も土だらけ・・・（でも嬉しそうなんだよなぁ～）[6] ぽーが掘った穴は埋め戻しました～",
+    "truncated": false,
+    "comments": []
+  },
+  {
+    "date": "2010.10.15",
+    "title": "秋晴れ",
+    "tags": [
+      "ぽー",
+      "2010年10月"
+    ],
+    "images": [
+      "https://stat.ameba.jp/user_images/20101015/10/rinbelu/9a/c8/j/o0500037510802052232.jpg",
+      "https://stat.ameba.jp/user_images/20101015/10/rinbelu/c4/fe/j/o0500051710802052233.jpg"
+    ],
+    "text": "こんにちは～今日も気持ちのよい天気です。[1] 歩くと暑いくらいなんですけれどねぇ。以前に『鹿認定』をうけたぽーですが、今朝は近所のおばさまに賞賛されましたっ！「キレイな子ね～人で言うと、八頭身やねぇ～」と。さらにぽーが振り返り立ち止まるものだから、褒められてるのわかってるのかしら～と大ウケ。振り返った理由の真実はさておき、鹿認定も楽しいのですけれどやはり褒められると嬉しいです。朝から妙なテンションで記事を書くわたくし。じつは週末にとある検定を受ける予定でてんぱっております。でもね、ぽーにとっては楽しい出会いの週末になる予定です。ふふふ・・・ぽーさん、楽しみだねぇ～[2]",
+    "truncated": false,
+    "comments": []
+  },
+  {
+    "date": "2010.10.17",
+    "title": "@香川",
+    "tags": [
+      "ぽー",
+      "お友達",
+      "お出かけ",
+      "2010年10月"
+    ],
+    "images": [
+      "https://stat.ameba.jp/user_images/20101017/17/rinbelu/16/4a/j/o0800060010806407643.jpg"
+    ],
+    "text": "[1] 私の検定は撃沈でしたが、ぽーは元気です♪香川の友達ルークくんと遊んできました～2人の楽しい様子はまた改めて…",
+    "truncated": false,
+    "comments": []
+  },
+  {
+    "date": "2010.10.18",
+    "title": "おさななじみ",
+    "tags": [
+      "ぽー",
+      "お友達",
+      "2010年10月"
+    ],
+    "images": [
+      "https://stat.ameba.jp/user_images/20101018/10/rinbelu/96/8a/j/o0500033310807855266.jpg",
+      "https://stat.ameba.jp/user_images/20101018/10/rinbelu/cf/ea/j/o0500033310807854141.jpg",
+      "https://stat.ameba.jp/user_images/20101018/10/rinbelu/65/31/j/o0500033310807853279.jpg",
+      "https://stat.ameba.jp/user_images/20101018/10/rinbelu/d6/13/j/o0500033310807853280.jpg",
+      "https://stat.ameba.jp/user_images/20101018/10/rinbelu/02/e2/j/o0500033310807852665.jpg",
+      "https://stat.ameba.jp/user_images/20101018/10/rinbelu/bc/84/j/o0500033310807853278.jpg",
+      "https://stat.ameba.jp/user_images/20101018/10/rinbelu/1f/95/j/o0500033310807855267.jpg",
+      "https://stat.ameba.jp/user_images/20101018/10/rinbelu/77/51/j/o0500033310807854142.jpg",
+      "https://stat.ameba.jp/user_images/20101018/10/rinbelu/d7/69/j/o0499034510807854143.jpg",
+      "https://stat.ameba.jp/user_images/20101018/10/rinbelu/f4/ad/j/o0500033310807855265.jpg"
+    ],
+    "text": "週末のこと。私が検定であわあわしている間、ぽーはルークくんとわぃわぃしておりました～[1] 彼との付き合いは生後４ヶ月の頃から。誕生日もたったの２週間違いなのです。春に遊んで以来の再会で、一歳を迎え未去勢の２人。もし仲が悪くなってたら・・・なんて心配はまったく不必要。軽く挨拶を済ませたら、あとは遊ぶ走る遊ぶ。[2][3][4] 検定を終えた私が戻って来ても遊びに夢中。５mくらい近づいたところでやっと気がつくほどで。休憩中のルークくんの周りではしゃぐぽーさん。[5] あぁっ！飛び越えたっ。[6] 後半、さすがに疲れの色がでてきて・・・[7] ぽーってば、ついに寝転んだ。[8] もしも～し、大丈夫ですか～[9] そんなこんなで、ず～っと笑顔の２人。近いうちにまた遊ぼうね～[10]",
+    "truncated": false,
+    "comments": []
+  },
+  {
+    "date": "2010.10.19",
+    "title": "赤くなると医者が蒼くなる",
+    "tags": [
+      "ぽー",
+      "2010年10月"
+    ],
+    "images": [
+      "https://stat.ameba.jp/user_images/20101019/10/rinbelu/76/ef/j/o0500037510809578184.jpg",
+      "https://stat.ameba.jp/user_images/20101019/10/rinbelu/80/00/j/o0500037510809578185.jpg",
+      "https://stat.ameba.jp/user_images/20101019/10/rinbelu/11/cc/j/o0500066610809578186.jpg"
+    ],
+    "text": "これらの品種名、ご存知ですか？[1] ㊧スターキング㊨レッドゴールド だそうです。これらの品種、私は初めて知りました～楽しくって思わず記事にしてしまったというわけで。りんごの花、見たことありますか？真っ白な５枚の花びらがかわいいのですが、なんとスターキングは５角形。[2] 花を想像させるカタチ、なんておもしろぃんだ～西日本であまりみかけない理由が気になり調べてみました。（私が無知なだけかもですが）それぞれアメリカで品種改良されその後日本に導入。そしてどちらも難点は「貯蔵性に乏しい」こと。レッドゴールドに至っては、暖地での完熟品の日持ちは５日程度だそうです。比較的未熟なうちに収穫すれば日持ちするそうで、未成熟果を市場にだしていたようですが・・・・赤くない未成熟果や保存性に乏しいことで、人気がなくなりあまり店頭に並ばなくなったようです。でもね、美味しいのですょ。青森出身の主人が「これはもぎたてだ～」と、少年時代を懐かしむくらいの新鮮さ。もぎたてほど酸味が強いそうなんですが、たしかにそうかも。果汁たっぷり、すんごいシャリシャリしてます。この美味しさは守らなければ！！というわけで、我が家の冷蔵庫はこうなりました。りんご好きのぽーにも、ちょこっとおすそわけ。これで我が家はみな「医者いらず」で過ごせそうです。[3]",
+    "truncated": false,
+    "comments": []
+  },
+  {
+    "date": "2010.10.19",
+    "title": "⇧伸長方向⇔",
+    "tags": [
+      "ぽー",
+      "成長記録",
+      "2010年10月"
+    ],
+    "images": [
+      "https://stat.ameba.jp/user_images/20101020/08/rinbelu/87/8b/j/o0500037410811273510.jpg",
+      "https://stat.ameba.jp/user_images/20101019/10/rinbelu/1f/a8/j/o0500066610809576954.jpg",
+      "https://stat.ameba.jp/user_images/20101019/10/rinbelu/53/3d/j/o0500037510809577575.jpg",
+      "https://stat.ameba.jp/user_images/20101019/10/rinbelu/ef/9c/j/o0500037510809577576.jpg",
+      "https://stat.ameba.jp/user_images/20101019/10/rinbelu/7e/32/j/o0500066610809576953.jpg",
+      "https://stat.ameba.jp/user_images/20101019/10/rinbelu/9e/a2/j/o0500066610809576958.jpg"
+    ],
+    "text": "短毛なうえに、体脂肪の少ないカラダ。『ウィペット』は寒さに弱いと言われています。そして・・・ぽーが布団から出て来ない季節になってまいりました。思い出されるは2009年の冬。散歩に行こうと外に飛び出すものの、玄関先でカタカタ震え屋内に戻るぽー。そこで作ったわんこ服。[1] 『生後４ヶ月 体重１２kg』ぽーさん、ちいさ～ぃ～服もぶかぶかです。もしかしたら、まだ着れるかも・・・・[2] 着れたっ。[3] ん～なんか妙ですねぇ。もう少し角度を変えてみて・・・[4] どう成長したか判り易いなぁ～[5] 笑い転げている私を気にすることもなく、本人は暖かいからか気に入っている様子。新しいの作るから待っててね。[6] おまけ。",
+    "truncated": false,
+    "comments": []
+  },
+  {
+    "date": "2010.10.19",
+    "title": "一石二鳥",
+    "tags": [
+      "ぽー",
+      "おもちゃ",
+      "2010年10月"
+    ],
+    "images": [
+      "https://stat.ameba.jp/user_images/20101019/10/rinbelu/e9/07/j/o0500066610809576320.jpg",
+      "https://stat.ameba.jp/user_images/20101019/10/rinbelu/66/67/j/o0500066610809576319.jpg",
+      "https://stat.ameba.jp/user_images/20101019/10/rinbelu/27/66/j/o0499066610809576318.jpg"
+    ],
+    "text": "好きなおもちゃの一つに『木』があります。正確には「木の枝」です。遊び方はいつも同じ。先ずは前歯で皮を剥ぐ。[1] 次に奥歯で枝をしがむ。[2] そして至福の表情。[3] 歯磨きにもなっていそうで、一石二鳥なのです。カケラは食べずに出すので、大丈夫。",
+    "truncated": false,
+    "comments": []
+  },
+  {
+    "date": "2010.10.22",
+    "title": "歩く。",
+    "tags": [
+      "ぽー",
+      "お散歩",
+      "2010年10月"
+    ],
+    "images": [
+      "https://stat.ameba.jp/user_images/20101022/10/rinbelu/a4/9c/j/o0500066610814808321.jpg",
+      "https://stat.ameba.jp/user_images/20101022/10/rinbelu/20/be/j/o0500037510814808320.jpg",
+      "https://stat.ameba.jp/user_images/20101022/10/rinbelu/f5/a0/j/o0500037510814808656.jpg",
+      "https://stat.ameba.jp/user_images/20101022/10/rinbelu/dd/a4/j/o0500037510814808655.jpg",
+      "https://stat.ameba.jp/user_images/20101022/10/rinbelu/62/2e/j/o0500066610814808322.jpg"
+    ],
+    "text": "昨日はいつもと違う道を散歩。[1] 初めて通る道では、きょろきょろ。[2] 踏切では、右を確認して・・・[3] 左も確認。[4] そういえば、四国ではJRのことを『汽車』と呼びます。それは何故かというと『電車』ではないから。正確には一部で電車も走っているのですが、メインはディーゼルカーなんです。なので、線路には電線がありません～[5] 停車中などはエンジン音がしたりして、電車とは違う乗り心地。ワンマンカーや無人改札に単線も多く、楽しさ倍増。機会があればぜひ利用してみてください～",
+    "truncated": false,
+    "comments": []
+  },
+  {
+    "date": "2010.10.24",
+    "title": "ヒトのようでヒトでないもの",
+    "tags": [
+      "ぽー",
+      "お出かけ",
+      "2010年10月"
+    ],
+    "images": [
+      "https://stat.ameba.jp/user_images/20101024/15/rinbelu/76/88/j/o0500037510818983899.jpg",
+      "https://stat.ameba.jp/user_images/20101024/15/rinbelu/fe/8a/j/o0500037510818982932.jpg",
+      "https://stat.ameba.jp/user_images/20101024/15/rinbelu/5d/a1/j/o0500037510818982931.jpg",
+      "https://stat.ameba.jp/user_images/20101024/15/rinbelu/e6/4d/j/o0500037510818984970.jpg",
+      "https://stat.ameba.jp/user_images/20101024/15/rinbelu/69/ca/j/o0500037510818983900.jpg",
+      "https://stat.ameba.jp/user_images/20101024/15/rinbelu/f1/3f/j/o0500037410818983901.jpg"
+    ],
+    "text": "週末のこと。『板野町歴史文化公園』に行ってきました。イタノザウルスが見たかったんですが、この日はイベントがあったらしく子供がたくさん。「かわいい～」「あれって犬なん～？」「大きい～」etc...賞賛の声を浴びつつ公園の隅っこに移動。「歴史文化公園」という名がついているだけあって、竪穴式住居が復元されていました。[1] しかも広い公園の隅っこなので、人がいない。ぽーを連れてのんびり散歩といきましょうか。しかし、ぽーさんの様子がヘン。[2][3][4] あ、逃げた。。。[5] 石像は異様な物体なんでしょうねぇ。ぽーと暮らし始めてもうすぐ一年。また新たな一面を発見です。ぽーはそれどころではなかったでしょうけれど。石像から離れたら笑顔で歩いていました（笑[6] 平日は人も少ないようなので、犬連れでの散歩もしやすそう。小さな丘を歩く遊歩道や、メリーゴーランドまであります。もちろんヒトのみで立ち寄るのにも楽しそうな公園でした～～私信～今週は私事で余裕がなく更新が滞るかもです。毎日楽しみにしてくれている方々ごめんなさぃ。更新なくてもみな元気ですのでご安心を～～～",
+    "truncated": false,
+    "comments": []
+  },
+  {
+    "date": "2010.10.27",
+    "title": "relaxation techniques",
+    "tags": [
+      "ぽー",
+      "2010年10月"
+    ],
+    "images": [
+      "https://stat.ameba.jp/user_images/20101027/06/rinbelu/93/a5/j/o0500037510823991643.jpg",
+      "https://stat.ameba.jp/user_images/20101027/06/rinbelu/c9/b5/j/o0499066910823991644.jpg"
+    ],
+    "text": "ぽーがいつものように、マッサージチェアに跳び乗りました。それは座る場所おかしいやん～[1] ぷはっ。[2] か、かわいいじゃないかぁ～これはもぅ、狙ってるとしか思えない（笑忙しいときや心の余裕がないときに限って、さらに面白い行動やかわいいことをしてくれるぽー。和むわぁ～そして用事が進まない・・・",
+    "truncated": false,
+    "comments": []
+  },
+  {
+    "date": "2010.10.28",
+    "title": "寒いですねぇ〜",
+    "tags": [
+      "ぽー",
+      "お友達",
+      "お散歩",
+      "2010年10月"
+    ],
+    "images": [
+      "https://stat.ameba.jp/user_images/20101028/11/rinbelu/04/3d/j/o0500037410825994447.jpg",
+      "https://stat.ameba.jp/user_images/20101028/11/rinbelu/98/fd/j/o0500037510825995128.jpg",
+      "https://stat.ameba.jp/user_images/20101028/11/rinbelu/76/81/j/o0500037410825994445.jpg",
+      "https://stat.ameba.jp/user_images/20101028/11/rinbelu/de/04/j/o0500037410825994446.jpg",
+      "https://stat.ameba.jp/user_images/20101028/11/rinbelu/d1/40/j/o0500037510825995130.jpg",
+      "https://stat.ameba.jp/user_images/20101028/11/rinbelu/3f/bd/j/o0500037510825995129.jpg"
+    ],
+    "text": "それでもこの子たちは元気です。[1] なんとかネムちゃんの散歩タイムに合流できた昨日。会うとすぐさま追いかけっこ＆レスリング開始です。会う度に速さ＆激しさが増し、携帯カメラに収まるのは残像ばかり。腕の問題も大きいのでしょうけれど。[2][3][4][5] うーむ、次は普通のカメラで撮ってみようかな。帰宅後は、うっすら笑みを浮かべて爆睡です。[6]",
+    "truncated": false,
+    "comments": []
+  },
+  {
+    "date": "2010.10.28",
+    "title": "監視体制強化中",
+    "tags": [
+      "ぽー",
+      "2010年10月"
+    ],
+    "images": [
+      "https://stat.ameba.jp/user_images/20101029/20/rinbelu/02/be/j/o0500075610828453498.jpg",
+      "https://stat.ameba.jp/user_images/20101029/20/rinbelu/89/a5/j/o0500066610828452593.jpg",
+      "https://stat.ameba.jp/user_images/20101029/20/rinbelu/7a/23/j/o0500066610828452592.jpg",
+      "https://stat.ameba.jp/user_images/20101029/20/rinbelu/76/2f/j/o0500066610828453474.jpg",
+      "https://stat.ameba.jp/user_images/20101029/20/rinbelu/bb/a0/j/o0500066610828452594.jpg"
+    ],
+    "text": "先日、私事で余裕がないと書きましたが、その原因は趣味でやっている「着付」関連なのです。今日は博物館で束帯の着付方法を勉強してきました。束帯とは、おひなさまの男雛の衣装です。皇室の行事でもよく見られます。これ↓でございます。[1] と、それはさておき、そんなこんなの今週。着物関連でぽーの留守番回数が増えています。普段の留守番は平気になっているのですが、私が着物を着始めると様子が変化するのです。甘えん坊度が大幅UP。足元にからみつき、[2] トイレに入ろうとしてもこの表情。[3] これもちょっとかわいい。[4] かわいそうだから、写真撮るヒマあるなら相手してあげて～、という声が聞こえてきそうですが・・・大丈夫ですょ。帰宅後は落ち着いたらイチャイチャしまくりですから。週明けの予定は少し落ち着くはずなのですが、まだしばらくは監視される日々が続きそうです。[5]",
+    "truncated": false,
+    "comments": []
+  },
+  {
+    "date": "2010.10.28",
+    "title": "子犬なウィペット",
+    "tags": [
+      "ぽー",
+      "お友達",
+      "成長記録",
+      "2010年10月"
+    ],
+    "images": [
+      "https://stat.ameba.jp/user_images/20101019/13/rinbelu/83/03/j/o0500033310809811439.jpg",
+      "https://stat.ameba.jp/user_images/20101019/14/rinbelu/be/7e/j/o0500033310809814724.jpg",
+      "https://stat.ameba.jp/user_images/20101019/13/rinbelu/07/e5/j/o0500033310809811437.jpg"
+    ],
+    "text": "ぽーと香川のルークくんとの初出会いは2009年12月。先日の再会で懐かしくなり、写真や動画を見直していました。[1] ２人ともちっちゃくてパピパピしてるやん～まだウィペットの細い体型に不慣れだった私は、当時は「子犬っぽくないなぁ～」なんて思ってマシタ。いやぁ～かわいいょ君たち～～～この頃からすでに大の仲良し。[2] 私の一番気に入っている写真がコレ。[3] 何度見ても可笑しい～～画質が悪いかもですが、当時の動画もどぞ。今見ると、走り方もしっかり子犬です。よちよち走っているように見えますが、みなさんはどう感じます？",
+    "truncated": false,
+    "comments": []
+  },
+  {
+    "date": "2010.10.29",
+    "title": "most of all",
+    "tags": [
+      "ぽー",
+      "2010年10月"
+    ],
+    "images": [
+      "https://stat.ameba.jp/user_images/20101028/11/rinbelu/9a/46/j/o0500066610825993978.jpg",
+      "https://stat.ameba.jp/user_images/20101028/11/rinbelu/4e/89/j/o0500066610825993977.jpg"
+    ],
+    "text": "うーむ。。。このお尻がたまらなくかわいい。[1][2]",
+    "truncated": false,
+    "comments": []
+  }
+];
+
+(function() {
+  const seen = {};
+  entries.forEach(function(e) {
+    const key = e.date;
+    seen[key] = (seen[key] || 0) + 1;
+    e.id = 'e' + e.date.replace(/\./g, '-') + '-' + seen[key];
+  });
+})();
+
+
+// ---- render ----
+const allTags = [...new Set(entries.flatMap(e => e.tags))];
+let activeTags = new Set();
+let keyword = "";
+
+function highlightNums(text) {
+  return text.replace(/\[(\d+)\]/g, '<b>[$1]</b>');
+}
+
+function esc(s) {
+  return String(s == null ? "" : s).replace(/[&<>]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
+}
+
+function renderTagFilter() {
+  const el = document.getElementById('tagFilter');
+  el.innerHTML = allTags.map(t =>
+    `<button class="tag-btn${activeTags.has(t) ? ' active' : ''}" data-tag="${t}">${t}</button>`
+  ).join('');
+  el.querySelectorAll('.tag-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const tag = btn.dataset.tag;
+      if (activeTags.has(tag)) activeTags.delete(tag); else activeTags.add(tag);
+      renderTagFilter();
+      renderEntries();
+    });
+  });
+}
+
+function matches(entry) {
+  const tagOk = activeTags.size === 0 || entry.tags.some(t => activeTags.has(t));
+  const kw = keyword.trim();
+  const kwOk = kw === "" ||
+    entry.title.includes(kw) ||
+    entry.text.includes(kw) ||
+    entry.tags.some(t => t.includes(kw));
+  return tagOk && kwOk;
+}
+
+function renderEntries() {
+  const main = document.getElementById('main');
+  const filtered = entries.filter(matches);
+  document.getElementById('count').textContent = `${filtered.length} / ${entries.length} 件表示中`;
+  document.getElementById('noResults').style.display = filtered.length === 0 ? 'block' : 'none';
+
+  main.innerHTML = filtered.map(entry => `
+    <article class="entry" id="${entry.id}">
+      <div class="entry-head">
+        <span class="entry-title">${entry.title}</span>
+        <span class="entry-date">${entry.date}</span>
+      </div>
+      ${entry.images.length > 0 ? `
+      <div class="photo-grid">
+        ${entry.images.map((src, i) => `
+          <a href="${src}" target="_blank" rel="noopener">
+            <img src="${src}" loading="lazy" alt="${entry.title} 写真${i+1}">
+            <span class="num">${i+1}</span>
+          </a>
+        `).join('')}
+      </div>` : entry.photosLost ? `<p class="no-photo">（写真は掲載されていましたが、保存されていないため表示できません）</p>` : `<p class="no-photo">（この記事には写真がありません）</p>`}
+      ${entry.truncated ? `<p class="truncated-note">（＊続きは読めない）</p>` : ''}
+      <p class="entry-text">${highlightNums(entry.text)}</p>
+      <div class="tags">
+        ${entry.tags.map(t => `<button class="tag-pill" data-tag="${t}">${t}</button>`).join('')}
+      </div>
+      ${entry.comments && entry.comments.length > 0 ? `
+      <div class="comments">
+        <div class="comments-label">コメント（${entry.comments.length}件）</div>
+        ${entry.comments.map(c => `
+          <div class="comment">
+            <div class="comment-meta"><span class="author">${esc(c.author)}</span>${c.date ? ' ・ ' + esc(c.date) : ''}</div>
+            <div>${esc(c.text)}</div>
+          </div>
+        `).join('')}
+      </div>` : ''}
+    </article>
+  `).join('');
+
+  main.querySelectorAll('.tag-pill').forEach(btn => {
+    btn.addEventListener('click', () => {
+      activeTags = new Set([btn.dataset.tag]);
+      renderTagFilter();
+      renderEntries();
+      window.scrollTo({top:0, behavior:'smooth'});
+    });
+  });
+}
+
+document.getElementById('search').addEventListener('input', (e) => {
+  keyword = e.target.value;
+  renderEntries();
+});
+
+renderTagFilter();
+renderEntries();
+if (location.hash) {
+  const target = document.getElementById(location.hash.slice(1));
+  if (target) target.scrollIntoView({block: 'start'});
+}
+</script>
+
+</body>
+</html>

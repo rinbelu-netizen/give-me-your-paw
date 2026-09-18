@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hey buddy, give me your paw! 絵日記帳 - 2012年12月</title>
+<style>
+  :root {
+    --bg: #faf6ef;
+    --card-bg: #ffffff;
+    --border: #e8dfd0;
+    --text: #4a4238;
+    --text-muted: #9a9082;
+    --accent: #c98a5e;
+    --accent-bg: #f5e6d8;
+    --accent-text: #8a5a35;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    padding: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: "Hiragino Kaku Gothic ProN", "Yu Gothic", "Meiryo", sans-serif;
+    line-height: 1.8;
+  }
+  header {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 32px 20px 16px;
+    text-align: center;
+  }
+  header h1 {
+    font-size: 22px;
+    font-weight: 500;
+    margin: 0 0 4px;
+    color: var(--text);
+  }
+  header p {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin: 0;
+  }
+  .controls {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 12px 20px 20px;
+    position: sticky;
+    top: 0;
+    background: var(--bg);
+    z-index: 10;
+  }
+  #search {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    font-size: 14px;
+    background: var(--card-bg);
+    color: var(--text);
+    margin-bottom: 10px;
+  }
+  .tag-filter {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .tag-btn {
+    font-size: 11px;
+    padding: 4px 12px;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    background: var(--card-bg);
+    color: var(--text-muted);
+    cursor: pointer;
+  }
+  .tag-btn.active {
+    background: var(--accent);
+    color: #fff;
+    border-color: var(--accent);
+  }
+  .count {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 0 20px 8px;
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+  main {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 0 20px 60px;
+  }
+  .entry {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 20px;
+    margin-bottom: 16px;
+  }
+  .entry-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+  .entry-title {
+    font-size: 16px;
+    font-weight: 500;
+  }
+  .entry-date {
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+  .photo-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+    gap: 6px;
+    margin-bottom: 12px;
+  }
+  .photo-grid a {
+    position: relative;
+    display: block;
+    aspect-ratio: 1;
+    overflow: hidden;
+    border-radius: 8px;
+    background: var(--accent-bg);
+  }
+  .photo-grid img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .photo-grid .num {
+    position: absolute;
+    bottom: 3px;
+    right: 4px;
+    font-size: 10px;
+    background: rgba(0,0,0,0.55);
+    color: #fff;
+    padding: 1px 5px;
+    border-radius: 8px;
+  }
+  .no-photo {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-bottom: 12px;
+  }
+  .truncated-note {
+    font-size: 12px;
+    color: var(--accent-text);
+    background: var(--accent-bg);
+    border-radius: 8px;
+    padding: 6px 10px;
+    margin: 0 0 12px;
+    display: inline-block;
+  }
+  .entry-text {
+    font-size: 14px;
+    line-height: 1.85;
+    margin: 0 0 12px;
+    white-space: pre-line;
+  }
+  .entry-text b {
+    color: var(--accent-text);
+    font-weight: 500;
+  }
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .tag-pill {
+    font-size: 11px;
+    padding: 2px 10px;
+    border-radius: 12px;
+    background: var(--accent-bg);
+    color: var(--accent-text);
+    cursor: pointer;
+    border: none;
+  }
+  .comments {
+    margin-top: 16px;
+    padding-top: 14px;
+    border-top: 1px dashed var(--border);
+  }
+  .comments-label {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+  }
+  .comment {
+    font-size: 13px;
+    line-height: 1.7;
+    margin-bottom: 12px;
+    padding-left: 10px;
+    border-left: 2px solid var(--accent-bg);
+  }
+  .comment-meta {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-bottom: 2px;
+  }
+  .comment-meta .author {
+    color: var(--accent-text);
+    font-weight: 500;
+  }
+  .no-results {
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 14px;
+    padding: 40px 0;
+    display: none;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Hey buddy, give me your paw! 絵日記帳</h1>
+  <p>ウィペットのぽー＆バドと暮らす日常あれこれ ― 2012年12月</p>
+</header>
+
+<div class="controls">
+  <input type="text" id="search" placeholder="キーワードで探す（例: 震災、ドッグラン、うみちゃん）">
+  <div class="tag-filter" id="tagFilter"></div>
+</div>
+<div class="count" id="count"></div>
+
+<main id="main"></main>
+<p class="no-results" id="noResults">該当する記事が見つかりません。</p>
+
+<script>
+const entries = [
+  {
+    "date": "2012.12.03",
+    "title": "ルクレイと一緒に行く。〜ループ編〜",
+    "tags": [
+      "ぽー",
+      "バド",
+      "犬舎",
+      "お友達",
+      "2012年12月"
+    ],
+    "images": [
+      "https://stat.ameba.jp/user_images/20121203/09/rinbelu/1a/36/j/o0400030012313935927.jpg",
+      "https://stat.ameba.jp/user_images/20121127/14/rinbelu/1c/8c/j/o0399023712305402087.jpg",
+      "https://stat.ameba.jp/user_images/20121203/09/rinbelu/e4/b6/j/o0400027112313935926.jpg",
+      "https://stat.ameba.jp/user_images/20121203/09/rinbelu/56/d7/j/o0399029012313935928.jpg",
+      "https://stat.ameba.jp/user_images/20121203/10/rinbelu/fe/8e/j/o0399025812313978961.jpg",
+      "https://stat.ameba.jp/user_images/20121203/09/rinbelu/0a/6d/j/o0400027812313935929.jpg",
+      "https://stat.ameba.jp/user_images/20121203/11/rinbelu/ca/50/j/o0400025712314008563.jpg",
+      "https://stat.ameba.jp/user_images/20121203/11/rinbelu/5f/5e/j/o0399030112314021196.jpg",
+      "https://stat.ameba.jp/user_images/20121203/11/rinbelu/8c/ca/j/o0400027512314021197.jpg",
+      "https://stat.ameba.jp/user_images/20121203/11/rinbelu/63/74/j/o0400030512314021199.jpg",
+      "https://stat.ameba.jp/user_images/20121203/11/rinbelu/f7/75/j/o0399026712314022955.jpg",
+      "https://stat.ameba.jp/user_images/20121203/11/rinbelu/6f/45/j/o0400029712314021198.jpg",
+      "https://stat.ameba.jp/user_images/20121203/11/rinbelu/24/39/j/o0400025912314035115.jpg",
+      "https://stat.ameba.jp/user_images/20121203/11/rinbelu/e7/8c/j/o0399026412314035116.jpg",
+      "https://stat.ameba.jp/user_images/20121203/11/rinbelu/1f/07/j/o0400026412314035117.jpg",
+      "https://stat.ameba.jp/user_images/20121203/12/rinbelu/4c/8b/j/o0399026712314050334.jpg"
+    ],
+    "text": "すっきーり気持ち良い青空のもと、２年ぶりっ！！ループさんとの再会なのだ～。久しぶり～！どぉ？元気にしてた？[1]ループさん、犬舎仲間としてはぽバドの大先輩なのである。改めて、あの家系図をもう一度。[2]今年の７月に１０歳を迎えたループ。チョット見てくださいな～ぜっんぜん年齢を感じさせないこの可愛さなんつーこった！！[3]とはいえ、やはり足腰のこともあるので、ルークレイルぽバドの４頭で遊ばせている間は見学のループさん。唯一撮れた揃って走る４頭。小さくてわかんないですね～[4]ところで、この５頭。パピーの頃に去勢しているのはレイルだけなのだ。よくここに書いているように、ぽーは未去勢犬に喧嘩を売る。そしてやはり兄ちゃん犬は似ているのかルークも同じなのよね～。でもね、心配は要らないのだ。ウィペットには、サイトハウンドオーナーにとっては、お馴染みな『マズルガード』を装着しているから。（実はこの日、バドが破壊しちゃったから、ルクレイ家に借りたのだけどね）私、少し前までは「咬むイヌ」がつけるもの、と思ってました。でもね、マズルガード装着の大きな理由は、チガウのですょ！[5]イヌは口で呼吸するため、運動時に口を開けていることが多いわけで。ということは、走っている時に衝突して歯があたる可能性もあるわけで。そしてさらに、ウィペットは皮膚が薄く僅かな衝撃でもケガをしやすい。（サイトハウンド種のほとんどが同じ条件だったりもする）着用を義務づけているレースもあるほど、馴染みのあるものなのです。実際にぽーは遊んでいたコの顔が体の側面にぶつかり、それが筋肉まで縫うケガになったこともあったり。（服を着せていれば回避できたかもしれないケガでもあるけれど）初めての大きなケガだったことや私の不注意も重なり、ケガをした方も、させてしまった方も、いかに辛いかを知りました。ウィペットにとって、小さな傷は日常茶飯なのだけどね。というわけで、喧嘩になる可能性があるルークとぽーにはマズルガード装着～（バドも未去勢だけど、咬み返す度胸はなく逃げるから非着用なのだ）[6]犬舎で一緒に過ごしたことはないけれど、親戚同士のルールなのか。止めずにルークとぽーに任せたことで、何か話し合いができたのか。けっきょく喧嘩にもならず、権勢しあうだけで済みました。何よりも、こーんな状況になっていても、お互いにマズルガードしてるからね。安心して、笑って見ていられたりもするわけです。～ってね。[7]さて、軽やかに走るレイルに夢中なのは、ぽーだけではない。[8]去勢したコって、未去勢♂にもてちゃうのだ。ループさんもやっぱり、レイルに夢中。で、そんなループの隙を狙って、思う存分スキンシップを謀るたっつー。[9]そして、それとなく避けられる。[10]それにしても夫婦とは、考え行動が似るものなのである。[11]いや、これは犬好きばかに共通することなのかもね。妻たちが飲み物の注文に行っている間、ループ父はぽバドとのスキンシップにいそしんでいたらしい。[12]私はけっきょく、別れ際にループをハグしちゃったもんね～（めっちゃ嫌がってたらしいが、スマヌ。私には見えなかったもん～）ループ家の案内で、ぷらりぷらりと紅葉散歩。[13]木々にはすでに雪囲いが施されていたりして、ほんともう冬、というか雪間近なのだなぁ。（積雪で木が倒れるのを防ぐための囲いなのだー。青森でもやってたもんね）[14]紅葉散歩とイヌたちの運動会のあとは、豆腐料理のお店で美味しいランチとデザートをいただいて、私たちは一足先に帰路につきました。ルークレイル家とループ家のみなさま、ほんといつもありがとう。とーっても楽しかったぁまた違う季節を一緒に歩きましょ～[15]◀おまけ▶ やっぱこれは外せない。ループさんのヘン顔もいただきやしたっ！[16]みなさま、毎度長くなる旅行記、読んでくださってありがとうございます～",
+    "truncated": false,
+    "comments": []
+  },
+  {
+    "date": "2012.12.06",
+    "title": "みっちゃく。",
+    "tags": [
+      "バド",
+      "日常",
+      "2012年12月"
+    ],
+    "images": [
+      "https://stat.ameba.jp/user_images/20121206/15/rinbelu/5b/8b/j/o0399029012318394815.jpg",
+      "https://stat.ameba.jp/user_images/20121206/15/rinbelu/d9/c6/j/o0399028712318394816.jpg",
+      "https://stat.ameba.jp/user_images/20121206/15/rinbelu/ff/41/j/o0399028512318394818.jpg",
+      "https://stat.ameba.jp/user_images/20121206/15/rinbelu/6f/25/j/o0399029512318399525.jpg",
+      "https://stat.ameba.jp/user_images/20121206/15/rinbelu/e8/85/j/o0399027112318399526.jpg",
+      "https://stat.ameba.jp/user_images/20121206/15/rinbelu/89/27/j/o0400030912318399528.jpg",
+      "https://stat.ameba.jp/user_images/20121206/15/rinbelu/16/22/j/o0400028812318399527.jpg",
+      "https://stat.ameba.jp/user_images/20121206/15/rinbelu/3f/6e/j/o0399029412318402442.jpg",
+      "https://stat.ameba.jp/user_images/20121206/15/rinbelu/75/80/j/o0400031412318402441.jpg",
+      "https://stat.ameba.jp/user_images/20121206/15/rinbelu/67/39/j/o0400029812318394817.jpg"
+    ],
+    "text": "比較的温暖な地域に住んではいるのですが、先週くらいから朝晩はストーブが活躍しております。[1]ん？何でしょうか、バドくん。何を訴えているのかね？って、飼主は分かっているのだけれどね。[2]バドはストーブに『密着』したいのです。ウィペットにしては珍しく、硬い床でも寝ちゃえるバドですが、さすがにこの季節は敷物がないと辛いらしい。はい。敷いたょ～[3]バドくん、敷物に気がついた。[4]前に座っても怒られないか、確認してみる。[5]「いいのかな。ここに座っちゃってもいいのかな」の、あくび。[6]では、座っちゃう準備をして、っと。[7]さて、座っちゃおう。ぽー兄、ずっと動いてないね。[8]あぁ、シアワセ～[9]残念ながらバドの幸せは１分で終了～。だってね、体が焼けそうなほど熱くなっても移動しないんだもの。そこでも充分、温かいじゃないか。ねっ。[10]そして再び、一番上の写真に戻る、と。",
+    "truncated": false,
+    "comments": []
+  },
+  {
+    "date": "2012.12.08",
+    "title": "語源。",
+    "tags": [
+      "ぽー",
+      "バド",
+      "おもしろ",
+      "2012年12月"
+    ],
+    "images": [
+      "https://stat.ameba.jp/user_images/20121208/11/rinbelu/62/6d/j/o0400030012320838416.jpg",
+      "https://stat.ameba.jp/user_images/20121208/11/rinbelu/08/00/j/o0399030512320838417.jpg"
+    ],
+    "text": "何気ない行動のいちいちが、[1]可愛いぞ。このちくしょーめっ！[2]あ・・・『畜生』って、そういうイミなのね。",
+    "truncated": false,
+    "comments": []
+  },
+  {
+    "date": "2012.12.14",
+    "title": "たいみんぐ。",
+    "tags": [
+      "ぽー",
+      "バド",
+      "お友達",
+      "ドッグラン",
+      "2012年12月"
+    ],
+    "images": [
+      "https://stat.ameba.jp/user_images/20121214/19/rinbelu/18/92/j/o0399026612330037913.jpg",
+      "https://stat.ameba.jp/user_images/20121214/19/rinbelu/04/ea/j/o0400024912330038611.jpg",
+      "https://stat.ameba.jp/user_images/20121214/19/rinbelu/3a/ec/j/o0399028912330037912.jpg",
+      "https://stat.ameba.jp/user_images/20121214/19/rinbelu/fd/45/j/o0400027112330037911.jpg",
+      "https://stat.ameba.jp/user_images/20121214/19/rinbelu/37/19/j/o0399026512330038609.jpg",
+      "https://stat.ameba.jp/user_images/20121214/19/rinbelu/67/81/j/o0399026612330038995.jpg",
+      "https://stat.ameba.jp/user_images/20121214/19/rinbelu/e0/43/j/o0400026612330038994.jpg",
+      "https://stat.ameba.jp/user_images/20121214/19/rinbelu/e6/60/j/o0400027312330038608.jpg",
+      "https://stat.ameba.jp/user_images/20121214/19/rinbelu/e0/99/j/o0299046912330038610.jpg",
+      "https://stat.ameba.jp/user_images/20121214/19/rinbelu/46/bd/j/o0399026512330038996.jpg",
+      "https://stat.ameba.jp/user_images/20121214/19/rinbelu/5d/7a/j/o0399026012330037910.jpg"
+    ],
+    "text": "牡蠣にあたって体調を崩していた私たち。気持ちだけは復活なのだ～。恐ろしやノロウィルス・・・体力も体調もまだびみょーにヘン。外からもらうのを防ぐには限界もあるけれど、（自宅での）牡蠣食はしっかり加熱すれば大丈夫ですもんねぇ。みなさんも、どうかお気をつけくださいませ。飼主不調とはいえ、そろそろぽバドを走らせてやりたい。と、思っていたところへNEOかーさんからお誘いが。「ノロわれてますけど、良い？」と、尋ねつつ。念のためにマスクをして遊んできました～ぽバドふたりでも楽しそうなのだけれど、やっぱトモダチが一緒だとチガウね。この笑顔っ[1]とくに、ぽーの喜びようといったら、凄くって。[2]砂浜で遊んだ後は、体についた砂をお湯で流しているのですが、体力ないので洗わないで良い方向にしたかった飼主。だけれども、だ。テンションがあがると、全力で穴堀を開始するぽバド。[3]ぽーに至っては鼻はもちろん、頭まで砂に突っ込みだす。というわけで、帰宅後のシャワー決定～！写真でわかるかしら、スバラシイぽーの状態を。[4]姿勢を低くし、そろりそろりと獲物に近づく。または伏せの体勢から、獲物に飛びかかるタイミングを待つ。NEOちゃんのボーダーコリーらしい特徴を、すっかり覚えて真似るようになったサイトハウンドのぽー。（本来サイトハウンドは俊足を生かして一気に走り追いかける）そしてそんなぽーの行動を、真似るようになったバド。[5]バドの見つめる方向、５０mほど先にぽーがいるわけだが・・・どこかしら可笑しいのが、バドなのである。この後、何かのタイミングをきっかけに、３頭で走り始める、というのが期待される行動なのだけれども。。。[6]待機時間のあまりの長さにNEOちゃん困惑。ちなみにぽーは飽きて、すでにてくてく歩いたりなんかしている。ようやく走り出したのは、さらに１分ほど経ってから。タイミング外したNEOちゃん、困惑顔のまま追いかけてマシタ。[7]飼主以外のヒトに甘えることはごく珍しいぽー。が、NEOかーさんは特別な存在なのです。全身でNEOかーさんの足にすり寄り甘えるぽー。しっぽの先を使ってまでの愛情表現・・[8]って、ちょっとなんなのさ、その甘えぷっりは～[9]まぁ、ぽーが楽しいならいいけどさ。ボーダーコリーとウィペットでは遊び方もちがうけれど、「かーちゃん、楽しいよ～」なNEOちゃんの表情に嬉しくなる。[10]それにしても、ほんと嬉しいタイミングでのお誘いでした～タイミングといえば・・いつかはわかるようになるのかしらネ、バドくんは。[11]",
+    "truncated": false,
+    "comments": []
+  },
+  {
+    "date": "2012.12.19",
+    "title": "ぽー派？バド派？",
+    "tags": [
+      "ぽー",
+      "バド",
+      "おもしろ",
+      "おでかけ",
+      "2012年12月"
+    ],
+    "images": [
+      "https://stat.ameba.jp/user_images/20121219/12/rinbelu/d4/0f/j/o0399026712336769647.jpg",
+      "https://stat.ameba.jp/user_images/20121219/13/rinbelu/11/2d/j/o0400025912336829399.jpg",
+      "https://stat.ameba.jp/user_images/20121219/13/rinbelu/4b/80/j/o0400026412336829398.jpg",
+      "https://stat.ameba.jp/user_images/20121219/13/rinbelu/3f/05/j/o0399052812336850763.jpg",
+      "https://stat.ameba.jp/user_images/20121219/13/rinbelu/d8/b2/j/o0400027012336856641.jpg",
+      "https://stat.ameba.jp/user_images/20121219/15/rinbelu/2e/89/j/o0400058212336937634.jpg",
+      "https://stat.ameba.jp/user_images/20121219/15/rinbelu/4a/3e/j/o0401026812336937633.jpg",
+      "https://stat.ameba.jp/user_images/20121219/15/rinbelu/09/60/j/o0399027712336980710.jpg",
+      "https://stat.ameba.jp/user_images/20121219/15/rinbelu/b5/74/j/o0400026412336937632.jpg",
+      "https://stat.ameba.jp/user_images/20121219/15/rinbelu/19/c8/j/o0400026612336937635.jpg"
+    ],
+    "text": "みなさま、お元気ですか～？ノロわれて以来、モチベーションがさがってしまいまして。。気がつけばブログの更新が週１とな。これはいかん！というわけで、お久しぶりどす～。週末はぽバドを連れて高原へ。走りまわってすでにごキゲン顔なぽバド。[1]ぽー＆バドの性格・行動が全くチガウこと、それは周知の事実。（↑“周知”なんていえるほどまったく有名ちゃうし～）この日も面白いほどに、ぽバドの性格差が現れました。いまにも雨が降りそうな、そんな天候のおかげか原っぱも公園も貸切。童心に返り、ひとり遊具で遊んでみる飼主。そんな私に、それぞれに分かりやすい反応を示すぽー＆バド。[2]はしゃぐ飼主につられて滑り台の上へとやって来る、ぽー＆バド。試しに「降りてごらんょ」と、ぽんぽんっと軽くタッチしてバドを促してみる。すると・・・[3]流石バド。迷う素振りすら見せずに降りていきマシタ。初めてのヒトやイヌと対峙する時は尻込みするけれど、こういうことに関しては臆すことなくへっちゃらなのよね～[4]そんな私たちの様子を、眉を下げ不安そうな顔で見つめるぽー。（実際、眉はないのだけれどね。困ったカオになってマスね。）[5]ぽーにも声をかけてみるけれど、何やらぽそぽそごにょごにょと言うばかり。[6]さんざん悩んだ末に『来た場所から戻ります』と、滑り台を使わずとも降りられることを覚えていたぽーさん。（裏側は階段や段差もなく、丘からそのままアプローチできるのです）[7]イヌと対峙する時は猪突猛進だけれど、こういうことに関してはとても慎重になるのよね～みなさまのわんこたち。ぽー派、バド派、どちらでしょ？そして、飼主に似るといわれる飼い犬たち。我家ではどちらかと言えば、あえて言うならば、ぽー：たっつー バド：わたし かなぁと。さてと。懲りない飼主、別の遊具でも遊んでみた。そちらの遊具は３段ほど板を登る仕組み。ぽーも登ることはしたけれど、滑り台はやはり嫌らしい。飛び降りることもせず、来た道をそのまま引き返す。たっつーが、ぽそりと呟く。「ぽーは賢いのだけどなぁ。ネタ的には真面目でおもしろくないなー。」（・・・まじめだからこその面白さがあるのだけどね～）[8]さてさて一方、バドは後ろなんぞは振り返ったりしません。常に前向きなのだ。前しか見ません。いや、見てません。[9]バドにがしがし押され、急いで降りてみてもこの調子。[10]さぁ、どっちだ～？どちらかというと、ぽー？ それとも、バド？",
+    "truncated": false,
+    "comments": []
+  },
+  {
+    "date": "2012.12.21",
+    "title": "ぽもじょ。",
+    "tags": [
+      "ぽー",
+      "バド",
+      "日常",
+      "2012年12月"
+    ],
+    "images": [
+      "https://stat.ameba.jp/user_images/20121221/15/rinbelu/ab/22/j/o0400030212339606600.jpg",
+      "https://stat.ameba.jp/user_images/20121221/15/rinbelu/c3/1b/j/o0400029412339622582.jpg",
+      "https://stat.ameba.jp/user_images/20121221/15/rinbelu/b7/4b/j/o0399028212339606598.jpg",
+      "https://stat.ameba.jp/user_images/20121221/15/rinbelu/fd/2f/j/o0399028812339606599.jpg",
+      "https://stat.ameba.jp/user_images/20121221/15/rinbelu/ba/32/j/o0400030712339606601.jpg"
+    ],
+    "text": "今日は河川敷に行ってまいりました～ オフリードにした途端に始まった、ぽーの喜びの舞。[1]ごろごろもじょもじょ、ひたすらに全身を芝生にこすりつける。この体勢のまま前進しちゃったりもするのよね～。[2]このもじょもじょをするウィペットはけっこういるらしい。ちなみにバドはミミズや鳥の糞の上で、好んでやろうとします。（イヌらしいといえば、そうなのだけどねぇ・・）[3]あ。。。イナバウアー風？？[4]それにしても、幸せそうな表情やねぇ。そんなに楽しいのかしら、もじょもじょは。[5]・・・誰もいないときに、一緒にやってみようかな。。",
+    "truncated": false,
+    "comments": []
+  },
+  {
+    "date": "2012.12.25",
+    "title": "懐かしい場所。落ち着きのない○○。",
+    "tags": [
+      "ぽー",
+      "バド",
+      "おでかけ",
+      "クリスマス",
+      "2012年12月"
+    ],
+    "images": [
+      "https://stat.ameba.jp/user_images/20121225/13/rinbelu/c1/c0/j/o0399026712346053087.jpg",
+      "https://stat.ameba.jp/user_images/20121225/13/rinbelu/08/ee/j/o0400026412346053088.jpg",
+      "https://stat.ameba.jp/user_images/20121225/13/rinbelu/b4/e3/j/o0399025912346053090.jpg",
+      "https://stat.ameba.jp/user_images/20121225/13/rinbelu/ec/ee/j/o0399026712346053089.jpg",
+      "https://stat.ameba.jp/user_images/20121225/14/rinbelu/e6/33/j/o0399026712346082389.jpg",
+      "https://stat.ameba.jp/user_images/20121225/14/rinbelu/3c/6b/j/o0319047912346082390.jpg",
+      "https://stat.ameba.jp/user_images/20121225/14/rinbelu/30/00/j/o0399026712346082391.jpg",
+      "https://stat.ameba.jp/user_images/20121225/15/rinbelu/56/ab/j/o0399029612346222291.jpg",
+      "https://stat.ameba.jp/user_images/20121225/15/rinbelu/4c/24/j/o0399029512346222290.jpg",
+      "https://stat.ameba.jp/user_images/20121225/14/rinbelu/e0/48/j/o0399025012346082392.jpg"
+    ],
+    "text": "室内に陽がさし、お天気な予感がした日曜の朝。とつぜんの思いつきで、淡路島国営明石海峡公園へ行ってみることに。ペットもリードをつけるなど、最低限のマナーを守れば入場可能らしい。この公園の一番の魅力は、春や秋に色とりどりの花を楽しめること。なのだけれど、残念ながら今は花の時期ではありません。朝の穏やかな陽射しはどこへやら、今にも降り出しそうな曇り空のせいも重なってかヒトもまばら。[1]だけれども、海が見えるだけで嬉しい私とバド。（海の近くに住んでいても、海が好きなのだー）[2]海を見渡せる「空のテラス」には私たち好みの土壁があったり。（何か特別な塗装名がありそうだけど、なんだっけかなぁ？）[3]園内をぷらりぷらりと歩いていると桜を発見。勘違いしちゃった早咲きの桜かなー？と呟く私と、遅れて咲いた桜かも、と言ってみるたっつー。調べてみたら「四季咲丁字桜（シキザキチョウジザクラ）」と言って、10~11月と３月下旬の二季咲きの桜でした～。つまり、たっつーが正解だな。まぁ、ぽバドにとっては（特にバドは）桜よりも、風で飛んでいく葉っぱの方が気になるよね。[4]ヒトの多い場所や初めての場所では、きょろきょろそわそわ落ち着きのなくなるバドくん。ヒトも少なくのんびりまったりな園内なのに、なぜかずーっとテンション上がり気味。そしてぽーは、手紙チェック（他のイヌの匂い嗅ぎ）でそわそわ。度々、オスワリを命じられ注意を受けることになる。（「つーけー」とは、私の体側を歩けという意味ですー）[5]バドに至っては、ちょろちょろとねずみのようにせわしなくて。ほんっと落ち着きがないんだからー[6]とか言ってたら、石につまづきすっ転ぶ飼主。そしてバドに心配されましたょ、と。あぁ、バドが落ち着きないのは飼主と同じなだけやね、と。（たっつー、良いタイミングで写真撮ったね～！てか、助けておくれよぅ）[7]・・・え、えーと。実はたっつー、大学院生時代に勉強＆交流会で、ウェスティンホテルに宿泊したことがあるのです。（2002年ワールカップ、イングランド代表が泊まったのだー）笑顔いっぱいで足漕ぎ白鳥ボートに乗る男子学生たち。写真で見たのだけど、可笑しかったんだよね～（彼らは私にとっても、遊び飲み仲間なので余計に笑えたのです）そのメンバーの１人は、私たちが大失態をおかした沖縄での結婚式の花婿さんだったりする。まさか○年後に、イヌを連れて訪れることになろうとは。懐かしさに、ホテルと白鳥ボートを撮ってみた。[8]花も咲いてないし、寒い時期だけれど、そんな思い出も含めてのんびり楽しい散歩でした。（池のほとりに、たっつーとぽバドがいます。右の方・・見えないね。）[9]さ～て、ぽー＆バド！次はどこへ向かおうか。[10]",
+    "truncated": false,
+    "comments": []
+  },
+  {
+    "date": "2012.12.28",
+    "title": "バドだも〜ん。",
+    "tags": [
+      "バド",
+      "健康",
+      "日常",
+      "2012年12月"
+    ],
+    "images": [
+      "https://stat.ameba.jp/user_images/20121226/21/rinbelu/8d/71/j/o0399029512348477438.jpg",
+      "https://stat.ameba.jp/user_images/20121227/16/rinbelu/be/11/j/o0400029212349508661.jpg",
+      "https://stat.ameba.jp/user_images/20121227/16/rinbelu/89/d8/j/o0320042612349527941.jpg",
+      "https://stat.ameba.jp/user_images/20121227/17/rinbelu/ae/40/j/o0800060012349590117.jpg",
+      "https://stat.ameba.jp/user_images/20121227/17/rinbelu/ac/2a/j/o0400030012349578160.jpg",
+      "https://stat.ameba.jp/user_images/20121227/17/rinbelu/5b/10/j/o0400030012349628762.jpg",
+      "https://stat.ameba.jp/user_images/20121227/18/rinbelu/7f/fa/j/o0400030012349640484.jpg"
+    ],
+    "text": "先週の金曜日、つまり２１日のできごと。ぽーがもじょり、バドがわ～ぃと遊んでいた日。[1]怪我をしやすいと言われるウィペット。何度かケガを経験しているぽーに比べ、天性の運動神経のおかげか病院知らずだったバド。けれども、バドが犬生初のケガをしました。（ぽバドの場合、数日で治る傷は“ケガ”に入れませんー）左後肢を痛めたのですが、診察の結果は「打撲による炎症」かなと。なんだぁ～ただの打ち身かぁ～という感じなのですが、バドだけに色々と良い経験になりました。昨日（27日）河川敷で走らせた後も問題なく、わさびちゃんにも出会えて大喜びだったぽー＆バド。（わさび母さん、それもあってあんなに大はしゃぎだったんですょ～）[2]ほぼ完治だなと。ほっとしたところで、備忘録。（ずばり、長いです。読み辛くてスミマセン・・）さてさて、時間を戻して・・・２１日のこと。河川敷でたっぷり遊んだぽバド、帰宅後すぐに昼寝タイム。（この時点ではまだ、バドのケガに気がついていない飼主）２時間後、左後肢をなんとなくかばいながら歩き始め、さらに時間の経過とともに足をあげたままにするなど、その様子がヒドくなってきた。今までぽーの場合だと、バドの遊びに乗らなかったり、大人しくしたりしてケガの程度がなんとなく判断できたのです。ところがですねぇ、さすがバドなのだ。ぽーに向かって飛びかかるわ、あげく片足で走りまわる。痛いの？それとも違和感があるだけなの？？[3]バドならば骨折していても走るんじゃないかとオモッタ。腰を痛めたのかとも心配していたけれど、夜になり、かかとのすぐ下が腫れてきた。腫れの程度からも骨折ではなさそうで、ちょっと安心な飼主たち。矢印の付近は骨と骨の隙き間になっており、窪んでいるように見えます。その凹みがわからなくなるほどに腫れていたのです。（この写真は正常な状態の左後肢）[4]翌日の午後に病院の予約が取れたので、それまでなるべくできるかぎり、安静にさせる努力をする飼主たち。[5]等々と、そんな経緯を聞きながら、バドの左後肢をcheckする先生。「よくこの腫れに気がつきましたねー」だって～実は・・高速に乗って３０分の病院へ向かう頃には、腫れもかなりひき、足をかばう様子もましになっていたんですよね～けれど、バドだから一応診てもらうことにしたのです。バドだから、ね。（←この理由を伝えるのが難しかったー）腫れている箇所を触りつつバドの表情を伺う先生に、一番腫れているときでも反応しなかったことを伝える。「バドくん、我慢強いんですねぇ」ぁ”ー・・・飼主２人そろって口ごもる。「えーと、あのですねぇ。なんと言いますか、わかってないというか。。。だから連れて来たんデス。」（楽しい、嬉しい＞＞＞痛い なのよね。決して、あフォなワケではない！）触診でもレントゲン（麻酔なし）でも骨折の疑いはナシ。打撲による軟部組織や筋組織などの炎症、ということデシタ。翌日にはさらに腫れはひき、そして今に至る。というわけです。ほんとヨカッター。こういったケガも「バドの怪我」も初だったので、良い経験になりました。そういえば、よくあることだけど、、、ぽーがバドに体当たりしたので、あの時かなーと。ケガをした瞬間に気がついてやれなかったことも反省なのです。やっぱねぇ、バドはいつも元気いっぱいがバドだからね～[6]◀おまけ▶ 昨日の河川敷にて。わさびちゃんに出会えて歓びのもじょもじょを披露するぽー[7]◀診療料金メモ▶ 初診料 1,500 X線検査１ 3,000 X腺検査２ 2,000 抗炎症剤（プレビコックス227） 1,300 1/2錠／日x3日分 支払計（保険50%） 4,095 ＊翌朝、下痢をしたため錠剤は初日のみ服用 バドの体重 18.1kg。 ちなみにぽーは18.6kg。かなりバドの方が小さいのに500g差しかないのかぁ。（小さくないってー、という声が聞こえる）ほんと、ウィペットの見た目と体重は比例しないですねぇ。",
+    "truncated": false,
+    "comments": []
+  },
+  {
+    "date": "2012.12.29",
+    "title": "狩りに行こう。",
+    "tags": [
+      "ぽー",
+      "バド",
+      "お友達",
+      "ドッグラン",
+      "2012年12月"
+    ],
+    "images": [
+      "https://stat.ameba.jp/user_images/20121229/18/rinbelu/4f/ff/j/o0400029712352668232.jpg",
+      "https://stat.ameba.jp/user_images/20121229/18/rinbelu/be/55/j/o0400030012352668233.jpg",
+      "https://stat.ameba.jp/user_images/20121229/19/rinbelu/f1/9d/j/o0400028312352686991.jpg",
+      "https://stat.ameba.jp/user_images/20121229/22/rinbelu/79/ed/j/o0399027712353074936.jpg",
+      "https://stat.ameba.jp/user_images/20121229/22/rinbelu/40/58/j/o0399027412353074103.jpg",
+      "https://stat.ameba.jp/user_images/20121229/23/rinbelu/e7/ff/j/o0399029512353108576.jpg",
+      "https://stat.ameba.jp/user_images/20121229/23/rinbelu/2e/a7/j/o0400028112353108577.jpg"
+    ],
+    "text": "金曜日は熟女むぅさんとクライミングで待合せ。[1]飼主はランチを、イヌたちにはおやつを。ぽバドは「ワンブラン」を二口（←ふたくちね。内輪ネタやけどww）で完食。[2]むぅさん、痩せたよね～とか、水泳が効いたのょーとか。バドの病院おもしろ話、とか、とか。飼主たちは盛り上がるが、イヌたちはひまひまオーラ全開。残念ながら、この日の天気は雨なのだ。なのだけれど・・霧雨になったところで、「行きますかー」寒々しい空のもとつるつる短毛種３頭、原っぱに立つ。（若い２頭はすでに遠くで走り回ってるけどねっ♪）[3]ワイマラナーなむぅちゃんも、ウィペットなぽバドも猟犬。（獲物も仕事内容も大きく違うし、グループ自体は異なるけれど）犬種は違っても遊んでいる最中に獲物を探していたりして、じっくり眺めてるとなかなかにオモシロイ。とは言え、フリスビー好きなのには個体差があるし、[4]湿った芝にもじょるのは、ぽーだけだったけれどね。[5]あぁ、バドは水鳥のフンにもじょったな。（帰宅後のシャンプー決定だからね。好きなだけもじょり賜え。）かーなーーりのヒト見知り＆イヌ見知り、飼主命なむぅさん。皆と一緒にいるのは嬉しいけれど、ひとりで遊んでいることが多いむぅさん。それがこの日は、なんと！！何度もぽバドに遊びの誘いをかけてくれるのだ。わふっと飛びかかるふりをしては、mitomonさんの側に戻る。これを何度も繰り返す。んーむ。あともうちょいで一緒に走りそうなのだけどっ。その遊びに誘う様子はあまりに一瞬で、私のiPhone撮影技術ではうまく撮れなかったー なんとか撮れたのは、嬉しそうに「遊んでミタ」とmitomonさんに報告するむぅさん。[6]今まで以上にぽバドに反応してくれるむぅさんのその行動。それがどれだけ珍しくて嬉しい事なのか、説明しきれないのがもどかしい。めっちゃ楽しそうだったのょ。[7]うむ。年が明けたらまた遊ぼう。次はどんな様子を見せてくれるのか、楽しみだ～",
+    "truncated": false,
+    "comments": []
+  }
+];
+
+(function() {
+  const seen = {};
+  entries.forEach(function(e) {
+    const key = e.date;
+    seen[key] = (seen[key] || 0) + 1;
+    e.id = 'e' + e.date.replace(/\./g, '-') + '-' + seen[key];
+  });
+})();
+
+
+// ---- render ----
+const allTags = [...new Set(entries.flatMap(e => e.tags))];
+let activeTags = new Set();
+let keyword = "";
+
+function highlightNums(text) {
+  return text.replace(/\[(\d+)\]/g, '<b>[$1]</b>');
+}
+
+function esc(s) {
+  return String(s == null ? "" : s).replace(/[&<>]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
+}
+
+function renderTagFilter() {
+  const el = document.getElementById('tagFilter');
+  el.innerHTML = allTags.map(t =>
+    `<button class="tag-btn${activeTags.has(t) ? ' active' : ''}" data-tag="${t}">${t}</button>`
+  ).join('');
+  el.querySelectorAll('.tag-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const tag = btn.dataset.tag;
+      if (activeTags.has(tag)) activeTags.delete(tag); else activeTags.add(tag);
+      renderTagFilter();
+      renderEntries();
+    });
+  });
+}
+
+function matches(entry) {
+  const tagOk = activeTags.size === 0 || entry.tags.some(t => activeTags.has(t));
+  const kw = keyword.trim();
+  const kwOk = kw === "" ||
+    entry.title.includes(kw) ||
+    entry.text.includes(kw) ||
+    entry.tags.some(t => t.includes(kw));
+  return tagOk && kwOk;
+}
+
+function renderEntries() {
+  const main = document.getElementById('main');
+  const filtered = entries.filter(matches);
+  document.getElementById('count').textContent = `${filtered.length} / ${entries.length} 件表示中`;
+  document.getElementById('noResults').style.display = filtered.length === 0 ? 'block' : 'none';
+
+  main.innerHTML = filtered.map(entry => `
+    <article class="entry" id="${entry.id}">
+      <div class="entry-head">
+        <span class="entry-title">${entry.title}</span>
+        <span class="entry-date">${entry.date}</span>
+      </div>
+      ${entry.images.length > 0 ? `
+      <div class="photo-grid">
+        ${entry.images.map((src, i) => `
+          <a href="${src}" target="_blank" rel="noopener">
+            <img src="${src}" loading="lazy" alt="${entry.title} 写真${i+1}">
+            <span class="num">${i+1}</span>
+          </a>
+        `).join('')}
+      </div>` : entry.photosLost ? `<p class="no-photo">（写真は掲載されていましたが、保存されていないため表示できません）</p>` : `<p class="no-photo">（この記事には写真がありません）</p>`}
+      ${entry.truncated ? `<p class="truncated-note">（＊続きは読めない）</p>` : ''}
+      <p class="entry-text">${highlightNums(entry.text)}</p>
+      <div class="tags">
+        ${entry.tags.map(t => `<button class="tag-pill" data-tag="${t}">${t}</button>`).join('')}
+      </div>
+      ${entry.comments && entry.comments.length > 0 ? `
+      <div class="comments">
+        <div class="comments-label">コメント（${entry.comments.length}件）</div>
+        ${entry.comments.map(c => `
+          <div class="comment">
+            <div class="comment-meta"><span class="author">${esc(c.author)}</span>${c.date ? ' ・ ' + esc(c.date) : ''}</div>
+            <div>${esc(c.text)}</div>
+          </div>
+        `).join('')}
+      </div>` : ''}
+    </article>
+  `).join('');
+
+  main.querySelectorAll('.tag-pill').forEach(btn => {
+    btn.addEventListener('click', () => {
+      activeTags = new Set([btn.dataset.tag]);
+      renderTagFilter();
+      renderEntries();
+      window.scrollTo({top:0, behavior:'smooth'});
+    });
+  });
+}
+
+document.getElementById('search').addEventListener('input', (e) => {
+  keyword = e.target.value;
+  renderEntries();
+});
+
+renderTagFilter();
+renderEntries();
+if (location.hash) {
+  const target = document.getElementById(location.hash.slice(1));
+  if (target) target.scrollIntoView({block: 'start'});
+}
+</script>
+
+</body>
+</html>

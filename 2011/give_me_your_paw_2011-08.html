@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hey buddy, give me your paw! 絵日記帳 - 2011年8月</title>
+<style>
+  :root {
+    --bg: #faf6ef;
+    --card-bg: #ffffff;
+    --border: #e8dfd0;
+    --text: #4a4238;
+    --text-muted: #9a9082;
+    --accent: #c98a5e;
+    --accent-bg: #f5e6d8;
+    --accent-text: #8a5a35;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    padding: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: "Hiragino Kaku Gothic ProN", "Yu Gothic", "Meiryo", sans-serif;
+    line-height: 1.8;
+  }
+  header {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 32px 20px 16px;
+    text-align: center;
+  }
+  header h1 {
+    font-size: 22px;
+    font-weight: 500;
+    margin: 0 0 4px;
+    color: var(--text);
+  }
+  header p {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin: 0;
+  }
+  .controls {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 12px 20px 20px;
+    position: sticky;
+    top: 0;
+    background: var(--bg);
+    z-index: 10;
+  }
+  #search {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    font-size: 14px;
+    background: var(--card-bg);
+    color: var(--text);
+    margin-bottom: 10px;
+  }
+  .tag-filter {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .tag-btn {
+    font-size: 11px;
+    padding: 4px 12px;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    background: var(--card-bg);
+    color: var(--text-muted);
+    cursor: pointer;
+  }
+  .tag-btn.active {
+    background: var(--accent);
+    color: #fff;
+    border-color: var(--accent);
+  }
+  .count {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 0 20px 8px;
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+  main {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 0 20px 60px;
+  }
+  .entry {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 20px;
+    margin-bottom: 16px;
+  }
+  .entry-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+  .entry-title {
+    font-size: 16px;
+    font-weight: 500;
+  }
+  .entry-date {
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+  .photo-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+    gap: 6px;
+    margin-bottom: 12px;
+  }
+  .photo-grid a {
+    position: relative;
+    display: block;
+    aspect-ratio: 1;
+    overflow: hidden;
+    border-radius: 8px;
+    background: var(--accent-bg);
+  }
+  .photo-grid img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .photo-grid .num {
+    position: absolute;
+    bottom: 3px;
+    right: 4px;
+    font-size: 10px;
+    background: rgba(0,0,0,0.55);
+    color: #fff;
+    padding: 1px 5px;
+    border-radius: 8px;
+  }
+  .no-photo {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-bottom: 12px;
+  }
+  .truncated-note {
+    font-size: 12px;
+    color: var(--accent-text);
+    background: var(--accent-bg);
+    border-radius: 8px;
+    padding: 6px 10px;
+    margin: 0 0 12px;
+    display: inline-block;
+  }
+  .entry-text {
+    font-size: 14px;
+    line-height: 1.85;
+    margin: 0 0 12px;
+    white-space: pre-line;
+  }
+  .entry-text b {
+    color: var(--accent-text);
+    font-weight: 500;
+  }
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .tag-pill {
+    font-size: 11px;
+    padding: 2px 10px;
+    border-radius: 12px;
+    background: var(--accent-bg);
+    color: var(--accent-text);
+    cursor: pointer;
+    border: none;
+  }
+  .comments {
+    margin-top: 16px;
+    padding-top: 14px;
+    border-top: 1px dashed var(--border);
+  }
+  .comments-label {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+  }
+  .comment {
+    font-size: 13px;
+    line-height: 1.7;
+    margin-bottom: 12px;
+    padding-left: 10px;
+    border-left: 2px solid var(--accent-bg);
+  }
+  .comment-meta {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-bottom: 2px;
+  }
+  .comment-meta .author {
+    color: var(--accent-text);
+    font-weight: 500;
+  }
+  .no-results {
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 14px;
+    padding: 40px 0;
+    display: none;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Hey buddy, give me your paw! 絵日記帳</h1>
+  <p>ウィペットのぽー＆バドと暮らす日常あれこれ ― 2011年8月</p>
+</header>
+
+<div class="controls">
+  <input type="text" id="search" placeholder="キーワードで探す（例: 震災、ドッグラン、うみちゃん）">
+  <div class="tag-filter" id="tagFilter"></div>
+</div>
+<div class="count" id="count"></div>
+
+<main id="main"></main>
+<p class="no-results" id="noResults">該当する記事が見つかりません。</p>
+
+<script>
+const entries = [
+  {
+    "date": "2011.08.01",
+    "title": "波間にぽー。",
+    "tags": [
+      "ぽー",
+      "砂浜",
+      "おもしろ",
+      "2011年8月"
+    ],
+    "images": [
+      "https://stat.ameba.jp/user_images/20110801/12/rinbelu/5d/cd/j/o0399026511387362221.jpg",
+      "https://stat.ameba.jp/user_images/20110801/12/rinbelu/2a/9d/j/o0399026711387363118.jpg",
+      "https://stat.ameba.jp/user_images/20110801/12/rinbelu/dd/c0/j/o0400027011387363120.jpg",
+      "https://stat.ameba.jp/user_images/20110801/12/rinbelu/33/70/j/o0400026511387363119.jpg",
+      "https://stat.ameba.jp/user_images/20110801/12/rinbelu/cb/9a/j/o0400027411387363122.jpg",
+      "https://stat.ameba.jp/user_images/20110801/12/rinbelu/09/29/j/o0399026511387362219.jpg",
+      "https://stat.ameba.jp/user_images/20110801/12/rinbelu/32/22/j/o0399026711387364268.jpg",
+      "https://stat.ameba.jp/user_images/20110801/12/rinbelu/5e/03/j/o0400028311387419979.jpg",
+      "https://stat.ameba.jp/user_images/20110801/12/rinbelu/e0/2f/j/o0399026711387362223.jpg",
+      "https://stat.ameba.jp/user_images/20110801/12/rinbelu/22/1b/j/o0399026911387362220.jpg"
+    ],
+    "text": "週末のこと。岡山県にわんこと泳げる専用ビーチがあるそうです。友人からお誘いを受けたのですが岡山まで行く元気がなく断念ライフジャケット着せてみたかったのだけどなぁ・・・しかしすでに気分は海モード前日に雨で行けなかったこともありいつもの砂浜へ。カメラを相方に託し、ナゼか水着を着込んでいるワタシそして、波打ち際は平気なのに呼んでも来てくれないぽー。[1] ならばとずんずん沖へ歩いて行ってみる（遠浅なのだ）不安げな表情、雰囲気をかもしだすぽー。[2] [3] 時折こうして相方に何かを訴えていたそうな[4] ついに意を決し沖へと進みはじめたぽーさん[5] しかし波に襲われ敢えなく退散[6] ひとしきり満喫したので岸に戻ると、吠えられ逃げられる飼主「おかえり～大丈夫？大丈夫？」とかいうのを期待していたのに。[7] 相方曰く、黒い帽子が波間に浮き沈みする姿に『ジョーズ』のテーマを聞いたそうな[8] 『ジョーズ』というより『海坊主』だな、これは・・まぁでも、ぽーも楽しそうな顔してるから良しとしますか[9] ちょうど去年の同じ頃に、沖まで泳いでいたのになぁ。わんこ友達が居るほうが泳ぐのかしら。どちらにしても砂浜を走ることが一番楽しいぽーなのデシタ[10]",
+    "truncated": false,
+    "comments": []
+  },
+  {
+    "date": "2011.08.02",
+    "title": "キライとニガテ。",
+    "tags": [
+      "ぽー",
+      "お友達",
+      "健康",
+      "2011年8月"
+    ],
+    "images": [
+      "https://stat.ameba.jp/user_images/20110802/13/rinbelu/1d/e9/j/o0399026011389735511.jpg",
+      "https://stat.ameba.jp/user_images/20110802/13/rinbelu/d8/bd/j/o0399026711389735512.jpg"
+    ],
+    "text": "イヌが「ニガテ」な相方の同僚小さな頃にちいさなわんこに咬まれたそうな。だから咬まないと解っていてもでっかいぽーはコワい存在[1] そんなイヌのニガテな彼なのですが、青森からの帰路が台風で揺れる飛行機だったことを知り、開口一番に「ぽーは大丈夫だったの？ケガは？？」ヒトならばシートベルトで固定され揺れにも備えられる。けれども何も知らされずクレートに入れられただけのぽーは、揺れるがまま、振り回されるがままになっちゃうじゃないか。と、ぽーのことを一番に心配してくれたのです。とても、とても嬉しいいつもぽーに会うたびに、近寄られるたびにオロオロしていたのですょそしてそんな彼にさらに近寄ろうとするのがイジワルぽー戸惑う彼の姿をフシギに感じ近寄るのかと思っていたけれど、そうえいばイヌたちは「イヌ嫌い」のヒトには近寄らないのだ。何とか彼の「ニガテ」を克服してあげたいなぁ。（本人は望んでいないのだけれども）いっそのこと、ぽーの口に手を突っ込ませてみようかしら。[2] こんな大きいイヌでも咬まない子もいるのだょ～って（イジワルなのはぽーではなく私ではないか）いつの日かぽーに触れて、そして撫でてほしいなぁ",
+    "truncated": false,
+    "comments": []
+  },
+  {
+    "date": "2011.08.02",
+    "title": "蓮源郷",
+    "tags": [
+      "ぽー",
+      "散歩",
+      "日常",
+      "2011年8月"
+    ],
+    "images": [
+      "https://stat.ameba.jp/user_images/20110802/15/rinbelu/69/fb/j/o0399029411389873466.jpg",
+      "https://stat.ameba.jp/user_images/20110802/15/rinbelu/94/c9/j/o0400030011389864066.jpg",
+      "https://stat.ameba.jp/user_images/20110802/15/rinbelu/2b/c4/j/o0400030011389864061.jpg",
+      "https://stat.ameba.jp/user_images/20110802/15/rinbelu/f1/90/j/o0400029511389864843.jpg"
+    ],
+    "text": "季節によって選ぶぽーとの散歩ルート。７月頃からのお気に入りの場所はココ[1] ぽーの背丈を超す大きな葉っぱ。ここはレンコン畑なのです大きな葉とピンクの花に囲まれる農道は、ちょっと俗世を離れたフシギな気分にさせてくれる散歩道。水もたくさんあるせいか心なしか涼しいのだなのですが、今年はちょっと様相が異なっています。台風6号の襲来で茎が折れ葉は枯れて、花も見つけられない状態７月１４日に訪れたときには花が咲き始めていました。[2] 茎も真っすぐで葉も青々としていたのになぁ[3] 風景は少し変ってしまっても、ぽーの「散歩たのし～けど、あち～」は変らないのです[4]",
+    "truncated": false,
+    "comments": []
+  },
+  {
+    "date": "2011.08.05",
+    "title": "自由研究。",
+    "tags": [
+      "ぽー",
+      "グッズ",
+      "おもしろ",
+      "2011年8月"
+    ],
+    "images": [
+      "https://stat.ameba.jp/user_images/20110805/09/rinbelu/ef/f3/j/o0400029811395778642.jpg",
+      "https://stat.ameba.jp/user_images/20110805/09/rinbelu/3d/b1/j/o0399031411395778644.jpg",
+      "https://stat.ameba.jp/user_images/20110805/09/rinbelu/c5/84/j/o0399029511395778643.jpg",
+      "https://stat.ameba.jp/user_images/20110805/09/rinbelu/38/e4/j/o0399027911395778646.jpg",
+      "https://stat.ameba.jp/user_images/20110805/10/rinbelu/c8/d8/j/o0399026811395813426.jpg",
+      "https://stat.ameba.jp/user_images/20110805/10/rinbelu/3e/8d/j/o0399026711395813427.jpg"
+    ],
+    "text": "母が送ってくれた手作りキット[1] ストールを作り付属の冷却ジェルを入れて使用します。体温調節がうまくできない私のためかしら、と思っていたら。母「ぽーに作ってあげて～～」なるほど～でも良さげなら私も使っちゃおさて「レースを縫い付ける」とあるけど要らないネ。布も使ってないバンダナを切ってつなげれば良いよネ。というわけで、完成なのだ[2] なんだか、ヘンなカオなのですけど・・・[3] うん、まぁこれなら良いか。冷却ジェルは水に１分ほど浸してから使用。あれですね、トイレシートなどに入ってるポリマーみたい。短毛のぽーですので、程よくひんやりで心地よさそうですさてさて話は変わり、今朝のこと。ここから先は虫が苦手な方は回避してください（敢えて画像は小さいめで。クリックすれば拡大できます）ぽーと一緒に相方を見送っていたら、バッタの仲間をうんこらしょと運ぶハチに遭遇[4] 調べてみると、このハチの生態がとても面白いのですょ～ちなみに名前は「クロアナバチ」だそうです。このハチの幼虫は肉食なのですが、成虫の餌は『花の蜜』なのですょ地面に穴を掘り、そこへ捕まえた虫を運び入れ卵を産みます。無造作に置いていた石の下に素穴を作っていたらしい[5] 幼虫はその虫を餌にして育つわけですが、餌になる昆虫は必ずキリギリス科。捉えられた虫は麻酔をかけられているだけで生きている。そしてさらに賢いのが偽の巣穴を掘るらしいのです。てなわけで、石をどけてみました[6] 鼻の穴みたい本物は土をかぶせて隠すそうなので、この２つはダミーかもしれません。クロアナバチは捕まえたりしない限りは刺さないそうですょ～もう既にお気づきかもですが、ぽーの飼主は犬など毛の生えた動物から爬虫類、そして昆虫類までをも好きでして、興味の対象なのです今後とも覚悟しておつきあいくださいませ",
+    "truncated": false,
+    "comments": []
+  },
+  {
+    "date": "2011.08.07",
+    "title": "夏の１ページ。",
+    "tags": [
+      "ぽー",
+      "お友達",
+      "砂浜",
+      "2011年8月"
+    ],
+    "images": [
+      "https://stat.ameba.jp/user_images/20110807/16/rinbelu/ef/89/j/o0399026711400857572.jpg",
+      "https://stat.ameba.jp/user_images/20110807/16/rinbelu/5c/af/j/o0399027211400857570.jpg",
+      "https://stat.ameba.jp/user_images/20110807/16/rinbelu/5d/c4/j/o0399026511400857581.jpg",
+      "https://stat.ameba.jp/user_images/20110808/11/rinbelu/41/3d/j/o0399026111402581235.jpg",
+      "https://stat.ameba.jp/user_images/20110808/11/rinbelu/c9/2e/j/o0399025211402574933.jpg",
+      "https://stat.ameba.jp/user_images/20110808/11/rinbelu/c6/48/j/o0399026811402574932.jpg",
+      "https://stat.ameba.jp/user_images/20110808/11/rinbelu/87/f0/j/o0399029811402603113.jpg",
+      "https://stat.ameba.jp/user_images/20110808/11/rinbelu/eb/eb/j/o0400027611402603114.jpg",
+      "https://stat.ameba.jp/user_images/20110808/11/rinbelu/d7/7b/j/o0400026311402574939.jpg",
+      "https://stat.ameba.jp/user_images/20110808/11/rinbelu/fd/5a/j/o0399024511402581240.jpg",
+      "https://stat.ameba.jp/user_images/20110808/11/rinbelu/80/4e/j/o0400027011402581236.jpg",
+      "https://stat.ameba.jp/user_images/20110808/11/rinbelu/31/62/j/o0399026811402581238.jpg",
+      "https://stat.ameba.jp/user_images/20110808/11/rinbelu/81/57/j/o0399029411402646995.jpg",
+      "https://stat.ameba.jp/user_images/20110808/12/rinbelu/42/b3/j/o0399026711402682266.jpg"
+    ],
+    "text": "昨日のこと。まんのう公園で出会ったミモザちゃんが遊びに来てくれました[1] 夏の遊び場所といえばやはり『海』ですよね～というわけでいつもの砂浜へやってまいりました。[2] 遊ぶの大好き、女の子大好きぽーですから、うひょうひょ全開でミモザちゃんに遊ぼうアピールなのです。案の定「傍に来ないで～」と怒られ大喜びのぽーさん[3] なんだかんだで追いかけっこ遊びになっているこの２人[4] パパのそばに行きたいミモザちゃん＆それを先読みするぽー[5] そして、やっぱり怒られて喜ぶぽー[6] 本気で彼女が嫌がっているならさすがに止めます。けれども飼主たちは（たぶん、ぽーも）知っているのだ。ミモザちゃんがつんでれなことをカフェへ向かう車の中、助手席からわざわざ移動してこんなトコで寝ちゃうのだもの[7] さて話を戻しまして、お２人さんせっかく海に来ているのだよ。というわけで波打ち際へと強制連行[8] ライフジャケットが脱げてしまったミモザちゃん。濡れねずみ状態なこの姿、かわいすぎるのですけど～～[9] ぽーさんはというとですね、ムリヤリ泳がされ・・・[10] 波をかぶらないよう顔をあげ・・・[11] がんばって泳いで・・・（ずっと目をつぶっていますネ）[12] 岸につけばミモザちゃんの元へと一目散[13] と、こんな会話をしていたかどうかはわかりませんが、ぽーのplayboy度数は夏の気温とともに上昇中のようです[14] このライフジャケットはペット用品店amigoにあるそうな。大きいサイズもあるそうなので見に行ってみようかな。ライフセーバーみたいでカッコいいぞ、ミモザちゃん！次に水場で会う時はお揃いかもょ～",
+    "truncated": false,
+    "comments": []
+  },
+  {
+    "date": "2011.08.10",
+    "title": "ぽーの食欲。",
+    "tags": [
+      "ぽー",
+      "健康",
+      "おもしろ",
+      "2011年8月"
+    ],
+    "images": [
+      "https://stat.ameba.jp/user_images/20110810/10/rinbelu/e8/9b/j/o0400029811406913874.jpg",
+      "https://stat.ameba.jp/user_images/20110810/10/rinbelu/ae/bd/j/o0400029811406913873.jpg",
+      "https://stat.ameba.jp/user_images/20110810/10/rinbelu/b0/3c/j/o0400029511406913879.jpg",
+      "https://stat.ameba.jp/user_images/20110810/10/rinbelu/2f/4f/j/o0399028611406913872.jpg"
+    ],
+    "text": "もうね、太陽がんばりすぎです食事量が２割ほど落ち、食べ方にも変化が起きているぽー。遊び疲れかと思っていたけれど夏バテかも。普段から食事タイムは朝夕の２回。わんこの食事風景ってそれぞれで面白いですよね～。リンとベルにも大きな違いがあったのですょ。リゾット風のものは食べにくい上に、中の方がまだ熱かったりで。（しっかり冷やしてあげようょ、飼主）食べるのがもともと下手なリンは、フードボウルの縁から舐めとるように食べる。そしてベルは、がしゃーんと、ボウルをひっくり返し床にばらまいた塊を食べていましたさてさて、話が逸れましたが、おなかがすいているときはがつがつ食べるぽー。ですが、食欲が落ちた場合はひじょーに怠慢食事になるのです。ある程度食べたら、その場を離れ・・[1] 部屋をぐるりと一周して、[2] ２、３口食べては再び部屋をぐるりと歩く、を繰返す。[3] 躾としては、「その場を離れたら片付ける」など色々あるけれど、まぁ体力落ちるのも困るし一周したら戻って食べますしねぇそれでもクッションに座ってしまえば没収なのだたくさん運動をしておなかがすいた時は、自ら台所そばでゴハンを待つほどなのですけどねぇ[4] というかだね、ぽーさん。「おいしいもの」を出しているのはワタシ達なのだょ",
+    "truncated": false,
+    "comments": []
+  },
+  {
+    "date": "2011.08.13",
+    "title": "月見。",
+    "tags": [
+      "ぽー",
+      "お友達",
+      "砂浜",
+      "2011年8月"
+    ],
+    "images": [
+      "https://stat.ameba.jp/user_images/20110813/11/rinbelu/bf/4a/j/o0399026411413660045.jpg",
+      "https://stat.ameba.jp/user_images/20110813/11/rinbelu/f4/19/j/o0399027211413667324.jpg",
+      "https://stat.ameba.jp/user_images/20110813/11/rinbelu/82/e2/j/o0400026511413680786.jpg",
+      "https://stat.ameba.jp/user_images/20110813/11/rinbelu/9f/ed/j/o0400026411413667326.jpg",
+      "https://stat.ameba.jp/user_images/20110813/11/rinbelu/df/87/j/o0400026511413660046.jpg",
+      "https://stat.ameba.jp/user_images/20110813/11/rinbelu/a6/36/j/o0400026411413680787.jpg",
+      "https://stat.ameba.jp/user_images/20110813/11/rinbelu/9d/d6/j/o0399026711413700309.jpg",
+      "https://stat.ameba.jp/user_images/20110813/11/rinbelu/bf/9b/j/o0399026311413660047.jpg"
+    ],
+    "text": "昨日のこと。わんこトモダチのむぅちゃん＆ネオちゃん。ひとトモダチのみうちゃん＆おにへーさんと月見で待合せすぐさまネオちゃんとぽーは追いかけっこ[1] 久しぶりのむぅちゃんはちょこっと様子を伺い中[2] そして最近この砂浜で出会ったメイちゃんと、高速SAランでよく遊んでいる文太くんとも偶然の合流というわけでメンバー増えてやっぱり走り回るぽー（メイちゃん写っておらずでごめんなさいです）[3] と、わんこと走り回り遊んでいたのに突然、ランニングをしていたおにへーちゃんの元へと猛ダッシュ。そしてそのまま彼を置いて笑いながら戻って来るぽー[4] ２度程ランニングを繰返し、皆のところへ戻れば犬種もサイズも様々でわんこ会議開幕なのだ[5] と、実は走りすぎで疲れたぽーは座り込みこんなカオだったり[6] ネオちゃんもたくさん走ったね～[7] またたく間に陽は暮れて、「月見ヶ丘」の名称にふさわしく海の上にまるーい月が昇る。[8] この写真、ぽーが写っているのだけどわかるかしら暑くて遊べる時間は短いけれどギュッと濃縮楽しい時間デシタ。みんなありがとう～～また遊ぼうねっ",
+    "truncated": false,
+    "comments": []
+  },
+  {
+    "date": "2011.08.14",
+    "title": "ついやってしまうこと。",
+    "tags": [
+      "ぽー",
+      "おもしろ",
+      "日常",
+      "2011年8月"
+    ],
+    "images": [
+      "https://stat.ameba.jp/user_images/20110814/10/rinbelu/d6/cb/j/o0400028211415773421.jpg",
+      "https://stat.ameba.jp/user_images/20110814/10/rinbelu/63/f6/j/o0400029811415773422.jpg"
+    ],
+    "text": "旅館などで和室に泊まると、敷布団の下へついつい足を入れちゃったりしません？それってヒトだけじゃないようなのです。とくに夏場の暑い季節は畳の冷たさが気持ち良かったりでどうやら犬だって同じなようです[1] しかしですねぇ、私たちと同じ方向に頭があるときは良いのですが・・・寝起きにぽーの可愛いオシリがあるときは、気怠さ倍増[2] さすがに隠してみた・・・あぁ・・・暑さにやられこんな内容更新してしもうた",
+    "truncated": false,
+    "comments": []
+  },
+  {
+    "date": "2011.08.16",
+    "title": "いぬかき。",
+    "tags": [
+      "ぽー",
+      "お友達",
+      "動画",
+      "2011年8月"
+    ],
+    "images": [
+      "https://stat.ameba.jp/user_images/20110816/07/rinbelu/c6/60/j/o0399027411420124147.jpg",
+      "https://stat.ameba.jp/user_images/20110816/07/rinbelu/3c/47/j/o0400027711420124149.jpg",
+      "https://stat.ameba.jp/user_images/20110816/07/rinbelu/06/19/j/o0399026711420124148.jpg",
+      "https://stat.ameba.jp/user_images/20110816/07/rinbelu/9a/50/j/o0399025811420124150.jpg",
+      "https://stat.ameba.jp/user_images/20110816/07/rinbelu/2e/9c/j/o0400026611420128585.jpg",
+      "https://stat.ameba.jp/user_images/20110816/07/rinbelu/5c/9a/j/o0399025811420131691.jpg",
+      "https://stat.ameba.jp/user_images/20110816/07/rinbelu/87/ed/j/o0399025011420131692.jpg",
+      "https://stat.ameba.jp/user_images/20110816/07/rinbelu/21/ff/j/o0400026611420131690.jpg",
+      "https://stat.ameba.jp/user_images/20110816/07/rinbelu/79/cd/j/o0399026711420139911.jpg",
+      "https://stat.ameba.jp/user_images/20110816/07/rinbelu/69/4a/j/o0399027111420139913.jpg",
+      "https://stat.ameba.jp/user_images/20110816/07/rinbelu/c4/99/j/o0400026711420139912.jpg",
+      "https://stat.ameba.jp/user_images/20110816/07/rinbelu/51/e9/j/o0400026511420139914.jpg",
+      "https://stat.ameba.jp/user_images/20110816/07/rinbelu/32/64/j/o0400026611420144307.jpg",
+      "https://stat.ameba.jp/user_images/20110816/07/rinbelu/91/0b/j/o0400027611420146992.jpg",
+      "https://stat.ameba.jp/user_images/20110816/07/rinbelu/6b/20/j/o0400024811420146993.jpg",
+      "https://stat.ameba.jp/user_images/20110816/07/rinbelu/17/88/j/o0400025711420146994.jpg"
+    ],
+    "text": "昨日のこと。むぅちゃん＆ネオちゃんと川遊びぽーにとっては水温が低かった５月の川遊びと比べると、気温・水温ともに快適でぽーも水につかって遊べるようです[1] 水に入るまで数年かかったというのが、信じられないほど余裕なむぅちゃんの泳ぎっぷり[2] そして川遊び大好きネオちゃんの華麗な泳ぎ[3] そしてぽーも泳ぎますょ～って、[4] 奥で静かに泳ぐむぅちゃんとナニカチガウ[5] ネオちゃんが、飼主たちもが皆で見守りたくなるほどの、[6] 激しい（ヒドい）泳ぎっぷり。どしたの、その水しぶき？泳ぎ方をわすれたのか[7] と思っていたけれど、さすがアスリートぽーさん。何度か泳ぎを繰返しいぬかきも安定。海に比べ浮力が小さいので戸惑ったのかしらねぇ。泳げるウィペットだけれど、ぽーの得意はやはりアレですよネ。陸にあがったネオちゃんを誘って、[8] はるか彼方へと追いかけっこの旅[9] 砂場を見つけてさらに大はしゃぎ。ネオちゃんまで変顔になってる[10] 休憩しなさいと言われたむぅちゃんは、[11] これまた大好きな『石拾い』を堪能中[12] たくさん遊んだらドッグカフェ楓でエネルギー補給。[13] 「イヌ」が変わるほど楓のおやきが好き過ぎのむぅさん[14] ぽーのおやつは河原に落ちてたイノシシの骨を・・[15] って、もちろん冗談ですとも体力使いひもじい子になっていたぽーは、おやきのお替わりもぺろりと完食。筋骨隆々で浮きにくいせいか泳ぎにかなりエネルギーを使うぽー。水に入ることも嫌がらず、どちらかというと皆と一緒に川で遊びたそう。というわけで帰り道、ドッグジュビリーにてライフジャケットげっと～[16] これでさらに快適安全に水遊びができるはず。いやぁ、楽しかった！みんなありがとう～～さぁて、ライフジャケットのお披露目はいつでしょうかね～～",
+    "truncated": false,
+    "comments": []
+  },
+  {
+    "date": "2011.08.18",
+    "title": "Happy 2nd birthday!!",
+    "tags": [
+      "ぽー",
+      "健康",
+      "おでかけ",
+      "2011年8月"
+    ],
+    "images": [
+      "https://stat.ameba.jp/user_images/20110818/18/rinbelu/fc/5f/j/o0399026711425805347.jpg"
+    ],
+    "text": "ぽーさん、本日２歳を迎えました～[1] ２歳記念、ぽーと一緒の初キャンプを楽しんできました！その様子はまた後日改めて兄弟のみんな、誕生日おめでとう！！２歳のこの一年も、健康でのんびり楽しい毎日を送りますように～～～",
+    "truncated": false,
+    "comments": []
+  },
+  {
+    "date": "2011.08.19",
+    "title": "美那川キャンプ村〜前編〜",
+    "tags": [
+      "ぽー",
+      "おでかけ",
+      "グッズ",
+      "2011年8月"
+    ],
+    "images": [
+      "https://stat.ameba.jp/user_images/20110819/11/rinbelu/ae/8f/j/o0400025711427317964.jpg",
+      "https://stat.ameba.jp/user_images/20110819/11/rinbelu/89/5d/j/o0399026311427317962.jpg",
+      "https://stat.ameba.jp/user_images/20110819/11/rinbelu/df/55/j/o0400024811427351404.jpg",
+      "https://stat.ameba.jp/user_images/20110819/11/rinbelu/b0/52/j/o0399060211427317969.jpg",
+      "https://stat.ameba.jp/user_images/20110819/11/rinbelu/db/b9/j/o0399026711427351403.jpg",
+      "https://stat.ameba.jp/user_images/20110819/16/rinbelu/7a/be/j/o0399026711427786431.jpg",
+      "https://stat.ameba.jp/user_images/20110819/16/rinbelu/2e/9f/j/o0400024911427787028.jpg",
+      "https://stat.ameba.jp/user_images/20110819/16/rinbelu/72/9a/j/o0399026711427804194.jpg",
+      "https://stat.ameba.jp/user_images/20110819/16/rinbelu/e7/25/j/o0400025711427786415.jpg",
+      "https://stat.ameba.jp/user_images/20110819/16/rinbelu/e5/1c/j/o0399026111427786417.jpg",
+      "https://stat.ameba.jp/user_images/20110819/16/rinbelu/1c/26/j/o0400026611427787042.jpg",
+      "https://stat.ameba.jp/user_images/20110819/16/rinbelu/d4/40/j/o0400026611427804209.jpg",
+      "https://stat.ameba.jp/user_images/20110819/16/rinbelu/58/ea/j/o0399026711427843370.jpg",
+      "https://stat.ameba.jp/user_images/20110819/16/rinbelu/a1/62/j/o0399026711427843406.jpg",
+      "https://stat.ameba.jp/user_images/20110819/11/rinbelu/bf/98/j/o0400026611427351402.jpg"
+    ],
+    "text": "「美那川キャンプ村」にてぽーと一緒の初キャンプ１８日宿泊予定を前線降下で雨予報のため、バンガローを借りさらに１７日泊に急遽変更。コテージもバンガローもペットO.K.な嬉しい山奥のキャンプ場。完全予約制で平日のみ役場にて予約受付の公営キャンプ場。というわけで（どういわけだ？）、キャンプだし設備なども多くを期待せず、トイレットペーパーをも持参して望んだキャンプ。でしたが、バンガロー内に電気は通り、トイレは綺麗、お風呂まである。管理人さんのがんばりで至れり尽くせりな快適すぎキャンプ場デシタ国道からそれ5kmほどはガードレールのない細い道。落石注意の看板もあるけれど離合場所は随所にあり意外に快適。[1] 手掘りトンネルもあったりで探検ムードも味わえたり[2] そうこうしている間に到着、一番端っこのバンガローを利用します。各棟毎にテーブルやベンチまであるではないか[3] 6畳の室内は寝袋２つならこんなにも広い！２穴コンセントと下駄箱に荷物棚、ハンガーラック＆ハンガーまで完備[4] 難点は駐車方法で、びょーな位置に杉があるのです駐車位置を確認してからバックで侵入するなりが必要デス。横一列に並んだバンガローの前には１００m程の河原が[5] なんだか間違い探しのような画像になっていますけれどもスギ苔の天然ベッドが気に入ったらしくぽーのくつろぎ場所はここに。さていよいよライフジャケット装着の時間ですょ～[6] 細い首周りは若干サイズオーバーですが、深い胸の部分もベルトで固定できなかなかのフィット感さぁて、泳いでみようか[7] ・・・ふははは というのもですね～ここは『流れ』のある川なのです。足先が小さく背の高いぽーにとってはさらに強く感じるでしょう。浮き輪などで流れに乗って遊ぶには楽しそうですがイヌだもの[8] 川の中にいる飼主たちをこうして心配気に眺めることしかできません。浅瀬で流れのゆるい場所ならば、水の中へ入るけれど険しく楽しくなさげなこの表情[9] 小さな小さな砂場を見つけてストレス発散・・・[10] そんなぽーを広場に案内なのだ～[11] 実はこの場所はテントサイトでして、奥に見える建物は２棟のみあるコテージ。ちょこっとここで走らせてもらったけれど、日中はやはり暑い木陰にもテントサイトはあるのですがスノコが狭く、こちらは２～３人用のテントを張るのが精一杯かもです。[12] 川遊びや探検を終えたらバーベキューの準備だ～１人で勝手に散歩に行かないようぽーは３０mリードで繋留。[13] やはり３０mは長過ぎるのか、自分で短くしたようですネ[14] 安く譲ってもらった特製骨付き肉でごきげんぽーなのでした[15] ・・・つづく",
+    "truncated": false,
+    "comments": []
+  },
+  {
+    "date": "2011.08.22",
+    "title": "美那川キャンプ村〜後編〜",
+    "tags": [
+      "ぽー",
+      "おでかけ",
+      "日常",
+      "2011年8月"
+    ],
+    "images": [
+      "https://stat.ameba.jp/user_images/20110822/13/rinbelu/c1/58/j/o0399026711434076098.jpg",
+      "https://stat.ameba.jp/user_images/20110822/13/rinbelu/d7/15/j/o0399026711434076104.jpg",
+      "https://stat.ameba.jp/user_images/20110819/16/rinbelu/20/ec/j/o0399060411427804215.jpg",
+      "https://stat.ameba.jp/user_images/20110819/16/rinbelu/1f/b2/j/o0399026711427804220.jpg",
+      "https://stat.ameba.jp/user_images/20110822/13/rinbelu/06/1f/j/o0399026711434076107.jpg",
+      "https://stat.ameba.jp/user_images/20110822/13/rinbelu/ea/bf/j/o0400027311434076099.jpg",
+      "https://stat.ameba.jp/user_images/20110822/15/rinbelu/b7/ec/j/o0300042511434280428.jpg",
+      "https://stat.ameba.jp/user_images/20110822/14/rinbelu/4c/76/j/o0399030211434151715.jpg",
+      "https://stat.ameba.jp/user_images/20110822/14/rinbelu/39/58/j/o0399026711434190081.jpg",
+      "https://stat.ameba.jp/user_images/20110822/14/rinbelu/93/43/j/o0399026711434190083.jpg",
+      "https://stat.ameba.jp/user_images/20110822/14/rinbelu/b3/5a/j/o0399026711434190082.jpg",
+      "https://stat.ameba.jp/user_images/20110822/14/rinbelu/8d/db/j/o0399026711434151710.jpg"
+    ],
+    "text": "お待たせしました～後編ですさすが山中のキャンプ場。朝晩はぽーが寝袋に潜り込んでくるほどの涼しさデシタ。朝ゴハンを先にすませたぽーはクーハンで森林浴。うろうろしなくなったから今朝は３０mリードは無しでね。[1] クーハンのそのカタチ、まるで舟のようだねぇ。舟のサイズに比べてぽーの体がチョット大きいけど[2] おっと！忘れていました、キャンプ場のお風呂情報。お湯がはられている時間は一応、１８時～２２時頃。浴室は男女別、シャンプーなども完備でシャワー２つにカラン２つ。ちょっとした民宿より快適かもですょ～[3] 川遊び以外では吊り橋があり、これが意外に揺れるのです。ぽーはといえば全く平気でふつーに下を覗いていマシタ[4] そういえば台風６号で増水し、テントサイトも壊れたそうです。山や川でのキャンプは天気のチェックがやはり重要ですねぇ。もう一つ重要情報、河原では３人ともウシアブに襲われまくり。ぽーは特に毛のないおなかを狙われ３カ所ほど咬まれました管理人さん曰く、この辺りではお盆過ぎから増えるそうです。そして黒っぽいものに集まるので「白い」服を着ればましなのだそう。それでも川でもうひと遊びしてキャンプ場を後に。ちょこっと寄り道をして『大轟の滝』へ。[5] 滝へと続く遊歩道は草に覆われ通行不可能。しかたないので道路脇からしばし眺めてみる、がアツイ[6] 吊り橋でもそうでしたが、高いところへ行くと覗きたくなるぽー。[7] と、思ったかどうかはわからないけれど、表情・様子がまさしくそんな感じで面白かったのです「このまま帰るのもったいななぁ・・」とつぶやく相方。ならば！と、地図をひろげ指差すワタシ.（我家はアナログな地図で旅行派なのだ）[8] 小浜大橋を渡り、『ミニ四国八十八か所』とやらを巡ろうではないか（この時、まさかあんなことになろうとは思いもしなかったわけで）橋を渡り左折し県道３０８号を走る。「ミニ八十八カ所」らしきモノが何も無い。いや、それよりも何よりも困ったことが起きている。[9] 運転席側には切り立つ崖が迫り、助手席側には・・・何も無い。落石だらけだし、離合場所もないしで引返すこともできない[10] まさかの状況に苦笑するしかない私たち苦しまぎれなワタシのつまらない冗談で笑う相方に、「笑うな～手元がぶれて落ちる～」と焦ってみたり。「とにかくこの先に橋があって、そこから国道に戻れるから！」相方を励ましながら進むこと３０分。ようやく少し広い場所に出たぞ～・・・って、[11] というわけで、ここでUターンをして来た道を引返したわけで。ホントの「ミニ八十八か所」は県道沿いではなく川の対岸。桜谷トンネルの両端に案内があったりして、石仏が８８体あったりして、道も整備されてたりなんかするらしい・・・地図ではどう見ても黄色の県道より、白い対岸の道の方が狭そうじゃないかあぁでも、家に帰れてヨカッタ。ブログの更新できて良かったよぅ～そんなオチありのぽーと一緒の初キャンプ。お待たせしたうえに何がメインかわからない「後編」ですが、私たちにとってはこれまた楽しい夏の思い出になりマシタ次はわんこ友達とコテージなんぞを利用したいなぁ。[12]",
+    "truncated": false,
+    "comments": []
+  },
+  {
+    "date": "2011.08.23",
+    "title": "全てはぽーのために。",
+    "tags": [
+      "ぽー",
+      "お友達",
+      "日常",
+      "2011年8月"
+    ],
+    "images": [
+      "https://stat.ameba.jp/user_images/20110823/12/rinbelu/69/4c/j/o0399029811436035537.jpg",
+      "https://stat.ameba.jp/user_images/20110823/12/rinbelu/9a/59/j/o0400029811436016571.jpg"
+    ],
+    "text": "キャンプ以降、すっきりしない天気が続き寝袋が干せません・・・しかたないので和室に放り出していたら、予想通りの展開に[1] この寝袋は友人からの頂きもので、１つは相方に、そしてもう１つはぽーにとくれたもの。そう、その友人とは例の「ぽー大好き友人」。「ぽー大好き友人」はなかなか（ぽーに）会えない場所へと転居。そして最近デジタルフォトフレームを契約したとメールがキタ。そうなのょ、「ぽーの写真送ってね」ということですわハートは付いてなかったけれど（笑）ふかふか具合もサイズもちょうど良いし、いっそのことぽーのベッドにしちゃおうかしらねぇ。アナタの寝袋、枕も含めてとってもお気に入りのようですょ～会いに帰っておいでょ～[2]",
+    "truncated": false,
+    "comments": []
+  },
+  {
+    "date": "2011.08.23",
+    "title": "楽しいひととき。",
+    "tags": [
+      "ぽー",
+      "お友達",
+      "おでかけ",
+      "2011年8月"
+    ],
+    "images": [
+      "https://stat.ameba.jp/user_images/20110823/13/rinbelu/f9/5f/j/o0399026811436169207.jpg",
+      "https://stat.ameba.jp/user_images/20110823/13/rinbelu/cd/c7/j/o0399026711436169209.jpg",
+      "https://stat.ameba.jp/user_images/20110823/13/rinbelu/93/39/j/o0400027111436169210.jpg",
+      "https://stat.ameba.jp/user_images/20110823/13/rinbelu/2a/17/j/o0399026711436169208.jpg"
+    ],
+    "text": "今さらですが週末のこと。ドッグカフェ「メイドリーム」のオーナーさんが、９月から代わると聞き、あの美味しいゴハンをもう一度！と、いうわけで行ってきました。しかーし、引継やらなんやかやで、１６日から月末まで閉めることにしたそうな友人談によると新オーナーさんもとてもステキな方だそう。９月になったらまた行こうっと美味しいゴハンを逃した飼主たちですが、ぽーは楽しい時間をすごせました。それはカフェに向かう前に立ち寄った高速SAランでのひととき。初めましてなボーダーコリーのソウタくん。パパの持つフリスビーに始終ロックオンな彼そんな彼と遊ぶ方法を模索するぽーが可笑しかったなぁ（写真ないけれど）[1] ぽーと同じく２歳の男の子。キリリとした表情でめちゃオトコマエなのだ～[2] そして３、４ヶ月ぶりな再会のさくらくん初めて出会ったとき彼は生後１０ヶ月。いまや１歳半で体もしっかりしてきたねぇ。[3] 子犬のころと変らず穏やかで優しい子。はしゃぎすぎてすでにお疲れモードの２人涼しくなったらたくさん遊ぼうね～[4]",
+    "truncated": false,
+    "comments": []
+  },
+  {
+    "date": "2011.08.25",
+    "title": "ぽーぺーす。",
+    "tags": [
+      "ぽー",
+      "日常",
+      "おもしろ",
+      "2011年8月"
+    ],
+    "images": [
+      "https://stat.ameba.jp/user_images/20110825/11/rinbelu/81/1c/j/o0399027811440242022.jpg",
+      "https://stat.ameba.jp/user_images/20110825/11/rinbelu/1a/bf/j/o0399029311440242021.jpg",
+      "https://stat.ameba.jp/user_images/20110825/11/rinbelu/eb/2d/j/o0399029811440242023.jpg"
+    ],
+    "text": "昨日のこと久しぶりのすっきりなソラモヨウ陽のあたる場所は暑いけれど、風があるので日陰は快適。そこで日向には寝袋を干し、日陰にはぽーを干しましょう[1] 私もしばしの間ぽーと一緒に陰干しされてみる。あら、ぽーの「誰かキタ」センサーが反応した。[2] 訪問者は宅配便のおにーさんでした。屋内にいるとき、来客があると吠えるようになったぽー。けれどもこうして庭にいるときは全く反応せずで。帰って行くときにようやく立ち上がり、お見送り[3] ぽーペースはまだまだ観察しがいがあるのです",
+    "truncated": false,
+    "comments": []
+  },
+  {
+    "date": "2011.08.26",
+    "title": "何事にもゆとりを。",
+    "tags": [
+      "ぽー",
+      "グッズ",
+      "おもしろ",
+      "2011年8月"
+    ],
+    "images": [
+      "https://stat.ameba.jp/user_images/20110826/10/rinbelu/28/35/j/o0400030011442257433.jpg",
+      "https://stat.ameba.jp/user_images/20110826/10/rinbelu/2b/dd/j/o0400026611442257437.jpg",
+      "https://stat.ameba.jp/user_images/20110826/10/rinbelu/05/f5/j/o0399029511442257449.jpg",
+      "https://stat.ameba.jp/user_images/20110826/11/rinbelu/31/1d/j/o0400029811442312713.jpg",
+      "https://stat.ameba.jp/user_images/20110826/11/rinbelu/e8/4d/j/o0400029811442319603.jpg",
+      "https://stat.ameba.jp/user_images/20110826/11/rinbelu/28/0c/j/o0400029811442312714.jpg",
+      "https://stat.ameba.jp/user_images/20110826/11/rinbelu/03/d1/j/o0400029811442319602.jpg"
+    ],
+    "text": "相方の愛車はホンダのビート91'～96'年まで販売されていたオープンカー。以前ブログにも載せたことがありますが、幌をあげオープンにするとこんな感じ。[1] リアウィンドウは折り畳めるようシート状になっています。そしてこれが経年劣化で曇ったりヒビが入ったりするのです。３年前の写真ですが、こうなると後ろは全く見えません[2] 純正なら３万円弱、オークションなら５千円くらいであるけど面倒。そこで３年前に試みたのが「ビニールシートで代用作戦」これが意外にうまくいき最近まで使えていました。当時はミシンもなく手縫いでがんばったリアウィンドウですが、縫目がほどけ上から半分くらいがだら～んと恥ずかしい状態に今ならミシンもあるし楽々できるぞ～と、0.5mm厚ビニールシート＆厚地用糸を購入して合計６００円ほど昨日、ぽーが見守るなか昼からのんびり制作。[3] さてさて、このリアスクリーンの脱着が私的にはチョット面倒事。外側の幌と一緒に合計１０本のビスで車本体に固定されている。そのうち４本はトランクの内側にあるのだ。そして車内側にて幌とファスナーで止める仕組み。「ぴしっ！」とたるみなく張った状態なので、脱着の順序も重要でもね屋内作業は涼しいしミシンあるし、ぽーもいるしで楽ちんなのだ２時間少しで完成したぞと、さてビートにつけようか。ファスナーを先に閉めちゃうと、引っ張られすぎてビスが入らないのよね～。ビス１０個完了、はいっ！！ファスナーが閉っまりません～・・・ビニールシートをですね、「ぴしっ！」と張りながら縫ったせいでですね、ゆとりがなくなりファスナーに届かなくなりマシタあぁ、そういえば、３年前に手縫いをしたときはあえてたるみ取ったかもなぁ～～暑いし、なんだか急に土砂降りになるし蚊はいるし・・・[4] 気を取り直してもう一度。シートを必要な倍の１m買っておいてよかった普通の布と違ってたるみを持たせて縫うのが大変。まるめてみたり縫う順序をかえてみたりと悪戦苦闘。[5] 完成度が低くて納得いかないけれど、なんとか無事装着。中断したりもあり完成したのは１９時頃。[6] そして今朝「視界良好！恥ずかしくなーい」とご機嫌出勤な相方[7] だけど、だけど、やはり納得いかない仕上がりだ～～＊数年後のワタシへスクリーン縫うときは「ゆとり」をもたせることバイアスで裁つ。１６号針→細くしてみる。しかし数年後、この記事を書いたことを覚えているのだろうか。覚えているあいだにまた破れないかな～～",
+    "truncated": false,
+    "comments": []
+  },
+  {
+    "date": "2011.08.26",
+    "title": "ぽーです。",
+    "tags": [
+      "ぽー",
+      "お友達",
+      "砂浜",
+      "2011年8月"
+    ],
+    "images": [
+      "https://stat.ameba.jp/user_images/20110826/22/rinbelu/db/1b/j/o0399026911443495368.jpg",
+      "https://stat.ameba.jp/user_images/20110826/22/rinbelu/10/72/j/o0399026711443495370.jpg",
+      "https://stat.ameba.jp/user_images/20110826/22/rinbelu/ae/f0/j/o0399025611443515231.jpg",
+      "https://stat.ameba.jp/user_images/20110826/22/rinbelu/f2/a5/j/o0400025411443515233.jpg",
+      "https://stat.ameba.jp/user_images/20110826/22/rinbelu/de/03/j/o0399027011443515232.jpg",
+      "https://stat.ameba.jp/user_images/20110826/22/rinbelu/b8/53/j/o0399026011443515234.jpg",
+      "https://stat.ameba.jp/user_images/20110826/22/rinbelu/b7/9c/j/o0400026711443531050.jpg",
+      "https://stat.ameba.jp/user_images/20110826/22/rinbelu/88/97/j/o0399026211443531056.jpg",
+      "https://stat.ameba.jp/user_images/20110826/22/rinbelu/5d/84/j/o0399027211443531052.jpg",
+      "https://stat.ameba.jp/user_images/20110826/22/rinbelu/4c/5e/j/o0399026711443531051.jpg"
+    ],
+    "text": "コンニチワ、ぽーです昨日は久しぶりに「楽しい場所」行きました！！（いやいや、たったの２日ぶりやし）それはもう、楽しくて楽しくてうっひゃひゃひゃ～～～[1] あぁ。。ぽーに語らせてみたけれどやはり話が進まない・・・飼い主、代わりま～すぽーがこんなに喜んでいるワケは、いつもの砂浜でむぅちゃんと一緒だから。[2] よく見たらぽーの足が砂で真っ黒[3] むぅちゃんがいるだけで嬉しいぽーは、一人はしゃいであんな足に。そしてさらに前方にトモダチはっけ～ん[4] 期待の眼差しで振り向くぽーに「いいよ。Go！」の合図。あっという間に彼女のもとへ[5] 遠くに見える白黒カラーな子はネオちゃん２人でぐるぐる走り回るから、砂にはきれいな同心円ができマシタ（笑）[6] 台風の影響かこの日は波が高い。けれどもそれ以上に高いぽーのテンション[7] なんだか妙にシンクロしたネオちゃん＆ぽー[8] カメラが苦手なはずのむぅちゃんも、この日はしっかりカメラ目線で笑顔サービス[9] 遊びトモダチたちがふらっと散歩かねて向かう砂浜。ちょこっと時間を合わせれば皆で集合できる砂浜。まもなく涼しくなる季節、これからも「楽しい」がたくさんなのだ～[10]",
+    "truncated": false,
+    "comments": []
+  },
+  {
+    "date": "2011.08.29",
+    "title": "水遊びとぽー。",
+    "tags": [
+      "ぽー",
+      "お友達",
+      "グッズ",
+      "2011年8月"
+    ],
+    "images": [
+      "https://stat.ameba.jp/user_images/20110829/12/rinbelu/c6/ee/j/o0399026411448986697.jpg",
+      "https://stat.ameba.jp/user_images/20110829/12/rinbelu/1c/bf/j/o0399026311448984508.jpg",
+      "https://stat.ameba.jp/user_images/20110829/12/rinbelu/21/93/j/o0400026711449046069.jpg",
+      "https://stat.ameba.jp/user_images/20110829/12/rinbelu/79/ea/j/o0400025211449006437.jpg",
+      "https://stat.ameba.jp/user_images/20110829/12/rinbelu/14/68/j/o0400025111448985554.jpg",
+      "https://stat.ameba.jp/user_images/20110829/12/rinbelu/be/1f/j/o0399026711448984511.jpg",
+      "https://stat.ameba.jp/user_images/20110829/14/rinbelu/cf/d4/j/o0299044911449210483.jpg",
+      "https://stat.ameba.jp/user_images/20110829/12/rinbelu/ac/f8/j/o0298040011448986696.jpg",
+      "https://stat.ameba.jp/user_images/20110829/12/rinbelu/90/ef/j/o0400027511448986694.jpg",
+      "https://stat.ameba.jp/user_images/20110829/12/rinbelu/3f/1e/j/o0399026711448986695.jpg",
+      "https://stat.ameba.jp/user_images/20110829/13/rinbelu/d0/fc/j/o0399026711449146735.jpg"
+    ],
+    "text": "週末のことライフジャケットの効果を試すときがきマシタキャンプ場では流れも速くて使えませんでしたからね～。さてさて効果はいかほどに・・・[1] おぉ！ぽーも川に入ってるじゃないこれくらいまでならとりあえず、活動可能範囲のようです。まぁ海でも波打ち際では遊ぶぽーですものネ。しかし「泳ぐ」ことが必要な深さではチョット事情が変わる。遊べば楽しくなるかなぁと、相方が木の取り合いっこ遊びをしてみる。[2] ひとかき、ふたかきくらいまでなら泳ぐようになりマシタ～それでもなるべくなら水に入りたくないぽー。なんと、すばらしく良い方法に気がついたむぅちゃんたちが取ってきた枝を戴いちゃえばよいのだ～[3] けっきょくホントの「取り合いっこ遊び」になりマシタ（いやほぼ、ぽーが奪っていたけれど）陸専門の「ウィペット」ぽー、やはり楽しいのは追いかけっこ[4] さすが水陸両用ネオちゃん、走って暑くなると川の中へ哀しいかな行きたいけれど、行けないぽー[5] ぽーはライフジャケット着用時の方が、深いところまで入っているかもですねぇさて、むぅちゃん＆ネオちゃんも着てみよう！ということで試着タイム～[6] [7] ２人ともサイズぴったりだし、かっこいいじゃないか～肩幅のないぽーと比べると首周りが落ち着きますねぇ。すいすい泳げる子たちだけれど、着ていると疲れが軽減されるかもそのとき、相方だけが気がついていた。ジャケットお試し水泳に夢中になっている飼主たちをじっと見つめる子がいることを・・・[8] その子は寂しげな表情で振り返り・・・というかですね～[9] 怒ってる。めっちゃ拗ねてますょ、この子[10] 飼主２人が必死になだめ、ネオちゃんたちと陸で遊びキゲンの戻るぽー。（カフェでおやつの頃にはすっかり忘れているのだけれど）[11] 次はうみちゃんも来れるかもょそうしたら河原でさらに遊べるかもょ～と、非情な飼主は水辺での遊びをやめてくれないのデシタ",
+    "truncated": false,
+    "comments": []
+  },
+  {
+    "date": "2011.08.30",
+    "title": "幼少時代。",
+    "tags": [
+      "ぽー",
+      "家族",
+      "日常",
+      "2011年8月"
+    ],
+    "images": [
+      "https://stat.ameba.jp/user_images/20110830/13/rinbelu/b1/9a/j/o0443031011451348063.jpg",
+      "https://stat.ameba.jp/user_images/20110830/12/rinbelu/8d/1a/j/o0404027111451252065.jpg"
+    ],
+    "text": "川遊びのあと、カフェで子犬時代の話になりましたほそーい体型なウィペットのぽー。今でこそウィペットの体型は見慣れましたけれど、当時は「子犬っぽくないなぁ～」と感じていました。今から思えばしっかりころころでぱぴぱぴ、だったのですけどね～というわけで、ぽーの子犬時代をご紹介我が家に来たその日の写真と、先日の川遊びでの写真です。当時の体重が5.7kg、現在は17.6kg。えーと、ワタシに関してはほぼ変化なしなので比較できるかと[1] どうです？想像していた子犬姿とは異なりますかね子犬時代の写真をもう一枚。連れて帰ってきた翌日に友人が撮ってくれた写真。ブログから勝手に拝借してきちゃいました（良い？よいよね？？）[2] うぉ～ん、何度見てもかわええ～～～～あぁ、いかん、いかん。思わず我を忘れてしまいマシタ主人の膝に乗るぽーを子犬時代とで比較した写真もあります。よかったら見てやってください",
+    "truncated": false,
+    "comments": []
+  }
+];
+
+(function() {
+  const seen = {};
+  entries.forEach(function(e) {
+    const key = e.date;
+    seen[key] = (seen[key] || 0) + 1;
+    e.id = 'e' + e.date.replace(/\./g, '-') + '-' + seen[key];
+  });
+})();
+
+
+// ---- render ----
+const allTags = [...new Set(entries.flatMap(e => e.tags))];
+let activeTags = new Set();
+let keyword = "";
+
+function highlightNums(text) {
+  return text.replace(/\[(\d+)\]/g, '<b>[$1]</b>');
+}
+
+function esc(s) {
+  return String(s == null ? "" : s).replace(/[&<>]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
+}
+
+function renderTagFilter() {
+  const el = document.getElementById('tagFilter');
+  el.innerHTML = allTags.map(t =>
+    `<button class="tag-btn${activeTags.has(t) ? ' active' : ''}" data-tag="${t}">${t}</button>`
+  ).join('');
+  el.querySelectorAll('.tag-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const tag = btn.dataset.tag;
+      if (activeTags.has(tag)) activeTags.delete(tag); else activeTags.add(tag);
+      renderTagFilter();
+      renderEntries();
+    });
+  });
+}
+
+function matches(entry) {
+  const tagOk = activeTags.size === 0 || entry.tags.some(t => activeTags.has(t));
+  const kw = keyword.trim();
+  const kwOk = kw === "" ||
+    entry.title.includes(kw) ||
+    entry.text.includes(kw) ||
+    entry.tags.some(t => t.includes(kw));
+  return tagOk && kwOk;
+}
+
+function renderEntries() {
+  const main = document.getElementById('main');
+  const filtered = entries.filter(matches);
+  document.getElementById('count').textContent = `${filtered.length} / ${entries.length} 件表示中`;
+  document.getElementById('noResults').style.display = filtered.length === 0 ? 'block' : 'none';
+
+  main.innerHTML = filtered.map(entry => `
+    <article class="entry" id="${entry.id}">
+      <div class="entry-head">
+        <span class="entry-title">${entry.title}</span>
+        <span class="entry-date">${entry.date}</span>
+      </div>
+      ${entry.images.length > 0 ? `
+      <div class="photo-grid">
+        ${entry.images.map((src, i) => `
+          <a href="${src}" target="_blank" rel="noopener">
+            <img src="${src}" loading="lazy" alt="${entry.title} 写真${i+1}">
+            <span class="num">${i+1}</span>
+          </a>
+        `).join('')}
+      </div>` : entry.photosLost ? `<p class="no-photo">（写真は掲載されていましたが、保存されていないため表示できません）</p>` : `<p class="no-photo">（この記事には写真がありません）</p>`}
+      ${entry.truncated ? `<p class="truncated-note">（＊続きは読めない）</p>` : ''}
+      <p class="entry-text">${highlightNums(entry.text)}</p>
+      <div class="tags">
+        ${entry.tags.map(t => `<button class="tag-pill" data-tag="${t}">${t}</button>`).join('')}
+      </div>
+      ${entry.comments && entry.comments.length > 0 ? `
+      <div class="comments">
+        <div class="comments-label">コメント（${entry.comments.length}件）</div>
+        ${entry.comments.map(c => `
+          <div class="comment">
+            <div class="comment-meta"><span class="author">${esc(c.author)}</span>${c.date ? ' ・ ' + esc(c.date) : ''}</div>
+            <div>${esc(c.text)}</div>
+          </div>
+        `).join('')}
+      </div>` : ''}
+    </article>
+  `).join('');
+
+  main.querySelectorAll('.tag-pill').forEach(btn => {
+    btn.addEventListener('click', () => {
+      activeTags = new Set([btn.dataset.tag]);
+      renderTagFilter();
+      renderEntries();
+      window.scrollTo({top:0, behavior:'smooth'});
+    });
+  });
+}
+
+document.getElementById('search').addEventListener('input', (e) => {
+  keyword = e.target.value;
+  renderEntries();
+});
+
+renderTagFilter();
+renderEntries();
+if (location.hash) {
+  const target = document.getElementById(location.hash.slice(1));
+  if (target) target.scrollIntoView({block: 'start'});
+}
+</script>
+
+</body>
+</html>

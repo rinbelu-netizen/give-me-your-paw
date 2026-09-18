@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hey buddy, give me your paw! 絵日記帳 - 2014年5月</title>
+<style>
+  :root {
+    --bg: #faf6ef;
+    --card-bg: #ffffff;
+    --border: #e8dfd0;
+    --text: #4a4238;
+    --text-muted: #9a9082;
+    --accent: #c98a5e;
+    --accent-bg: #f5e6d8;
+    --accent-text: #8a5a35;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    padding: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: "Hiragino Kaku Gothic ProN", "Yu Gothic", "Meiryo", sans-serif;
+    line-height: 1.8;
+  }
+  header {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 32px 20px 16px;
+    text-align: center;
+  }
+  header h1 {
+    font-size: 22px;
+    font-weight: 500;
+    margin: 0 0 4px;
+    color: var(--text);
+  }
+  header p {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin: 0;
+  }
+  .controls {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 12px 20px 20px;
+    position: sticky;
+    top: 0;
+    background: var(--bg);
+    z-index: 10;
+  }
+  #search {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    font-size: 14px;
+    background: var(--card-bg);
+    color: var(--text);
+    margin-bottom: 10px;
+  }
+  .tag-filter {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .tag-btn {
+    font-size: 11px;
+    padding: 4px 12px;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    background: var(--card-bg);
+    color: var(--text-muted);
+    cursor: pointer;
+  }
+  .tag-btn.active {
+    background: var(--accent);
+    color: #fff;
+    border-color: var(--accent);
+  }
+  .count {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 0 20px 8px;
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+  main {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 0 20px 60px;
+  }
+  .entry {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 20px;
+    margin-bottom: 16px;
+  }
+  .entry-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+  .entry-title {
+    font-size: 16px;
+    font-weight: 500;
+  }
+  .entry-date {
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+  .photo-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+    gap: 6px;
+    margin-bottom: 12px;
+  }
+  .photo-grid a {
+    position: relative;
+    display: block;
+    aspect-ratio: 1;
+    overflow: hidden;
+    border-radius: 8px;
+    background: var(--accent-bg);
+  }
+  .photo-grid img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .photo-grid .num {
+    position: absolute;
+    bottom: 3px;
+    right: 4px;
+    font-size: 10px;
+    background: rgba(0,0,0,0.55);
+    color: #fff;
+    padding: 1px 5px;
+    border-radius: 8px;
+  }
+  .no-photo {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-bottom: 12px;
+  }
+  .truncated-note {
+    font-size: 12px;
+    color: var(--accent-text);
+    background: var(--accent-bg);
+    border-radius: 8px;
+    padding: 6px 10px;
+    margin: 0 0 12px;
+    display: inline-block;
+  }
+  .entry-text {
+    font-size: 14px;
+    line-height: 1.85;
+    margin: 0 0 12px;
+    white-space: pre-line;
+  }
+  .entry-text b {
+    color: var(--accent-text);
+    font-weight: 500;
+  }
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .tag-pill {
+    font-size: 11px;
+    padding: 2px 10px;
+    border-radius: 12px;
+    background: var(--accent-bg);
+    color: var(--accent-text);
+    cursor: pointer;
+    border: none;
+  }
+  .comments {
+    margin-top: 16px;
+    padding-top: 14px;
+    border-top: 1px dashed var(--border);
+  }
+  .comments-label {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+  }
+  .comment {
+    font-size: 13px;
+    line-height: 1.7;
+    margin-bottom: 12px;
+    padding-left: 10px;
+    border-left: 2px solid var(--accent-bg);
+  }
+  .comment-meta {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-bottom: 2px;
+  }
+  .comment-meta .author {
+    color: var(--accent-text);
+    font-weight: 500;
+  }
+  .no-results {
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 14px;
+    padding: 40px 0;
+    display: none;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Hey buddy, give me your paw! 絵日記帳</h1>
+  <p>ウィペットのぽー＆バド（＆うめ）と暮らす日常あれこれ ― 2014年5月 ※so-netブログ・archive.orgより復元</p>
+</header>
+
+<div class="controls">
+  <input type="text" id="search" placeholder="キーワードで探す（例: 震災、ドッグラン、うみちゃん）">
+  <div class="tag-filter" id="tagFilter"></div>
+</div>
+<div class="count" id="count"></div>
+
+<main id="main"></main>
+<p class="no-results" id="noResults">該当する記事が見つかりません。</p>
+
+<script>
+const entries = [
+  {
+    "date": "2014.05.29",
+    "title": "足柄運動会2014夏ー前編。",
+    "tags": [
+      "足柄運動会",
+      "友人",
+      "2014年5月"
+    ],
+    "images": [],
+    "text": "5月25日 足柄運動会2014夏 開催〜！！\nルークレイル・ディルトワ・トーテムホピの初参加もあり、今回はさらに楽しみ倍増だったりな足柄運動会♪ちなみに、わたしたちにとっては３回目の参加だじぇ。\nルクレイとトテホピはぽバドの親戚・兄弟犬家族。ディルトワとは雪遊びに行ったり、横浜で遊んだりなトモダチね♪\n朝からウキウキ気分で家を出発し、ノリノリで高速にのり目的地も近くなった頃。ディルトワ母からメールが届く。「今、どの辺り？こちらは足柄SAで休憩中ー」\nそのとき私たちが居たのは、足柄SAまであと3kmほどの地点。現在地を伝える返信をし、暫くして今度はルクレイ母から電話がはいる。「いま、どこ〜？」\nとっても元気に答えましたともさ！ディルトワ家＆ルクレイ家が居る、足柄SAを通過なうっ！ってな感じで♪\nそうなのょー。そうだったんですよねぇ。。。\nディルトワ家もルクレイ家も待ってくれていたらしく。そりゃそうよね、だってちょうど同じくらいの場所に居るんだものね。しかも、なんてったって初参加だもん。私たちが案内をしないとー・・のはずが。\nそうなんですよぅー・・・ね。彼らの現在地を知ったとき、私たちばか夫婦が揃って考えたこと。それは、\n「よしっ！今なら勝てる！！先に会場に着けるじぇ〜」\nいっ、家を出た瞬間から、帰るまでが運動会ですょー的な・・・・ｴﾍﾍ♪\nなーんて、そんな珍騒動から始まる（誰のせいやなー）足柄運動会2014夏スタートっ♪\nイヌと一緒に・・いや、ほぼ飼主が楽しむためかもなこの運動会。ウィペットだけでなく他犬種の飼主さんと交流できることも楽しみな運動会。\n主催のほめ家＆ロン家や彼らの親しい友人家族が準備・進行等を担ってくれて、そして参加者のみなで協力して盛り上がっちゃう足柄運動会。\n会場となるランの入り口では、お馴染みの看板とレイチェル＆ロンがお出迎え。（なーんて。実は昼休憩時に撮った、コーシングや飼主を見つめる二頭デシタ♪）\n受付を済ませ、タープを張ったら、開始時刻まで少し時間もあるので隣のランでひとっ遊び♪\n仲良く走っているディル＆トワを撮った、つもりだった１枚。（しかもその後の写真も、ディルはおしりばっかりだという・・ ｽﾏﾇ）\nぽー＆レイルを撮ってみれば、ふだん遊んでいるときの写真と一緒やーん、という１枚。\n四国から遠路はるばる参加な カイト＆ベッテル兄弟。パピー走りで元気いっぱいに駆けまわるベッテル。\nしかーし！生後５ヶ月ですでにけっこう大きく、将来有望ですな。\nお兄ちゃんのカイトもしっかり大きく逞しく育っていて、四国で育つと大きくなるかも説が、真実味を帯びてきたような・・・（これからも、のびのーびと元気に育ってねぇ〜♪）\n（あ・・ルークもおしりだけ登場だった。。ゴメンヨー）\nさてさて、いよいよ運動会のはじまりはじまりー♪３３家族（ヒト：67名・イヌ：69頭）、白・黄・赤の３チームに分けられて。\n私たちはディルトワ、トテホピと同じ赤チーム。リーダー:クレア父、サブリーダー:チェス・トイ・アニュー父の元で頑張るぞぃ！ルクレイはチェルブリ（ほめ家）と同じ黄チームね〜♪\n開会式が終われば、各チーム毎に出場競技を決めたり作戦会議をしたり。\nこの間。係留されるわ、飼主は見てくれないわでぎゃんぎゃん鳴くぽバド。そんな彼らを澄子・ゆり子ママが慰めてくれていたりして。\n「男のコはほんと甘えん坊よねぇ♪」と、スミユリママ。はいっ！しかも、ぽバドを凄まじく甘ったれに育てマシタ〜！（ヒトもイヌも大はしゃぎなこの運動会で逞しくなれ〜、という、期待も込めて参加していたり・・・）\nさてさて、最初の競技は全員参加の『ピンポン玉運び』。\n向かい合わせでずらっと並び、ピンポン玉が乗ったお盆を順に送る。そして、最後尾のペアがゴールの箱へとピンポン玉を入れる、というゲーム。\n単純なようで、なかなコツを掴むのが難しくって。\nお盆に残った玉の個数と、ゴールまでにかかった秒数がポイントに影響する。だから、ゴールぎりぎりまで広くヒトが配置したり、最後尾のペアにお盆を持ってゴールの箱まで走らせたりと、各チーム毎に工夫を凝らして挑戦する。\nこちらは黄チームの様子〜。パノラマ風につなげたかったけれど、人物がちいさーくなってしまうので階段式につなげてみマシタ！\nこちらは、白チーム。ペア毎の距離があるので、ゴール近くまでヒトが並ぶ作戦かしらん♪\nところで、ところで。この競技にて白チームの一番手をつとめている ひめ・水紫パパが、それはもう、とっても楽しくてスペクタルな運動会予告動画を作っていらして。\nほめろぐにてUPされていた動画をお借りしてきちゃいました〜！⇨ほめろぐ\n壮大な予告編に沿うような記事はとうてい書けないけれど、つづきはまた次回にてー\n〆写真は、サブリーダー：チェス・トイ・アニュー家のお三方で♪",
+    "photosLost": true,
+    "truncated": false,
+    "comments": []
+  },
+  {
+    "date": "2014.05.30",
+    "title": "足柄運動会2014夏ー中編。",
+    "tags": [
+      "足柄運動会",
+      "バド",
+      "2014年5月"
+    ],
+    "images": [],
+    "text": "二番目の競技は、『早飲み、早食いリレー』\n担当する食材を食べきったら、お玉をバトン代わりに次の担当者へと渡していく、というゲーム。\nビール→バナナ→ジンジャーエール→豆腐→トマト、そして、バトンであるお玉にピンポン玉を入れてビール担当者の元へと走る。というのを、４回繰り返す。（ちなみに人数の都合上、赤チームは４名が２品目を担当する必要ありネ）\n俊足なウィペットを飼う、鈍足な飼主のわたし。\nチームに貢献できるかもしれない唯一の競技がコレなんですょ。とはいえ、炭酸は得意ではないし、得意なビールはたっつーが担当してくれるし。（色々と矛盾しているようないような。そもそも、たっつーにすら負ける私がゆうこさんに勝てる気は全くしましぇ〜ん笑）\nというわけなので、１周目に豆腐、４周目にトマトをたいらげることに。（二品目担当はスポック父・マックス家・たっつーネ♪）はてさて、赤チームの勝負の行方はどうなりますことやら。\n運動会中編記事、レイチェル・ラッキー・つばめトリオ写真でスタート♪\nところで。\n私がチームメンバーに声援を送っていると、バドが抱きついてくるんですょ。それはマウントとかではなく、言葉通り、しがみついてくるのです。（ちなみに、バドが立ち上がると頭は私の胸高くらいになりマス）\n「声援を送る＝飼主が興奮して大きな声で鳴いている」と、バドが感じているのではと運動会や今までの生活の中から推測してミタ。（いや、私は飼主なんだけどネ。ヒトなんすけど。。。ねぇ）\nそういうことであるならば、バドのしがみついてくる理由は「落ち着いて！しっかりして、micky！！」もしくは、「なんなのっ？ヤダ、タスケテ！！」なのではなかろうかと。\nそれが今回の早食いリレーで、前者説が有力ではないかと考えマシタ。なぜならば、１周目の豆腐ではバドは何もせず、４周目のトマトで抱きついてきたから。\nもちろん、豆腐も必死で飲み込みましたともさ。が、４周目のトマトはアンカーのひとつ手前の順番なのです。さらに赤チームは遅れをとっていたので、ここで少しでも巻き返しを。\nそんな状態ですから大声なんてあげられるはずもなく、私が発していたであろうものは気迫と気合いのみ。普段なら振り払っているけれど、抱きつかれたままトマト齧ってマシタょー。\nと、まぁ。。。。競技の内容ではなく、バドの行動についてつらつらと書いたわけですが。それはですね、写真が１枚も無いからだけだったりして。\nと、いうわけでだ。赤チームのリーダーの、まったりクレア写真で気分一新〜♪\n三番目の競技は、『鬼瓦権造ゲーム』。ではなくて（笑）、『マテマテゲーム』。（ナゼなのか。頂いた写真を含め、理由はコチラへ〜⇨ほめろぐ ほめさん、写真ありがとです！）\n先ずは３０秒間イヌたちを待たせましょう。その後、イヌと飼主の間にひかれたテープが移動し始め、それに従い飼主も後方へ。結果、どんどん広がる飼主とイヌとの距離。最終的に目標時間内に動かず残った頭数がそのままポイントとして追加される。\n見所は、イヌたちが待てるかどうかよりも、必死の形相で「待てっ！」と繰り返す飼主の方であるとかないとか（笑\n赤チームは一茶とスポックが残ってポイントに♪澄子・ゆり子・バブルスも惜しかったぁー！！\nそれでだな。ぽバドはというと・・・ほめさんの写真にしっかり写ってた〜♪\n既にテープのあちら側、私の元へと走り寄っているバドのおしりが中央に。そして写真向かって右端、テープぎりぎりで立っているぽー。このあと、左側に走り出します。\nつまり、伏せしているコたちの前を横切って大脱走！！（これで釣られたコ、多数いたとオモウ。。ｺﾞﾒﾝﾅｻｲ･･･）\nみんなで鬼瓦権造なワケは、⇨ほめろぐへ〜（笑\n午前中の最終競技は、『パン食い競争』予選。\nそのまんまの競技なわけですが、ちょっとチガウのはイヌを連れて走るということ。イヌを連れていることで走りにくかったり、さらにトラップもある。\nとっても良い香りの、とっても美味しいフードが置かれているから、イヌたちがそちらへ行こうとしたりして邪魔をされちゃう。（食べたことあるコほど引っ張ってた気もするかもな。ブリも然り。）\nそしてトラップは、フードだけでなかったようで。\nなんと次のこのレースでは、カイトが我らのサブリーダー：チェストイ父の邪魔をしてるぅー！\nそして、初参加のルクレイ父、パンに到達するのが遅れてしまって。弾かれたゴムが顔面にビンゴっ！というハプニングもあったわネ。・・・そう、そんなトラップもあったりするらしい。。。痛そう。。\nそして、冬の運動会では２着でゴールした たっつー。今回は、なんと！！１着ですって〜っ♪\nさてさて、トラップフードの片付けは、ボクたちワタシたちに任せてねっと♪\nこのパン食い競走予選、終わってみれば赤チームは大健闘でして♪チェストイ父・クロバブ父＆息子さん、たっつー。４人もが見事１着でゴールして、午後からの決勝に出場とあいなりました♪\nさて、午前の競技が全て終了して得点は。赤：41 白：38 黄：36 接戦ではあるけれど、赤組リード！\nこのあとは、お待ちかねのランチタイムにチャリティコーシング。それはまた次回の記事に綴ります・・・\n〆の写真は、クロッキー＆バブルス家のバブルスで♪後編or完結編？ではクロバブ父とバドの、名コンビぶりを書く予定〜\nつづく〜",
+    "photosLost": true,
+    "truncated": false,
+    "comments": []
+  }
+];
+
+(function() {
+  const seen = {};
+  entries.forEach(function(e) {
+    const key = e.date;
+    seen[key] = (seen[key] || 0) + 1;
+    e.id = 'e' + e.date.replace(/\./g, '-') + '-' + seen[key];
+  });
+})();
+
+
+// ---- render ----
+const allTags = [...new Set(entries.flatMap(e => e.tags))];
+let activeTags = new Set();
+let keyword = "";
+
+function highlightNums(text) {
+  return text.replace(/\[(\d+)\]/g, '<b>[$1]</b>');
+}
+
+function esc(s) {
+  return String(s == null ? "" : s).replace(/[&<>]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
+}
+
+function renderTagFilter() {
+  const el = document.getElementById('tagFilter');
+  el.innerHTML = allTags.map(t =>
+    `<button class="tag-btn${activeTags.has(t) ? ' active' : ''}" data-tag="${t}">${t}</button>`
+  ).join('');
+  el.querySelectorAll('.tag-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const tag = btn.dataset.tag;
+      if (activeTags.has(tag)) activeTags.delete(tag); else activeTags.add(tag);
+      renderTagFilter();
+      renderEntries();
+    });
+  });
+}
+
+function matches(entry) {
+  const tagOk = activeTags.size === 0 || entry.tags.some(t => activeTags.has(t));
+  const kw = keyword.trim();
+  const kwOk = kw === "" ||
+    entry.title.includes(kw) ||
+    entry.text.includes(kw) ||
+    entry.tags.some(t => t.includes(kw));
+  return tagOk && kwOk;
+}
+
+function renderEntries() {
+  const main = document.getElementById('main');
+  const filtered = entries.filter(matches);
+  document.getElementById('count').textContent = `${filtered.length} / ${entries.length} 件表示中`;
+  document.getElementById('noResults').style.display = filtered.length === 0 ? 'block' : 'none';
+
+  main.innerHTML = filtered.map(entry => `
+    <article class="entry" id="${entry.id}">
+      <div class="entry-head">
+        <span class="entry-title">${entry.title}</span>
+        <span class="entry-date">${entry.date}</span>
+      </div>
+      ${entry.images.length > 0 ? `
+      <div class="photo-grid">
+        ${entry.images.map((src, i) => `
+          <a href="${src}" target="_blank" rel="noopener">
+            <img src="${src}" loading="lazy" alt="${entry.title} 写真${i+1}">
+            <span class="num">${i+1}</span>
+          </a>
+        `).join('')}
+      </div>` : entry.photosLost ? `<p class="no-photo">（写真は掲載されていましたが、保存されていないため表示できません）</p>` : `<p class="no-photo">（この記事には写真がありません）</p>`}
+      ${entry.truncated ? `<p class="truncated-note">（＊続きは読めない）</p>` : ''}
+      <p class="entry-text">${highlightNums(entry.text)}</p>
+      <div class="tags">
+        ${entry.tags.map(t => `<button class="tag-pill" data-tag="${t}">${t}</button>`).join('')}
+      </div>
+      ${entry.comments && entry.comments.length > 0 ? `
+      <div class="comments">
+        <div class="comments-label">コメント（${entry.comments.length}件）</div>
+        ${entry.comments.map(c => `
+          <div class="comment">
+            <div class="comment-meta"><span class="author">${esc(c.author)}</span>${c.date ? ' ・ ' + esc(c.date) : ''}</div>
+            <div>${esc(c.text)}</div>
+          </div>
+        `).join('')}
+      </div>` : ''}
+    </article>
+  `).join('');
+
+  main.querySelectorAll('.tag-pill').forEach(btn => {
+    btn.addEventListener('click', () => {
+      activeTags = new Set([btn.dataset.tag]);
+      renderTagFilter();
+      renderEntries();
+      window.scrollTo({top:0, behavior:'smooth'});
+    });
+  });
+}
+
+document.getElementById('search').addEventListener('input', (e) => {
+  keyword = e.target.value;
+  renderEntries();
+});
+
+renderTagFilter();
+renderEntries();
+if (location.hash) {
+  const target = document.getElementById(location.hash.slice(1));
+  if (target) target.scrollIntoView({block: 'start'});
+}
+</script>
+
+</body>
+</html>
