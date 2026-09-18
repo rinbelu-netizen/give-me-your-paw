@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hey buddy, give me your paw! 絵日記帳 - 欠落記事調査メモ</title>
+<style>
+  :root {
+    --bg: #faf6ef;
+    --card-bg: #ffffff;
+    --border: #e8dfd0;
+    --text: #4a4238;
+    --text-muted: #9a9082;
+    --accent: #c98a5e;
+    --accent-bg: #f5e6d8;
+    --accent-text: #8a5a35;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    padding: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: "Hiragino Kaku Gothic ProN", "Yu Gothic", "Meiryo", sans-serif;
+    line-height: 1.8;
+  }
+  header {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 32px 20px 16px;
+    text-align: center;
+  }
+  .site-banner {
+    width: 100%;
+    max-width: 770px;
+    height: auto;
+    border-radius: 18px;
+    box-shadow: 0 4px 16px rgba(74, 66, 56, 0.15);
+    margin-bottom: 16px;
+  }
+  header h1 { font-size: 22px; font-weight: 500; margin: 0 0 4px; }
+  header p { font-size: 13px; color: var(--text-muted); margin: 0; }
+  main {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 8px 20px 60px;
+  }
+  .back-link {
+    display: inline-block;
+    font-size: 13px;
+    color: var(--accent-text);
+    text-decoration: none;
+    margin-bottom: 16px;
+  }
+  .back-link:hover { text-decoration: underline; }
+  .card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 20px 24px;
+    margin-bottom: 16px;
+  }
+  .card h2 { font-size: 16px; margin: 0 0 10px; color: var(--accent-text); }
+  .card p { font-size: 14px; margin: 0 0 10px; }
+  .card p:last-child { margin-bottom: 0; }
+  .stat-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: 10px 0 4px;
+  }
+  .stat-box {
+    flex: 1 1 140px;
+    background: var(--accent-bg);
+    border-radius: 10px;
+    padding: 10px 14px;
+    text-align: center;
+  }
+  .stat-box .num { font-size: 20px; font-weight: 600; color: var(--accent-text); }
+  .stat-box .label { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    margin: 10px 0;
+  }
+  th, td {
+    text-align: center;
+    padding: 6px 8px;
+    border-bottom: 1px solid var(--border);
+  }
+  th { color: var(--text-muted); font-weight: 500; font-size: 12px; }
+  td.month { text-align: left; }
+  td.gap { color: var(--accent-text); font-weight: 600; }
+  ul.plain {
+    margin: 8px 0 0;
+    padding-left: 20px;
+    font-size: 14px;
+  }
+  ul.plain li { margin-bottom: 4px; }
+  .note {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-top: 14px;
+    padding-top: 12px;
+    border-top: 1px dashed var(--border);
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <img class="site-banner" src="banner.jpg" alt="Hey buddy, give me your paw! ぽー&amp;バドと徳島の砂浜にて">
+  <h1>Hey buddy, give me your paw! 絵日記帳</h1>
+  <p>欠落記事調査メモ ― so-netブログ（2013年7月〜2019年8月）</p>
+</header>
+
+<main>
+  <a class="back-link" href="toc.html">← 全記事目次に戻る</a>
+
+  <div class="card">
+    <h2>概要</h2>
+    <p>so-netブログ側は在籍当時「記事327件」だったことが分かっている（archive.orgに残るブログトップページの表示より）。そのうち、archive.orgから復元・保存できているのは以下の通り。</p>
+    <div class="stat-row">
+      <div class="stat-box"><div class="num">327件</div><div class="label">ブログ本来の総数</div></div>
+      <div class="stat-box"><div class="num">185件</div><div class="label">保存できている</div></div>
+      <div class="stat-box"><div class="num">142件</div><div class="label">未保存（差分）</div></div>
+    </div>
+    <div class="stat-row">
+      <div class="stat-box"><div class="num">108件</div><div class="label">うち全文取得済み</div></div>
+      <div class="stat-box"><div class="num">77件</div><div class="label">うち概要のみ</div></div>
+      <div class="stat-box"><div class="num">30件</div><div class="label">存在は確認できるがタイトル不明</div></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>調査方法</h2>
+    <p>archive.orgに残っている、このブログのトップページのクロール履歴（全7回分：2013年8月・2014年8月・2014年9月・2015年8月・2015年11月・2016年1月・2019年8月）を1件ずつ開き、サイドバーの「月別表示」（各月の投稿数）と、現在サイトに保存できている件数を突き合わせた。あわせて、カテゴリー別ページ・月別アーカイブページ・個別記事URLのクロール履歴（CDX検索）も確認し、タイトルの手がかりがないか調べた。</p>
+  </div>
+
+  <div class="card">
+    <h2>存在は確認できたがタイトル不明な月（30件）</h2>
+    <p>トップページの「月別表示」件数と、保存できている件数に差がある月。件数は確実だが、記事名・内容の手がかりはカテゴリーページ等を含めて一切見つからなかった。</p>
+    <table>
+      <tr><th>月</th><th>本来の件数</th><th>保存できている件数</th><th>不明な欠落</th></tr>
+      <tr><td class="month">2013年7月</td><td>11</td><td>7</td><td class="gap">4</td></tr>
+      <tr><td class="month">2014年4月</td><td>10</td><td>4</td><td class="gap">6</td></tr>
+      <tr><td class="month">2014年5月</td><td>12</td><td>2</td><td class="gap">10</td></tr>
+      <tr><td class="month">2014年6月</td><td>9</td><td>4</td><td class="gap">5</td></tr>
+      <tr><td class="month">2015年4月</td><td>6</td><td>2</td><td class="gap">4</td></tr>
+      <tr><td class="month">2015年5月</td><td>8</td><td>7</td><td class="gap">1</td></tr>
+    </table>
+  </div>
+
+  <div class="card">
+    <h2>アーカイブに手がかりが全く残っていない期間</h2>
+    <p>トップページのクロールが存在しないため、月別の投稿数すら分からない期間。残り約112件の大半はこの範囲に散らばっていると推定される。</p>
+    <ul class="plain">
+      <li>2013年9月〜12月</li>
+      <li>2014年1月〜3月（2月・3月は1件ずつ確認済みだが、それ以外は不明）</li>
+      <li>2014年10月〜11月</li>
+      <li>2015年1月（以前から復元不可と判明済み）</li>
+      <li>2016年2月〜2018年5月（約27ヶ月。個別記事・カテゴリー調査済みの範囲はある程度埋まっているが、全体の見取り図はない）</li>
+    </ul>
+  </div>
+
+  <div class="note">
+    作成日: 2026年9月18日。archive.org（Wayback Machine）のクロール履歴に基づく調査。今後さらに手がかりが見つかった場合はこのページを更新する。
+  </div>
+</main>
+
+</body>
+</html>
