@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hey buddy, give me your paw! 絵日記帳 - 2015年10月</title>
+<style>
+  :root {
+    --bg: #faf6ef;
+    --card-bg: #ffffff;
+    --border: #e8dfd0;
+    --text: #4a4238;
+    --text-muted: #9a9082;
+    --accent: #c98a5e;
+    --accent-bg: #f5e6d8;
+    --accent-text: #8a5a35;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    padding: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: "Hiragino Kaku Gothic ProN", "Yu Gothic", "Meiryo", sans-serif;
+    line-height: 1.8;
+  }
+  header {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 32px 20px 16px;
+    text-align: center;
+  }
+  header h1 {
+    font-size: 22px;
+    font-weight: 500;
+    margin: 0 0 4px;
+    color: var(--text);
+  }
+  header p {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin: 0;
+  }
+  .controls {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 12px 20px 20px;
+    position: sticky;
+    top: 0;
+    background: var(--bg);
+    z-index: 10;
+  }
+  #search {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    font-size: 14px;
+    background: var(--card-bg);
+    color: var(--text);
+    margin-bottom: 10px;
+  }
+  .tag-filter {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .tag-btn {
+    font-size: 11px;
+    padding: 4px 12px;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    background: var(--card-bg);
+    color: var(--text-muted);
+    cursor: pointer;
+  }
+  .tag-btn.active {
+    background: var(--accent);
+    color: #fff;
+    border-color: var(--accent);
+  }
+  .count {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 0 20px 8px;
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+  main {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 0 20px 60px;
+  }
+  .entry {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 20px;
+    margin-bottom: 16px;
+  }
+  .entry-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+  .entry-title {
+    font-size: 16px;
+    font-weight: 500;
+  }
+  .entry-date {
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+  .photo-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+    gap: 6px;
+    margin-bottom: 12px;
+  }
+  .photo-grid a {
+    position: relative;
+    display: block;
+    aspect-ratio: 1;
+    overflow: hidden;
+    border-radius: 8px;
+    background: var(--accent-bg);
+  }
+  .photo-grid img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .photo-grid .num {
+    position: absolute;
+    bottom: 3px;
+    right: 4px;
+    font-size: 10px;
+    background: rgba(0,0,0,0.55);
+    color: #fff;
+    padding: 1px 5px;
+    border-radius: 8px;
+  }
+  .no-photo {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-bottom: 12px;
+  }
+  .truncated-note {
+    font-size: 12px;
+    color: var(--accent-text);
+    background: var(--accent-bg);
+    border-radius: 8px;
+    padding: 6px 10px;
+    margin: 0 0 12px;
+    display: inline-block;
+  }
+  .entry-text {
+    font-size: 14px;
+    line-height: 1.85;
+    margin: 0 0 12px;
+    white-space: pre-line;
+  }
+  .entry-text b {
+    color: var(--accent-text);
+    font-weight: 500;
+  }
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .tag-pill {
+    font-size: 11px;
+    padding: 2px 10px;
+    border-radius: 12px;
+    background: var(--accent-bg);
+    color: var(--accent-text);
+    cursor: pointer;
+    border: none;
+  }
+  .comments {
+    margin-top: 16px;
+    padding-top: 14px;
+    border-top: 1px dashed var(--border);
+  }
+  .comments-label {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+  }
+  .comment {
+    font-size: 13px;
+    line-height: 1.7;
+    margin-bottom: 12px;
+    padding-left: 10px;
+    border-left: 2px solid var(--accent-bg);
+  }
+  .comment-meta {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-bottom: 2px;
+  }
+  .comment-meta .author {
+    color: var(--accent-text);
+    font-weight: 500;
+  }
+  .no-results {
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 14px;
+    padding: 40px 0;
+    display: none;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Hey buddy, give me your paw! 絵日記帳</h1>
+  <p>ウィペットのぽー＆バド（＆うめ）と暮らす日常あれこれ ― 2015年10月 ※so-netブログ・archive.orgより復元</p>
+</header>
+
+<div class="controls">
+  <input type="text" id="search" placeholder="キーワードで探す（例: 震災、ドッグラン、うみちゃん）">
+  <div class="tag-filter" id="tagFilter"></div>
+</div>
+<div class="count" id="count"></div>
+
+<main id="main"></main>
+<p class="no-results" id="noResults">該当する記事が見つかりません。</p>
+
+<script>
+const entries = [
+  {
+    "date": "2015.10.01",
+    "title": "未・との遭遇。",
+    "tags": [
+      "出掛ける",
+      "2015年10月"
+    ],
+    "images": [],
+    "photosLost": true,
+    "text": "さてさて、2015年9月20日の記録のつづきー\n吊り橋を渡り終えたらば、\nつぎは橋の下を歩いてみたりして園内をぷらりぷらりと散策。\nさーて、ぽーお待ちかねの場所へ行きましょか〜♪\n続きはこちらからー⇩\nぽーが柵を乗り越え急坂を下ってまで行きたかった場所へ。\nドッグイベントを行っている広場に到着〜！\nタープがたくさん、ボーダーコリーが数頭いるのも見えるねー♪\nどうやらこれから、ロングディスタンス(?)なるものが行われるらしい。\nできるだけ遠くへディスクを投げ、最も遠くでキャッチしたチームの勝ちだそうな。\nいったいどれくらいの距離があるのか。スタート地点はぼんやり見えるだけ〜\nイヌたちが見事キャッチしても惜しくても、会場からは大歓声と拍手〜！！\n勝利チームはたしか70数mで大会新記録だとか。70mとかって、凄いーーっ！\nところで競技後半、終わりも近い頃に聞き覚えのあるチーム名が紹介されまして。\nなんとビオラ&チャオさんデシタ！競技終了後ダカラ家のタープにちょこっとお邪魔。\nセミナー以来の久しぶりでお喋りしてたらうっかりワンズの写真撮り忘れ。ｱｧｰ\nビゼルちゃんも大きくなってたなぁ〜♪→ イヌと遺伝学。\nそしてその間、待ちぼうけだったよっしー。ごめん、おまたせ～♪\nというわけで、宮ヶ瀬湖畔をあとにして次に向かったのは服部牧場。\nうわさによるとかなりフリーダムな牧場らしいのデス♪\n動物園や水族館はまぁまぁ無難にこなせたけれど。\n徳島自宅そばの牛舎では怖がったり吼えたりしていたのよねぇ。\nしかし何事も経験してみないとね♪ あかんかったら、帰りましょーということで。\n先ずは無難なところで美味しそうな 七面鳥サンとご対面♪ ヾ(~∇~;) ｺﾚｺﾚ\n何かを察したのか、ぽーはすでに近づこうとせず。(笑\n次に対面したのは、木の柵で囲まれたエリアにいる白馬たち。\nとてもおとなしくて可愛くて、よっしーが撫でに行っていたのだけれど・・・\n頑に「ヤダ！行きたくない！！」と言うコがいるので近づけず。\nそんな時に出会えたイタグレ兄弟さん。おかげでぽーはご機嫌サンに変身(笑\nなんとダカラ家のお友達で宮ヶ瀬園地で私達のことも見かけてくれていたそうな♪\nさて、馬を見てからは木の柵に近づくこと一切拒否のぽー。\n一方、好奇心が勝ってしまうのか、\nビクビクしながらも柵に手をかけ中を覗いてみたり・・・\n柵の間にハナを突っ込んでみたりのバド(笑\nところで、こちらの羊たちはとてもヒト慣れしているらしくサービス精神旺盛。\n彼らはイヌに対しても平等で、わざわざ近い場所へ来て柵にもたれて寝る(笑\nだけどバドにはそれが「何か」分からナイ。\nビクビクしながら鼻をおしつけ匂いを嗅いでもその正体が分からナイ(笑\nそしてさらには、別の場所にて・・・\nバド、初めてロバに会う(笑\nこの一瞬のあと、吠え始めたので慌てて離したけれどロバの方は動じず。\n羊やロバたちも慣れるものなんやなぁ〜\nと、そんなバドの様子を面白楽しく眺めていたら、突如ぽーに異変が起きタ。\n正確には何か行動を起こしたわけではなく、おかしな気配を発したぽー。\n明らかに硬直・緊張しているぽーの視線の先にいたもの。それは野良・・？？\n抜け出したのか敢えて放牧か、積極的に子供たちの接客をしている羊たち。\nそのうちの一頭がぽーに興味を示して近づいてきたらしい(笑\n言葉も発せずただ立ちすくみ羊と見つめ合うこと数秒。\n「こっち来るなぁー！！やめてー来ないでぇぇーーーっ」\nぽーの必死のお願いに「あら、そうですか。」とのっそり移動して、\nバドへ挨拶にきてくれた羊さん。バドは元気にごあいさつ・・・\n後ろ足はガクガクフルフル。それでも、匂いを嗅ごうと近づいたりと。\nそして羊の方は、全く動じず逃げもせず。いやぁ〜おかげで面白いもの見れマシタ。\n少しその場を離れればすぐに落ち着きを取り戻すぽバド。\nならば、ラストはココに行ってみようかー。\n他のお客さんにヒドイ飼主だわ〜とか思われていたかもネ(笑\nいやいや、世の中どんなことが起きるか分からナイ。\nぬくぬく平穏ばかりではないのだ！\nドキドキだって経験しておかないとー・・・え？必要ないデスカ？(￣∇￣*)ゞｴﾍ\nさ〜〜て、とっ。\nとても有名だという服部牧場のジェラート。行列も短くなったので並んでみよう。\n店内に入るころに鳴り始めた蛍の光。ささっと頂いて帰りましょか〜\nドキドキのあとには楽しいことが待ってるカモ・・しれないネ(笑\nよっしー、今回もおつきあいありがとー！！　またよろしくね〜♪",
+    "truncated": false,
+    "comments": []
+  },
+  {
+    "date": "2015.10.12",
+    "title": "週末出張とぽー。",
+    "tags": [
+      "Family",
+      "2015年10月"
+    ],
+    "images": [],
+    "photosLost": true,
+    "text": "関東・関西ともに比較的天候に恵まれた３連休。\nみなさまはどのように過ごされたのでしょーか。\n我家は9〜13日まで、なんとっ！！....たっつー不在デス。(・ε・`*) …\nたっつーは関西らしい電車の雰囲気を懐かしんでみたり、\n「ここはどーこだ？」とこんな写真を送ってきてくれたり。\n彼の所在はポートアイランド、建物には「計算科学センタービル」とな。\nとくれば・・・それはそこはっ！！『京』がある建物やーん！！\n(ちなみにたっつーの出張内容とは関係ありませぬ)\nと、実はこんな内容も後から思い返すための記録だったりしマス。ﾃﾍ♪\nそしてこの出張大サービス期間の前半には、\nヒマヒマな私のために友人が泊まりに来てくれていたのでーす♪\n続きはこちらから〜↓\n友人の到着は夕方だからそれまでにしっかり遊んで、この表情♪\nバドはせっせと、友人用の布団を温めておきますよ〜っと。ゞ(￣∇￣;)ｺﾚｺﾚ\nまだかな、まだかな。早く来ーい、いつ到着かなぁ〜〜((o(*^^*)o))ﾜｸﾜｸ♪\nあれ？　いつの間にか一頭、増えてるやーんっ？！\nっと、実は上の写真は翌朝に撮ったものでして。\nつまり泊まりに来てくれた友人とは、レイル&ルークレイル母でしたんー♪\n前日には久しぶりの石鹸作りを教えてもらいつつ楽しんで。→理科の実験。\nその後は夕飯を食べつつ２人だけのいわゆる女子会というのを催しまして、\nいつの間にやら翌朝を迎えたというわけでございますです♪\nところで。\nぽーはレイルのことがとてもとても好きなのです。\nあまりに好き過ぎて、会うと理性は吹っ飛び大興奮。\n少しずつ慣れて落ち着いてきたような感じはあるものの、\nそれでもルクレイ母に会うだけでレイルを思い出し気分は高揚もうタイヘン(笑\nと、いうのが常だったのですけれども。\nいったい何がトリガーになったのやら、今回は様子が一変。\nレイルがぬいぐるみで遊び始めても少し体を起こし見守るだけだったり。\n今までならばぴぃぴぃ鳴いて「ボクに構ってよぅー」と大忙しだったのにねぇ。\nそもそも今回は、ぽーの表情すら今までとチガウ。\n参考・比較を兼ねて、今年の夏ルークレイルと一緒に誕生日をした時の写真を。\nたまたまこういう表情が撮れた訳ではなく、毎回魂抜けるんですョ。まじで(笑\nもちろん今回もレイルのことを意識はしているけれど、ほぼ平常通りの姿。\n上の写真も、下の写真も、嘘偽り無く間違いなく「ぽー」デス(笑\nぽーが落ち着いていればバドも落ち着けるし、何よりレイルも寛げる♪\nそして飼主たちも、気にせず用事ができる！！\nルークレイルが遊びに来てくれて、帰る際には必ず大鳴きしていたぽー。\n今回は滞在時間が数時間ではなく、泊まったことで何か安心したのかしら。\n(宿泊は初めてではないけれどレイルだけというのは初だものねぇ)\nそれとも今までの経験の積み重ねが良い影響を与えているのか。\n理由が何であれ、これは良い傾向だわっ♪\nよし。この穏やかな雰囲気のまま、共に散歩に行こうではナイカ！\nと、出発しようとしたら誰が誘ったのか(出かける直前だからバドかもー)、\nなんだかレイルが遊ぶぜ！モードになっておるではないか(笑\nレイルが遊びに乗ったところで、ルクレイ母の荷物を気にするぽバド。(￣∇￣;)\nあ〜ドッグランの予約を入れておけば良かったなぁ。\nそれでもこれから行く場所は7kmくらいの散歩コースだから楽しいはず！\n田んぼの稲刈りは終わったけれど畑にはコスモスが満開に。\n・・・ぽバドは何をしておるのかね(笑\n屋内での落ち着いた雰囲気は、散歩でも変わらずで・・・嬉しいっ！！\n今まではぽーがレイルの近くに行きたがり引っぱり気味に。\nさらにそんなぽーの興奮がバドに伝染し、バドがぽーにマウントしたりだったのが。\nぽーさん、至ってフツー。\nレイルの真後ろを歩くと若干そわそわもするけれど。\n3頭並べてみても、やっぱりフツウ。(左からバド・ぽー・レイル)\n農場直営のジェラート屋さんで休憩中も、フツウ〜♪(左がぽー、右がレイル)\n元気がなかったわけでもナイし、調子が悪いわけでもなく。\n散歩途中に出会ったネコやリスには3頭で仲良くはげしく反応(笑\nそうそう、リスは初遭遇だったというレイル。\nリスは樹上というにひとりだけ別の方向見て警戒していたのが面白かったなぁ〜ｳｼｼ\nレイルが一緒のときも、幼馴染や散歩トモダチと居るときのような落ち着きに。\nなるまではまだ後もう少しだけれど、それでもこの状態が続けば嬉しいなぁ♪\nルークレイル家と一緒に楽しめることがさらに増えるもんね〜っ♪♪♪",
+    "truncated": false,
+    "comments": []
+  },
+  {
+    "date": "2015.10.14",
+    "title": "めじろおし。",
+    "tags": [
+      "日常",
+      "2015年10月"
+    ],
+    "images": [],
+    "text": "先日レイルと一緒に歩いた散歩道。秋から春にかけてはここへ来る回数が増えちゃいます。(夏は単純に、暑くて歩けナーイ)\n道沿いには田畑が多く、田植えや稲刈りで季節を感じることができて。\n今の時期には、ポキ パキっと軽快な音を立てながらどんぐりが落ちてくる。と、そのどんぐりを食べるのに夢中なリスを狙うケモノたち。\n耳がひっくり返ってチョットおまぬけ顔だけど、リスを狙ってます(笑\nぽバドと樹上のカラスを眺めていたら、木の実を落とされるという出来事も(笑 見事、私の肩へと命中！カラスに完全に遊ばれてるけれど、楽しい！！\nそうそう、散歩コースには河童もいます。彼らは季節・気候関係なく、ずーっと相撲をとっているけれど(笑\nこれまた道沿いにある、池にはカワセミが住んでいて、冬になればキンクロハジロなど様々なカモもやって来る。\nが、今年は水温がなかなか下がらないらしくプランクトンが消えないのよね...\n林の中ではアオゲラに遭遇したことも♪ いわゆる、キツツキです。\nと、先ほどから色々と名前をあげているけれど、実は鳥に関して全くの無知！ぜーんぶ、バードウオッチャーさんからの受け売りデシタ〜\n徳島ならば元々に自然豊かだから野鳥も多いけれど、ヒトに会う方がびっくりするぐらいな散歩コースもあったりで。一方、こちらでは散歩すれば必ずと言っていいほどにバードウォッチャーに出会う。そして鳥の名前を教えてもらっちゃう、というわけなのだー♪(森林や自然公園に行くことが多いからなのかもしれナイけれど...)\nさてさて、13日 水曜日のこと。またまた同じくこちらの散歩コースを歩いていると・・・\n私のすぐ脇1mほどの位置へ、上からぽとりと何かが落ちて来て。どんぐりかしらと見てみれば、それは10cmもないくらいの小さな緑のカタマリ。\n中央の草の生えた箇所の真上。なんと、なんと、メジロ〜〜〜っ♪♪♪目の白い縁取りのおかげでさらにびっくりしているように見える。\nぽバドが全く気がついてないのをいいことに、そーっと少しだけ接近。メジロにはばれてしまって、パタパタと軽く飛んで移動。\nおかげでもっとよく見えた♪ かわいい〜〜〜\n巣立ちしたばかりなのかと思ったけれど、繁殖期は春らしいので大人かなぁ？メジロは群れで行動するらしく『目白押し』の語源もメジロからだそうな。樹上で押し合いへしあいしながら並んで止まる様からきたとか(笑\nということは、もしかして押し合いしているうちに落ちたの？？早く樹の上に戻るのよぅーと祈りつつそっとその場を離れることに。それにしても、小さくてキレイで可愛かったなぁ〜♪\nさて、レイルと一緒に撮ったコスモスの前で再び記念撮影をしよう。\nそうそう、このイヌたちのあご越しに見る空。沖縄でお世話になった宿のオーナーさんが素敵なhashtagをつけてくれてマス。それはイマソラならぬ、#イヌソラ。\nTwitterは放置してるからせっかくのタグが使えてないけれど・・イヌソラで〆〜っ♪",
+    "photosLost": true,
+    "truncated": false,
+    "comments": []
+  },
+  {
+    "date": "2015.10.21",
+    "title": "Which is which.",
+    "tags": [
+      "犬と暮らす",
+      "2015年10月"
+    ],
+    "images": [],
+    "photosLost": true,
+    "text": "とつぜんですが・・・問題です。\nAとB どちらの尻尾がぽーで、どちらがバドのでしょー？\n(写真の色補正等、加工は一切行っておりません〜)\n続きはこちらからー⇩\n奥にいるぽーの主な毛色はブルーブリンドル、\n手前のバドの毛色はレッドブリンドルでございます。\nふたりとも偶然にも、手足と尻尾の先に白い毛が入っておりまして。\nその白い毛の範囲は、もちろんぽバドそれぞれに異なっていて。\n尻尾の場合はバドの方が白い部分は広め。\nそしてぽーの尻尾の先端はちょっと筆っぽい。\nと、いうことは。\n冒頭の写真の「ブルーに見えなくもないかもなA」と、\n「レッドに見えるような気がするようなB」ですが。\n白い毛の部分を見比べれば明らかですネっ！\nA　⇨ バド　　B ⇨ ぽー　でしたぁ〜♪\nバドの尻尾がですね、表と裏といいますか半分で色がチガウのですょ。\nそこでいつか書こうと考えていたブログネタでした〜(￣∇￣*)ゞｴﾍﾍ\n（＊この記事にはコメント4件が寄せられていましたが、内容は復元できていません。）",
+    "truncated": false,
+    "comments": []
+  },
+  {
+    "date": "2015.10.23",
+    "title": "カモに見る。",
+    "tags": [
+      "日常",
+      "2015年10月"
+    ],
+    "images": [],
+    "photosLost": true,
+    "text": "ぽーと私と、たっつーは知らない道を行くのが好き。\nとはいえ、歩ける距離や範囲は限られるから、\n散歩のたびに前回とはほんの少しチガウ道を選んでみたりしていマス。\n(ちなみにバドは慣れたとこの方がイイ。けれど、皆が一緒ならそれでイイ！)\nそんな私たちが歩く散歩コース途中の、とある橋。\n続きはこちらから〜⇩\n渡らず真っすぐ通りすぎることの方が多い橋なのだけれど。\nでも、たまーに川を眺めたり渡ってみたりする、とある橋。\nそのとある橋の欄干飾りは擬宝珠・・ではなく、カルガモ。\n(肝心のカルガモではなく、背景にピントが合っとるやないかー)\nこれが本物に見えるのか、通るたびにぽーが必ず飛びつくのです。\nそこである日の散歩中、ふと思いつきマシタ。\nぽーが飛びついて「あ、違うわ」と我に返るまでの一部始終を、\n写真に撮りブログネタにしてやろうと。(￣∀￣*)\nが、やはり思い通りにはいかないものですよネー\nせめて橋とぽーの写真をと並べてみたけれど、迷惑そうですネーヽ(*ﾟ∀ﾟ)ﾉｱﾋｬﾋｬ\nいつも飛びつくのになぁ。私の悪巧みを感じとられてしまったか。ﾁｪｯ(・ε・｀)\nそれとも、遂に本物じゃないことを覚えてしまったのか・・・\nなどなど考えながら、カモとぽーの交互に視線や念を送っていたら。\n今まで飛びついたことのなかったバドがやってくれました〜っ♪♪♪\nでも、なんやろね、バドの目線がちょっと変ね。(・・?)ﾊﾃ？\n試しに橋を渡った先の、反対側に設置されているカモにも近づいてみる。\nよし！ここでも飛びついてくれたっ！！\nだけど・・バドの視界にカモの像が入っていないっぽいわねぇ。\n私が「何か」を気にしていることに気がついたからそれを確認してみた、\nそんな感じやろうか。うーん。バド、教えて〜〜\nぽバドは何がしたいの？と感じることよくあるけれど、\nmickyは何やってんの？とぽバドに思われてること多いカモ...(笑\nソファにて、私に挟まれゆるゆる寝顔のバドで〆〜っ！\nところで、このカモも舐めると緑青の味がしそう..←落語ネタ〜",
+    "truncated": false,
+    "comments": []
+  }
+];
+
+(function() {
+  const seen = {};
+  entries.forEach(function(e) {
+    const key = e.date;
+    seen[key] = (seen[key] || 0) + 1;
+    e.id = 'e' + e.date.replace(/\./g, '-') + '-' + seen[key];
+  });
+})();
+
+
+// ---- render ----
+const allTags = [...new Set(entries.flatMap(e => e.tags))];
+let activeTags = new Set();
+let keyword = "";
+
+function highlightNums(text) {
+  return text.replace(/\[(\d+)\]/g, '<b>[$1]</b>');
+}
+
+function esc(s) {
+  return String(s == null ? "" : s).replace(/[&<>]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
+}
+
+function renderTagFilter() {
+  const el = document.getElementById('tagFilter');
+  el.innerHTML = allTags.map(t =>
+    `<button class="tag-btn${activeTags.has(t) ? ' active' : ''}" data-tag="${t}">${t}</button>`
+  ).join('');
+  el.querySelectorAll('.tag-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const tag = btn.dataset.tag;
+      if (activeTags.has(tag)) activeTags.delete(tag); else activeTags.add(tag);
+      renderTagFilter();
+      renderEntries();
+    });
+  });
+}
+
+function matches(entry) {
+  const tagOk = activeTags.size === 0 || entry.tags.some(t => activeTags.has(t));
+  const kw = keyword.trim();
+  const kwOk = kw === "" ||
+    entry.title.includes(kw) ||
+    entry.text.includes(kw) ||
+    entry.tags.some(t => t.includes(kw));
+  return tagOk && kwOk;
+}
+
+function renderEntries() {
+  const main = document.getElementById('main');
+  const filtered = entries.filter(matches);
+  document.getElementById('count').textContent = `${filtered.length} / ${entries.length} 件表示中`;
+  document.getElementById('noResults').style.display = filtered.length === 0 ? 'block' : 'none';
+
+  main.innerHTML = filtered.map(entry => `
+    <article class="entry" id="${entry.id}">
+      <div class="entry-head">
+        <span class="entry-title">${entry.title}</span>
+        <span class="entry-date">${entry.date}</span>
+      </div>
+      ${entry.images.length > 0 ? `
+      <div class="photo-grid">
+        ${entry.images.map((src, i) => `
+          <a href="${src}" target="_blank" rel="noopener">
+            <img src="${src}" loading="lazy" alt="${entry.title} 写真${i+1}">
+            <span class="num">${i+1}</span>
+          </a>
+        `).join('')}
+      </div>` : entry.photosLost ? `<p class="no-photo">（写真は掲載されていましたが、保存されていないため表示できません）</p>` : `<p class="no-photo">（この記事には写真がありません）</p>`}
+      ${entry.truncated ? `<p class="truncated-note">（＊続きは読めない）</p>` : ''}
+      <p class="entry-text">${highlightNums(entry.text)}</p>
+      <div class="tags">
+        ${entry.tags.map(t => `<button class="tag-pill" data-tag="${t}">${t}</button>`).join('')}
+      </div>
+      ${entry.comments && entry.comments.length > 0 ? `
+      <div class="comments">
+        <div class="comments-label">コメント（${entry.comments.length}件）</div>
+        ${entry.comments.map(c => `
+          <div class="comment">
+            <div class="comment-meta"><span class="author">${esc(c.author)}</span>${c.date ? ' ・ ' + esc(c.date) : ''}</div>
+            <div>${esc(c.text)}</div>
+          </div>
+        `).join('')}
+      </div>` : ''}
+    </article>
+  `).join('');
+
+  main.querySelectorAll('.tag-pill').forEach(btn => {
+    btn.addEventListener('click', () => {
+      activeTags = new Set([btn.dataset.tag]);
+      renderTagFilter();
+      renderEntries();
+      window.scrollTo({top:0, behavior:'smooth'});
+    });
+  });
+}
+
+document.getElementById('search').addEventListener('input', (e) => {
+  keyword = e.target.value;
+  renderEntries();
+});
+
+renderTagFilter();
+renderEntries();
+if (location.hash) {
+  const target = document.getElementById(location.hash.slice(1));
+  if (target) target.scrollIntoView({block: 'start'});
+}
+</script>
+
+</body>
+</html>

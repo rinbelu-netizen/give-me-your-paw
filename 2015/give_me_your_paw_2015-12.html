@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hey buddy, give me your paw! 絵日記帳 - 2015年12月</title>
+<style>
+  :root {
+    --bg: #faf6ef;
+    --card-bg: #ffffff;
+    --border: #e8dfd0;
+    --text: #4a4238;
+    --text-muted: #9a9082;
+    --accent: #c98a5e;
+    --accent-bg: #f5e6d8;
+    --accent-text: #8a5a35;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    padding: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: "Hiragino Kaku Gothic ProN", "Yu Gothic", "Meiryo", sans-serif;
+    line-height: 1.8;
+  }
+  header {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 32px 20px 16px;
+    text-align: center;
+  }
+  header h1 {
+    font-size: 22px;
+    font-weight: 500;
+    margin: 0 0 4px;
+    color: var(--text);
+  }
+  header p {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin: 0;
+  }
+  .controls {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 12px 20px 20px;
+    position: sticky;
+    top: 0;
+    background: var(--bg);
+    z-index: 10;
+  }
+  #search {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    font-size: 14px;
+    background: var(--card-bg);
+    color: var(--text);
+    margin-bottom: 10px;
+  }
+  .tag-filter {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .tag-btn {
+    font-size: 11px;
+    padding: 4px 12px;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    background: var(--card-bg);
+    color: var(--text-muted);
+    cursor: pointer;
+  }
+  .tag-btn.active {
+    background: var(--accent);
+    color: #fff;
+    border-color: var(--accent);
+  }
+  .count {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 0 20px 8px;
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+  main {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 0 20px 60px;
+  }
+  .entry {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 20px;
+    margin-bottom: 16px;
+  }
+  .entry-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+  .entry-title {
+    font-size: 16px;
+    font-weight: 500;
+  }
+  .entry-date {
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+  .photo-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+    gap: 6px;
+    margin-bottom: 12px;
+  }
+  .photo-grid a {
+    position: relative;
+    display: block;
+    aspect-ratio: 1;
+    overflow: hidden;
+    border-radius: 8px;
+    background: var(--accent-bg);
+  }
+  .photo-grid img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .photo-grid .num {
+    position: absolute;
+    bottom: 3px;
+    right: 4px;
+    font-size: 10px;
+    background: rgba(0,0,0,0.55);
+    color: #fff;
+    padding: 1px 5px;
+    border-radius: 8px;
+  }
+  .no-photo {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-bottom: 12px;
+  }
+  .truncated-note {
+    font-size: 12px;
+    color: var(--accent-text);
+    background: var(--accent-bg);
+    border-radius: 8px;
+    padding: 6px 10px;
+    margin: 0 0 12px;
+    display: inline-block;
+  }
+  .entry-text {
+    font-size: 14px;
+    line-height: 1.85;
+    margin: 0 0 12px;
+    white-space: pre-line;
+  }
+  .entry-text b {
+    color: var(--accent-text);
+    font-weight: 500;
+  }
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .tag-pill {
+    font-size: 11px;
+    padding: 2px 10px;
+    border-radius: 12px;
+    background: var(--accent-bg);
+    color: var(--accent-text);
+    cursor: pointer;
+    border: none;
+  }
+  .comments {
+    margin-top: 16px;
+    padding-top: 14px;
+    border-top: 1px dashed var(--border);
+  }
+  .comments-label {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+  }
+  .comment {
+    font-size: 13px;
+    line-height: 1.7;
+    margin-bottom: 12px;
+    padding-left: 10px;
+    border-left: 2px solid var(--accent-bg);
+  }
+  .comment-meta {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-bottom: 2px;
+  }
+  .comment-meta .author {
+    color: var(--accent-text);
+    font-weight: 500;
+  }
+  .no-results {
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 14px;
+    padding: 40px 0;
+    display: none;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Hey buddy, give me your paw! 絵日記帳</h1>
+  <p>ウィペットのぽー＆バド（＆うめ）と暮らす日常あれこれ ― 2015年12月 ※so-netブログ・archive.orgより復元</p>
+</header>
+
+<div class="controls">
+  <input type="text" id="search" placeholder="キーワードで探す（例: 震災、ドッグラン、うみちゃん）">
+  <div class="tag-filter" id="tagFilter"></div>
+</div>
+<div class="count" id="count"></div>
+
+<main id="main"></main>
+<p class="no-results" id="noResults">該当する記事が見つかりません。</p>
+
+<script>
+const entries = [
+  {
+    "date": "2015.12.02",
+    "title": "良剤。",
+    "tags": [
+      "日常",
+      "2015年12月"
+    ],
+    "images": [],
+    "text": "もう12月なのですねぇ。ところで、数日前のこと。ぽーはぷちやさぐれて、ガラ悪ぽーになっておりマシタ(笑\nそれはナゼかと言いますと・・・\n11月の貴重な連休に風邪をひき、その後かくーんと体調を崩した飼主。トモダチと交わした約束もキャンセルし寝込むこと10日ほど。\nその間、ぽーは優しく添い寝してくれたり、\n早よ元気になれと言っているかのように、こうして慰めてくれたり。\nさらにバドも、外出できない私の気分転換につきあってくれたり。\n時には「遊ぼうよ！」と吠えたり、おもちゃを持ってきたりするものの、だら〜っと動きの鈍い私の隣でしかたなくふたりで遊んでみたりするぽバド。\nそんなことを繰り返しながらの、ぽバドを下から眺める日々も10日ほど・・・\n実は・・・そこそこ体調は戻ってきていたというのに、本来の怠け癖から少々だらだらしちゃっていたのです。\nだらだらごろごろしながら、ぽバドをぱしゃぱしゃ撮っていたら・・・ぽーのやさぐれ顔が撮れた、というわけでございマス（笑\nそれで、ですね。ひさしぶりの真剣散歩に出かけ、さらにご近所トモダチに会い一緒に散歩してみたりしていたら、ナオッタ。\n実際はまだ咳が残ってはいるけれど、治ったど〜〜\nうむ、やっぱ。ぽバドがいちばんのクスリでしたん〜♪",
+    "photosLost": true,
+    "truncated": false,
+    "comments": []
+  },
+  {
+    "date": "2015.12.09",
+    "title": "目黒に限る。",
+    "tags": [
+      "出掛ける",
+      "2015年12月"
+    ],
+    "images": [],
+    "text": "2015年12月6日のこと。約1ヶ月ぶりのお出掛けはココからスタート〜♪『目黒寄生虫館』\n訪れるのは十数年ぶり。展示内容はさほど変わってはいないような。だけれど、ぽーの東洋眼虫感染や知人のアニサキス症のおかげで、線虫の種類の多さに改めて驚愕&脅威を感じたり・・\n博物館をしっかり堪能したのちは、車で留守番してくれていた彼らと目黒散策といきますか〜♪\n先ずはぷらっと目黒川沿いを北方向に向かって歩いてみる。\n約4km続く目黒川の桜並木は有名だそうで、なるほど確かに、春には桜のトンネルができたりしてキレイだろうなぁ〜♪\nだけれども、その時期には大混雑だろうから行かない、だろなぁ。なので桜の季節を妄想して、せめてアタマの中で花を咲かせてみる。(笑\n冬の桜並木も良いけれど、それよりも気になったのがコレ。\nナニその文章。これは・・注意を呼びかけている対象は『イヌ』？？(笑\nさすが、東京都！飼主ではなく直接イヌに対して看板を作るとはっ！！イヌの権利を尊重しているんだなぁ〜・・・って。\nさてさて、(笑 さらに北上して行くと石垣と広場のある場所にデタ。\n段差があるとその上を歩きたがるバドは、身軽にぴょいっと石垣の上へ。でもね、ヒトがいるから一旦降りましょネ。\nなーんてことをしつつ川をよく見ると、この辺りだけ川幅も広くなっていることに気がついて。そんな様子を写真に撮るため、バドに再び石垣へ飛び乗るよう促す、っと。\nあぁ・・バド、ごめん。誘導する方角を間違えてしもうた(笑\nなんとか体勢を立て直して、はいポーズ♪そして川の全景を撮る目的を忘れた構図になる、っと。(笑\nここは昭和初期に船入場だったそうで、現在は残念ながらその面影はないけれど。地下を調節池に、そして地上部は公園として整備し利用されているそうなー\nイベントとか出来そうね〜と思っていたら、フリマとかやってるみたいネ。\n壁際にはナゼか、ウチワサボテンが。\nさて、ここからさらに進めば中目黒駅、だけれど駒沢通りを歩いてみる。\nどうやら目黒界隈はイヌO.K.のお店が多いらしいのだ。お腹が空いてきたし、散策しつつ飲食店を探してみることに。\nテクテクと歩いていると、たっつーが何かを見つけた。「ここ、暗渠だ！」 それは、行ってみないと〜♪\n（この写真は暗渠の道に入ってから途中で撮ったもの〜）暗渠とは蓋されて外からは見えなくなった水路のこと。\nここの暗渠は年季が入っているけれどしっかり整備されているなぁ。\nというわけで調べてみたら、『蛇崩緑道』だそう。そのキョリ約3km。\n世田谷区の馬事公苑付近から幾つかの支流と合流したのち、目黒川へと流れ込む『蛇崩川』そこに蓋をした緑道なんですってー\nなんでしょね♪ こんなゲートも作られたりしていてオモシロイ。\n『蛇崩』の由来は、洪水の際に崖が崩れ大蛇が現れた、とか、谷は深く大きく蛇行し土砂崩れを何度も起こすその暴れ様から、とか、等々諸説あるそうで。ここの道幅が広くなっているのは、浸食の跡かも〜\n『鍋ころ坂』なんて坂もあったりして、昔を妄想しながらの散策はオモシローイ！\n・・・なんだけど、本格的にお腹空いてきたなぁ。こんな道を歩いていれば、もちろんお店に出合えるわけもなく。そしてところで、ここはいったいどの辺りなんでしょ？\nあぁ、なんて親切な緑道なんでショ。道標もありマシタ(笑\nさて、時刻はまだ13時、どうしようか。飲食店が見つけられてないけれど・・・帰るか。\nというわけで、少し遠回りのコースでドライブしつつ帰路へ・・のつもりが、あるモノが目に入り次のICで降りてもらうことに。\nじゃーん！！初めて来たぁ！！いつか行きたいと思ってたのよぅ〜\nはとバスにもいつか乗ってみたいのよネ。せっかくだもの、ぽバドと記念撮影ネ。\n車はタワーに隣接する地下駐車場へ。3時間滞在で1,800えーん。ぽバドには車待機してもらって、先ずは・・・ゴハンだ〜♪\nモスバーガー 東京タワー店のみ限定 『東京タワーバーガー』☆(撮り方をミスったー。めっちゃ、小さく見えるけどチガウの..)\nではでは、地上150mの大展望台へGO〜♪はとバスを背景にぽバドとタワーを撮った場所をはっけーん。\n大展望台1Fに設置されたタワー名物ルックダウンウィンドウ。地上145mの眺め。 うひゃひゃー♪\n高いところ好きだからたまらん〜♪\nせっかくなので、特別展望台にもいっちゃおう。混雑のためエレベーター利用に入場制限がかかってしもうた。30分ほど並んで・・\n到着〜♪ 時刻は15時、快晴ではないけれど良い眺めっ♪\nお台場方面を、地上250mの特別展望台から眺めてみる。\n少し位置はずれるけれど、こちらは大展望台(150m)からのお台場方面。\n100mの差。ビルだと、25~30階分くらいかしら。\n特別展望台 限定のこんなモノを思わず購入し、展望台をぐるぐる回って眺めて。再びエレベーター待ちをしぽバドの元へ帰るっ！\nこんな位置からの東京タワーも新鮮だったなぁ〜♪さーて、次はどこに行こうか。もちろん、ぽバドも一緒にネっ♪\n＜おまけのあとがきな独り言＞散策中、知ってるコにとってもよく似たウィペットに遭遇しまして。似てるなぁ〜と思いつつも、飼主さんと他愛もない話をしてお別れして。\nちなみにその知ってるコとぽーは親戚になるわけで。やっぱりどうしても気になり、後日友人に尋ねてみたらば、なんと！\nたぶんほぼ間違いなく、異母兄妹とな〜♪ということは、同じくぽーとは親戚かもやんー！！\nあぁーーーー思い切って聞いてみればヨカッタ。写真を撮らせてもらっておけばよかったよぅー\nしかし、とても嬉しい一期一会なのデシタ♪",
+    "photosLost": true,
+    "truncated": false,
+    "comments": []
+  },
+  {
+    "date": "2015.12.15",
+    "title": "黄葉。",
+    "tags": [
+      "我が事",
+      "2015年12月"
+    ],
+    "images": [],
+    "text": "2015年12月10日 木曜日のこと。またもやぽーは、やさぐれーの、ふてくされ〜の。(笑\nふてくされの理由は、留守番させられるから〜っ♪\nam10:30 千駄ヶ谷駅にて、たーぼー&ゆっきーと待合せ〜っ♪そして共に向かったのは明治神宮外苑のいちょう並木。\n黄葉の絨毯はまだ敷かれていないけれど、300m続く黄金色の並木道は絶景なり。明治41年に蒔かれた種が第一号ということなので樹齢は107年〜！！\nいちょう並木といえば、子供のころ大阪府立大学の近くに住んでいて、よく銀杏を拾いに行ったのが懐かしい。そういや、外苑は雄木ばかりなのやろか？\n道路を挟んだ通りには何やら大行列が。友人たちに尋ねると、NYのハンバーガーショップの日本第一号店なのだそうな！オープンしてまだ1ヶ月らしく、行列は100m以上あったかもー\nそんな行列と銀杏をのんびりと眺めながら歩いたら、次の目的地へ向かいましょー\nなんかね、友人たちが私好みの場所に案内してくれるそうなんですョ。いったいドコへ連れて行ってくれるのか。何だろう〜♪♪♪\n私の関心事は世間の大半とチョットずれている、らしいことは自覚しておりまして。そんな私の好きそうなモノらしい！めーっちゃ、楽しみぃ〜♪\nその場所へ向かう途中、最近話題の秩父宮ラグビー場をパチリっと。\nそしてこちらも話題の、国立霞ヶ丘陸上競技場。\nちょうど2年前の2013年12月8日、徳島ヴォルティスのJ1昇格試合をココで応援したんですよぅ♪ → 四国な一日。\nっと、そうこうしている間に、目的地に近づいたらしい。\nおっ♪ 神社なのねっ！ 神社、好きょ〜♪ こちらは『鳩森八幡神社』ですって。鳥居の奥に見えるご神木の大銀杏は樹齢400年を越えるとか。\n平安時代(貞観2年)に慈覚大師により、正八幡宮として奉られたと伝わっているこちらの神社。\nさらに『江戸名所図会』によるとこの辺りの林では、吉兆の前触れといわれる瑞雲がたびたび現れたそうな。ある日、瑞雲を見た村人が林に入ると沢山の白い鳩が西に向かって飛び立った・・それから「鳩森」と名付けられた、などの伝説も残っているそうなー。\nが、彼女たちが私に見せたかったものは、神社でも大銀杏でもないそうで。さらに境内を進むと、鳥居と小さな丘が見えてきた。んんっ？！\nあぁーっ！！ここは、富士塚やーんっ！！！\n一生のうちに一度は登っておきたいと思っている富士山。だけど今はぽバドを置いてくわけにも行かないしで、断念中のふっじさーん。\nそんな私のように富士へお参りに行きたいけれど行けない、富士参拝ができない人々のために各地に築かれたのが富士塚というわけで・・そんな場所に連れてきてくれるなんて〜〜\nここ千駄ヶ谷の富士塚は寛政元年(1789年)築造と言われていて、関東大震災の際に修復されてはいるものの都内で現存するものとしては最古だそう。\nではでは、ご挨拶をしてからちょっくら登ってきまぁす♪なんでもね、山頂付近には富士山の溶岩を使ってるらしいっすょ。\n五合目には小御嶽石尊。写真には撮ってないけれど、この隣には烏帽子岩も。\n七合目の洞窟には弥勒菩薩。\nそして、ついに山頂へ〜！！奥宮も安置されていて、ほんと富士山登った気分だぁ〜♪♪♪\n頂上についたら、万歳しておかナー。けど、周囲と同化しっちゃてるナ...\n麓から見守ってくれている２人にも、ムリヤリ万歳させてみる(笑\n数ヶ月前、たまたま２人でこの辺りを散策していて偶然見つけたという神社。mickyが喜ぶ場所かも！と、いうわけで連れて来てくれたんですってー♪\nもう、ねぇ〜ほんっと、シアワセです♪富士塚を欲張って2周廻って、エネルギー充電！\nでも・・・お腹はすいたよねっ。というわけで、たーぼーおすすめのお店『BALLOWER TERRACE』に向かいましょ〜♪ソファ席があり、のんびりくつろげるお店だそうな。\n残念なことに店内は満席、だがしかし！テラス席にもゆったり席あったどー♪ストーブもあるし、ブランケットも借りられるので全く寒くナイ！！\nサーモンときのこのグラタンがメインのdeli plateを注文して、食後にはモンブラン〜♪ 甘さ控えめ、リキュールが効いたオトナスイーツ\n時間の許す限りのんびりだらーっと、それはもう、とても素敵な時間を共有させてもらったのデシタ〜♪\n<おまけの後日談>どこ行ってたのー？！と、かわいいお叱りをぽバドから受けた翌日。こたつ布団を適当にあげて掃除をしていたら、突然にぽーがこんなことを・・\nあーぁ。もしや昨日の長い留守番に対する抗議かしら〜というよりも、この状況を注意しなよわたし〜あはは(笑\nなーんて感じで様子を眺めていたら、ぽーの希望に気がついたのでお手伝い♪\n窓から差し込む陽射しがぽかぽかと暖かく気持ちが良さそう。でもちょうど良い場所にはバドがいる。こたつの上にクッションがあればサイコーなのに、というわけだっ！\nいや、あかんてー。止めさせないとー(笑",
+    "photosLost": true,
+    "truncated": false,
+    "comments": []
+  },
+  {
+    "date": "2015.12.18",
+    "title": "会話。",
+    "tags": [
+      "犬と暮らす",
+      "2015年12月"
+    ],
+    "images": [],
+    "text": "まったりくつろいでいたソファから、おもむろにすっと立ち上がる。すると、こんな質問をされることがよくあるのです。\n『へ？ いや、何って。ちょっと、立ち上がっただけょ...』\nそして続けて次の質問がやってくる。\n『えー。ちょっと洗面所に行くだけやってー』\n『いや、だから、ほんとちょっと洗面所に・・』\n『すでに洗面所に来てるやーん(笑) いや、というか遊ばないョー』\n『あー・・先ずはそこから退いてくれる？洗面台との間はちょっとジャマかなぁ』\n『バドくん、そうなの〜。ただ、後半は関係ナイかなー(笑 ーーーーーん？ 何だか強い視線を感じるような。。。』\n『あー、買物にね、ぷぃんと車で行ってこようかと。すぐ戻るからー』\n『あ、はい。 一緒に行きましょか〜(笑』\nというような、この流れ。我家ではよくあることだし、以前にも似たような内容で書き残しているような。それでもナゼ書いたのかといいますと・・・\n先日、Facebookでこんな投稿を見てしまったからなのデシタ(笑\nぽバドの場合は、散歩に行く準備をしようと考えたり、買物や留守番の気配なんかでこの会話が発生するわけなのですが。ほぼそのまんまでオモシローイ！！！",
+    "photosLost": true,
+    "truncated": false,
+    "comments": []
+  }
+];
+
+(function() {
+  const seen = {};
+  entries.forEach(function(e) {
+    const key = e.date;
+    seen[key] = (seen[key] || 0) + 1;
+    e.id = 'e' + e.date.replace(/\./g, '-') + '-' + seen[key];
+  });
+})();
+
+
+// ---- render ----
+const allTags = [...new Set(entries.flatMap(e => e.tags))];
+let activeTags = new Set();
+let keyword = "";
+
+function highlightNums(text) {
+  return text.replace(/\[(\d+)\]/g, '<b>[$1]</b>');
+}
+
+function esc(s) {
+  return String(s == null ? "" : s).replace(/[&<>]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
+}
+
+function renderTagFilter() {
+  const el = document.getElementById('tagFilter');
+  el.innerHTML = allTags.map(t =>
+    `<button class="tag-btn${activeTags.has(t) ? ' active' : ''}" data-tag="${t}">${t}</button>`
+  ).join('');
+  el.querySelectorAll('.tag-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const tag = btn.dataset.tag;
+      if (activeTags.has(tag)) activeTags.delete(tag); else activeTags.add(tag);
+      renderTagFilter();
+      renderEntries();
+    });
+  });
+}
+
+function matches(entry) {
+  const tagOk = activeTags.size === 0 || entry.tags.some(t => activeTags.has(t));
+  const kw = keyword.trim();
+  const kwOk = kw === "" ||
+    entry.title.includes(kw) ||
+    entry.text.includes(kw) ||
+    entry.tags.some(t => t.includes(kw));
+  return tagOk && kwOk;
+}
+
+function renderEntries() {
+  const main = document.getElementById('main');
+  const filtered = entries.filter(matches);
+  document.getElementById('count').textContent = `${filtered.length} / ${entries.length} 件表示中`;
+  document.getElementById('noResults').style.display = filtered.length === 0 ? 'block' : 'none';
+
+  main.innerHTML = filtered.map(entry => `
+    <article class="entry" id="${entry.id}">
+      <div class="entry-head">
+        <span class="entry-title">${entry.title}</span>
+        <span class="entry-date">${entry.date}</span>
+      </div>
+      ${entry.images.length > 0 ? `
+      <div class="photo-grid">
+        ${entry.images.map((src, i) => `
+          <a href="${src}" target="_blank" rel="noopener">
+            <img src="${src}" loading="lazy" alt="${entry.title} 写真${i+1}">
+            <span class="num">${i+1}</span>
+          </a>
+        `).join('')}
+      </div>` : entry.photosLost ? `<p class="no-photo">（写真は掲載されていましたが、保存されていないため表示できません）</p>` : `<p class="no-photo">（この記事には写真がありません）</p>`}
+      ${entry.truncated ? `<p class="truncated-note">（＊続きは読めない）</p>` : ''}
+      <p class="entry-text">${highlightNums(entry.text)}</p>
+      <div class="tags">
+        ${entry.tags.map(t => `<button class="tag-pill" data-tag="${t}">${t}</button>`).join('')}
+      </div>
+      ${entry.comments && entry.comments.length > 0 ? `
+      <div class="comments">
+        <div class="comments-label">コメント（${entry.comments.length}件）</div>
+        ${entry.comments.map(c => `
+          <div class="comment">
+            <div class="comment-meta"><span class="author">${esc(c.author)}</span>${c.date ? ' ・ ' + esc(c.date) : ''}</div>
+            <div>${esc(c.text)}</div>
+          </div>
+        `).join('')}
+      </div>` : ''}
+    </article>
+  `).join('');
+
+  main.querySelectorAll('.tag-pill').forEach(btn => {
+    btn.addEventListener('click', () => {
+      activeTags = new Set([btn.dataset.tag]);
+      renderTagFilter();
+      renderEntries();
+      window.scrollTo({top:0, behavior:'smooth'});
+    });
+  });
+}
+
+document.getElementById('search').addEventListener('input', (e) => {
+  keyword = e.target.value;
+  renderEntries();
+});
+
+renderTagFilter();
+renderEntries();
+if (location.hash) {
+  const target = document.getElementById(location.hash.slice(1));
+  if (target) target.scrollIntoView({block: 'start'});
+}
+</script>
+
+</body>
+</html>

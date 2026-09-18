@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hey buddy, give me your paw! 絵日記帳 - 2015年2月</title>
+<style>
+  :root {
+    --bg: #faf6ef;
+    --card-bg: #ffffff;
+    --border: #e8dfd0;
+    --text: #4a4238;
+    --text-muted: #9a9082;
+    --accent: #c98a5e;
+    --accent-bg: #f5e6d8;
+    --accent-text: #8a5a35;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    padding: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: "Hiragino Kaku Gothic ProN", "Yu Gothic", "Meiryo", sans-serif;
+    line-height: 1.8;
+  }
+  header {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 32px 20px 16px;
+    text-align: center;
+  }
+  header h1 {
+    font-size: 22px;
+    font-weight: 500;
+    margin: 0 0 4px;
+    color: var(--text);
+  }
+  header p {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin: 0;
+  }
+  .controls {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 12px 20px 20px;
+    position: sticky;
+    top: 0;
+    background: var(--bg);
+    z-index: 10;
+  }
+  #search {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    font-size: 14px;
+    background: var(--card-bg);
+    color: var(--text);
+    margin-bottom: 10px;
+  }
+  .tag-filter {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .tag-btn {
+    font-size: 11px;
+    padding: 4px 12px;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    background: var(--card-bg);
+    color: var(--text-muted);
+    cursor: pointer;
+  }
+  .tag-btn.active {
+    background: var(--accent);
+    color: #fff;
+    border-color: var(--accent);
+  }
+  .count {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 0 20px 8px;
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+  main {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 0 20px 60px;
+  }
+  .entry {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 20px;
+    margin-bottom: 16px;
+  }
+  .entry-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+  .entry-title {
+    font-size: 16px;
+    font-weight: 500;
+  }
+  .entry-date {
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+  .photo-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+    gap: 6px;
+    margin-bottom: 12px;
+  }
+  .photo-grid a {
+    position: relative;
+    display: block;
+    aspect-ratio: 1;
+    overflow: hidden;
+    border-radius: 8px;
+    background: var(--accent-bg);
+  }
+  .photo-grid img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .photo-grid .num {
+    position: absolute;
+    bottom: 3px;
+    right: 4px;
+    font-size: 10px;
+    background: rgba(0,0,0,0.55);
+    color: #fff;
+    padding: 1px 5px;
+    border-radius: 8px;
+  }
+  .no-photo {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-bottom: 12px;
+  }
+  .truncated-note {
+    font-size: 12px;
+    color: var(--accent-text);
+    background: var(--accent-bg);
+    border-radius: 8px;
+    padding: 6px 10px;
+    margin: 0 0 12px;
+    display: inline-block;
+  }
+  .entry-text {
+    font-size: 14px;
+    line-height: 1.85;
+    margin: 0 0 12px;
+    white-space: pre-line;
+  }
+  .entry-text b {
+    color: var(--accent-text);
+    font-weight: 500;
+  }
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .tag-pill {
+    font-size: 11px;
+    padding: 2px 10px;
+    border-radius: 12px;
+    background: var(--accent-bg);
+    color: var(--accent-text);
+    cursor: pointer;
+    border: none;
+  }
+  .comments {
+    margin-top: 16px;
+    padding-top: 14px;
+    border-top: 1px dashed var(--border);
+  }
+  .comments-label {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+  }
+  .comment {
+    font-size: 13px;
+    line-height: 1.7;
+    margin-bottom: 12px;
+    padding-left: 10px;
+    border-left: 2px solid var(--accent-bg);
+  }
+  .comment-meta {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-bottom: 2px;
+  }
+  .comment-meta .author {
+    color: var(--accent-text);
+    font-weight: 500;
+  }
+  .no-results {
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 14px;
+    padding: 40px 0;
+    display: none;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Hey buddy, give me your paw! 絵日記帳</h1>
+  <p>ウィペットのぽー＆バド（＆うめ）と暮らす日常あれこれ ― 2015年2月 ※so-netブログ・archive.orgより復元</p>
+</header>
+
+<div class="controls">
+  <input type="text" id="search" placeholder="キーワードで探す（例: 震災、ドッグラン、うみちゃん）">
+  <div class="tag-filter" id="tagFilter"></div>
+</div>
+<div class="count" id="count"></div>
+
+<main id="main"></main>
+<p class="no-results" id="noResults">該当する記事が見つかりません。</p>
+
+<script>
+const entries = [
+  {
+    "date": "2015.02.01",
+    "title": "お正月休み 2014〜その4。",
+    "tags": [
+      "お正月",
+      "ume",
+      "2015年2月"
+    ],
+    "images": [],
+    "text": "2014年12月30日。\nうめとたっぷり砂浜で遊んだあとはカフェへGO〜♪\n徳島に住んでいた頃はもちろん、横浜へ転勤してからも私たちの憩いの場になっているクライミングさん。7月8日に2周年を迎えたそうで、記念タオル頂いた〜♪\nクライミングのオープンから約１ヶ月後の8月6日、むぅちゃん&うみちゃんと行ったのが初だったのよね。同じ日にマースくんと偶然の初対面をして、しかも誕生日だったのよね〜♪\nあぁ。それからホント、色々なことがあったなぁ。。。\nっと、思わず感慨に浸ってしまったけれども。2014年〆のクライミングで、嬉しい再会ができたのデス♪\n中途半端な時間のおかげもあって、私たちで貸切になった3Fフロア。私の後ろで行ったり来たりを繰り返しているコがおりました（笑\nこれらの写真を撮っている、たっつーのそばへ行きたくて・・・\n行ったり来たりを繰り返しているのは・・・\nワイマラナーのむぅちゃんこと、むぎさーん♪\n会えば永遠と遊んでくれることもあり、たっつーが大好きなむぅさん♪彼のそばに行きたいのだけれどー--どうしても行けない理由がある。\nそれは・・・たっつーの隣でバドが寝ているから（笑\nたっつーのそばへ行くことは、間にいるバドのスペースを侵してしまうことになる。そんな大それたこと、むぅちゃんには出来ません！たとえ相手がバドでもネ（笑\nというか、こんな顔して寝てたから怪しかったのカモー\nそんなむぅさんの悩みは、たっつーの方からそばへ行く事で万事解決なりっ。\nなんだかパピーっぽい写真になったけれど、むぅさん11歳。\nえ?! 11歳っ??!!\n年齢を聞く度に、決まって2歳若く勘違いしてしまっているョ・・大きな病気からも必ず元気に復活な不死身のむぅちゃんだもん。やっぱまだ9歳くらいな気分ョ。うん。次はのんびり、たっぷり草むら探検に行こうね〜♪\n先に帰るむぅ家をお見送りして、ぽーはうめママの膝の上でおやすみ中。\nそういや、カフェでうめの写真を撮っていなかった！だってソファの下が定位置なんだもーん。← というタダの言い訳（笑\n砂浜での元気な写真を載せちゃおう♪\n次もたっぷりしっかり遊ぼうね〜♪\nさて、うめ家とも別れた後はちょっと買物へ、・・・という、つもりだったけれど急遽ドライブへと変更〜っ！\n先ずはふらっと、小松島港へ。\n端っこへ行くと覗いてみたくなるのはぽー。そしてバドが真似をするっと（笑\nこちらは、海上保安庁 巡視船『びざん』2011年４月に就役したばかりな、全長46m 約195tの小型巡視船。\n港をぐるっと回って、桟橋を渡り反対側からも見学〜♪\n前部甲板には20ミリ機関砲と遠隔放水銃。使う機会はなるべくナイように。でも、いざという時はよろしくねっ！！\nところで、ここへ来るための桟橋。ぽバドの足がすっぽり抜けるほどの網状鉄板。抱っこして渡ったのデシタ（笑\n港散歩を満喫したら、ちりめんじゃこを買いに和田島へ。残念ながら漁は前日で終了。乾燥じゃこや吉野川青のりをget！（和田島のちりめんじゃこ・紫蘇・すだちの卵かけごはん友人が教えてくれたこの組合わせ、絶品なのだ〜♪）\n恵比寿丸で刺身盛り合せを購入して帰路へつく頃にはすっかり夕焼け空。吉野川沿いの夕焼け空と眉山。この光景、ほっとするのよね♪\nお正月日記はあと2回ほどで完結予定〜 つづく！",
+    "photosLost": true,
+    "truncated": false,
+    "comments": []
+  },
+  {
+    "date": "2015.02.11",
+    "title": "県立観音崎公園へ。",
+    "tags": [
+      "ぽー",
+      "バド",
+      "海",
+      "2015年2月"
+    ],
+    "images": [],
+    "photosLost": true,
+    "text": "2015年2月11日 建国記念日のこと。せっかくの休みだし、どこかへ行こう！というわけで・・・「神奈川県立観音崎公園」へGo！！\nバドが一生懸命に覗いているのは、二十八サンチ榴弾砲の実物大模型。\n（2009年に制作・展示されてきたが、老朽化のため今年の3/14解体予定...＊サンチ ← フランス語読みらしい）\n地図で確認すると、観音崎は三浦半島東端に位置する岬。房総半島の富津岬と同じく東京湾を守るかのように湾に突き出してマス。\nそのため東京湾要塞の一角として、明治時代から多くの砲台が築かれ立ち入り禁止となっていた地域だそうな。\n砲台の多くは関東大震災で大破し、現在は荒廃したレンガとコンクリート造りの砲台跡を見ることができ・・・\nなーんて、にわか仕込みの知識を披露してミタ！(￣∇￣*)ゞｴﾍﾍ\n続きはこちらから〜⇩",
+    "truncated": true,
+    "comments": []
+  },
+  {
+    "date": "2015.02.13",
+    "title": "日帰りたまご旅。",
+    "tags": [
+      "旅",
+      "2015年2月"
+    ],
+    "images": [],
+    "text": "2015年2月13日 金曜日のこと。\nたっつーの出勤を見送ったら、いそいそと用意をして。迎えに来てくれた友人の車へと、うきうき乗り込む♪\n後部座席にはぽーが好きで好きでたまらない ヒト イヌが居る。彼の隣に座れば良いのに、それとこれは何かがチガウらしい（笑\nけっきょく、落ち着いた場所は私の膝の上。そして足元にはバド。密度高いわ〜（笑\nこの日ともにお出かけするのはお馴染みの、ぽーとは同胎兄弟のレイルなり。というわけで、ルークレイル母！運転その他諸々お世話になりま〜す♪\n横浜市内から国道を走り渋滞につかまりつつも、2時間弱で最初の目的地『箱根ビジターセンター』に到着！\n箱根。そう、日帰り温泉旅行なり〜♪\n・・・ではなくて。大桶谷まで片道1時間のぷちハイキングなり〜♪\nたった1時間の道のり、とは言っても大桶谷の標高は1,044m。ほんの数日前には雪のため大桶谷の駐車場が閉鎖されていたようだし。\nというわけで、ビジネスセンターで地図を貰い残雪について尋ねてみる、と。「それなりにヒトも入ってるから大丈夫だよ」\nよしっ！ならば、いざ出発〜♪大桶谷までは階段があったり石畳だったりで整備されて歩きやすいらしい。あら、やはりすこーし雪が残っているわねぇ〜\n・・・す、すこし？？\n積雪は深いところで15cmほどで、昨日・今日は降ってなさそうだけれど。確かに、ヒトも通っているらしく雪は踏み固められていて・・・道の中央が凍ってるんですけどーっ！\nこ、この状況で1時間で登れるの？ふつーのトレッキングシューズだから転びそう〜（実際にこけたけどねんー）めっちゃ疲れそう〜〜〜と、初っ端から泣き言を繰り返すダメ飼主。\nそんな私をルクレイ母が励ましてくれ、誰かが作った雪だるまが可愛くお出迎え♪\n・・あ、登れる気がしてきたっ！\n道中には『弘法の硯石』と『梵字仏像』が。ーーーって、どこにあるん？（完全に下調べ不足...）\nたぶん、どちらもこの写真には写ってましぇん。梵字仏像は看板後ろの岩肌に、硯石は・・雪に埋もれてもはや推測も不可能。\n掘られていた梵字はたぶん、この2文字。向かって右はバンと読み「大日如来」を表すそうで、左はア。（アに関しては特別な働きがあるらしく、にわかでは理解不能デシタ..）\n硯石に関しては、窪みに水が溜まった岩があるそうな。その水は涸れることがなく、弘法大師曰く、「石冷たく木生い茂り雨多くまた雪降りて湿度高く自然、だからなくならない。自然は無限なり」\n真言宗については全く知識がないけれど、箱根権現に山岳信仰。そして弘法大師、ん〜〜これまた日本を感じるなぁ〜\nと、それはさておき。。。\n足元に注意しつつ山道を登っていくと、雪の溶けた道にさしかかり、さらにゆで卵の香りも漂い始めたぞ♪\n雪が溶けているのは陽があたっているからではなく、これのおかげ。\n柵より向こうは立ち入り禁止ゾーン。黄色くざらついた地面から立ち昇る噴気ガス。これぞ、温泉地〜っ♪\nそして、ついに山頂に到着〜♪\n「遂に」なんて書いたけれど、山頂までの所要時間約40分（笑\nけれどもさすがに山頂は風も強く寒い。気温は確か5~6℃だったかしら。吹き流しが暴れ回っていたから、体感温度はもっと低いはず。\nピムリコのウォームシャツを着ていたけれど、カタカタ震えるレイル。ぽバドは意外と平気そうだったなぁ。このあとレイルは重ね着で一安心ね♪\nパノラマ撮影で、良い写真が撮れたーっ♪\nと、思っていたのに！帰宅後に確認したら・・・ぽーのバカーーっ!（でも載せちゃうもんね。全体をぼーっと眺めれば良い景色だもんねっ）\n場所によっては強く匂う硫化水素臭。イヌたちはどないやろかと気になったけれど、平気みたい。普段はトラックなどが横を通るとくしゃみをしたりもするけれど、それもナシ。\nゆで卵の香りと勘違いしていたりしてネ（笑\nというかですね。実際に山頂付近のある一角ではゆで卵の香りがぷんぷん。\nそれは有名な 、大桶谷の黒たまごが茹でられているから！！食べると長生きできると言われている『黒たまご』。\n80℃の温泉池に60分、さらに100℃の蒸気で蒸された『黒たまご』温泉成分の鉄と硫化水素による硫化鉄で殻は真っ黒に。\n熱々のたまごをその場で頂く。もちろん、レイルぽバドもね。歩いたあとだし余計に美味しーっ♪\n翌朝には泊まりに来ていた義弟とたっつーも食べて、皆で長生きだじぇ♪（そういえば、翌日はさらに鉄の香りを強く感じたなぁー）\n登ってきた道と同じルートを、約30分ほどで降りきって駐車場へ。小腹が空いた・・・ルクレイ母が用意してくれたおにぎりを道中に食べたきりだもんねぇ。\nというわけなので、カフェに行きましょか〜さすが、箱根！イヌO.K.のカフェがけっこう隣接して在るじゃない♪そのうちの一軒『paSeo』へと行ってみる。\nイヌ連れは別棟での食事、しかも他にお客もおらず貸切状態。古民家を改装したらしくなかなかに落ち着いた雰囲気でゆったり♪\n店内は石油ストーブでぬくぬくぽかぽか♪\n小腹どころでなく、けっこうお腹空いたかも・・・というわけで、各々ケーキセットを注文して『ナッツァ』を２人でシェアすることに。\nこれが「ナッツァ」ね♪\nピザですネ。 納豆・長ネギ・海苔の和風ピザなり。チャレンジ的な感じで注文してみたら、これがかなり美味しくって♪\nで、その頃のイヌたち・・・レイル＆バドの弟犬たちはこんな様子で。\nぽーはというと・・・またまた私の膝のうえ。まぁ、食べてるところを邪魔しないからいいんだけどねん。寝息たてるほどに眠っていたから、重さ増してマシタ（笑（自撮りモードで撮ってみた！）\nそして、もらえないと知った弟犬たちはこんな感じに。\nいやぁ〜♪ まさかバドが、ぽー以外のコの隣で落ち着けちゃうなんてっ♪それだけレイルたちと一緒に居ることに慣れたということかしらん〜\nさて、お腹が満たされたらラストの目的を果たしに行こうか。\nやっぱ、箱根といえば温泉だもんね〜♪のんびりお湯に浸かってハイキングの疲れを癒しましょ〜\nイヌたちが、ねっ！！\nそう、これはイヌ用温泉なのです。300mの地下から汲み上げた源泉で、なんと100%掛け流し！！\nとはいえ、3頭ともお風呂好きではないもんねぇ。交互に出たり 入ったり 入れられたりを繰り返すぽバド。レイルは比較的大人しく浸かってたネ♪\nけれども、手桶で背中や体にお湯をかけてやるうちに３頭とも浸かったままに。こちらのお母さん曰く、どのイヌもみな温かさを知るとおとなしくなるそうな。\nまぁ、びみょーな表情をしてはいるけれど。逃げなくなりマシタ（笑\nヒト的にはかなーりぬるめの温度。やはり温泉効果かしら、パンティングは全くせずに体はぽかぽか。このあと30分ほど待たせることになるのだけれど、寒がることもなく。\nそうそう、ちなみに料金はタオルの貸し出し含め、1人、1頭それぞれ200円。イヌ用にはバスタオルをたくさん用意してくださいました。\nそうなの、ヒトも1人200円。\nつまりココは、ヒトもO.K.な足湯なのです。（←ヒトとイヌの順番がおかしい...笑）二の平温泉の『箱根の森足湯』さん。\n民家の敷地に作られた秘湯的な足湯で、しかもイヌ専用がある素敵な場所なのだー♪（写真奥にあるのがぽバドたちが入らせてもらったイヌ用温泉）\nヒト用は5~6人がゆったり腰掛けられる広さでした。\nそういえば、ぽバドから離れた場所で浸かっていたらバドがぴーぴー鳴いて。何を言っているのだと思っていたら、ルクレイ母が「遠いょーじゃない？」と。試しに写真に写っている座布団の場所へ移動してみたら鳴き止みマシタ。\n誰だっ！バドをこんな甘えん坊にしたのは？！\nさてさて、２人でのんびり長々と足湯に浸かって元気復活！ここはビニールと屋根で囲まれただけなのだけれど、あら不思議。外に出てもぜんぜん寒くない。ふと壁に掛けられていた温度計に目をやると『ー１℃』!?\n温泉＆足湯効果すごいっ！\nそういえば、早々にiPohoneの充電が切れたのですょ。寒かったのね、iPhoneは。（お湯につけてやるわけにはいかないけれどw）\n＊箱根森の足湯付近は坂が多く、凍結のため臨時休業をしていることがあります。HPでチェック、もしくは問い合わせた方がいいかもー\n帰り道、ぽーはやはり私の膝のうえ。そして、バドはむりやり足に顔を乗せこんな感じ♪\n一日たっぷり楽しかったなぁ〜♪ 次は泊まりで温泉旅行に行きたいねぇ〜ルクレイ母、運転はもちろん、いろいろありがと〜！\n＜おまけ１＞同じ日の夜。上野にてたっつーは男兄弟３人揃っての飲み会♪\n＜おまけ２＞タイから観光に来ていたBobさんと記念撮影♪5ヶ月のイタグレを飼っているそうで、レイルやぽーと同じブルー系の体色でなんだかより親近感〜♪",
+    "photosLost": true,
+    "truncated": false,
+    "comments": []
+  }
+];
+
+(function() {
+  const seen = {};
+  entries.forEach(function(e) {
+    const key = e.date;
+    seen[key] = (seen[key] || 0) + 1;
+    e.id = 'e' + e.date.replace(/\./g, '-') + '-' + seen[key];
+  });
+})();
+
+
+// ---- render ----
+const allTags = [...new Set(entries.flatMap(e => e.tags))];
+let activeTags = new Set();
+let keyword = "";
+
+function highlightNums(text) {
+  return text.replace(/\[(\d+)\]/g, '<b>[$1]</b>');
+}
+
+function esc(s) {
+  return String(s == null ? "" : s).replace(/[&<>]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
+}
+
+function renderTagFilter() {
+  const el = document.getElementById('tagFilter');
+  el.innerHTML = allTags.map(t =>
+    `<button class="tag-btn${activeTags.has(t) ? ' active' : ''}" data-tag="${t}">${t}</button>`
+  ).join('');
+  el.querySelectorAll('.tag-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const tag = btn.dataset.tag;
+      if (activeTags.has(tag)) activeTags.delete(tag); else activeTags.add(tag);
+      renderTagFilter();
+      renderEntries();
+    });
+  });
+}
+
+function matches(entry) {
+  const tagOk = activeTags.size === 0 || entry.tags.some(t => activeTags.has(t));
+  const kw = keyword.trim();
+  const kwOk = kw === "" ||
+    entry.title.includes(kw) ||
+    entry.text.includes(kw) ||
+    entry.tags.some(t => t.includes(kw));
+  return tagOk && kwOk;
+}
+
+function renderEntries() {
+  const main = document.getElementById('main');
+  const filtered = entries.filter(matches);
+  document.getElementById('count').textContent = `${filtered.length} / ${entries.length} 件表示中`;
+  document.getElementById('noResults').style.display = filtered.length === 0 ? 'block' : 'none';
+
+  main.innerHTML = filtered.map(entry => `
+    <article class="entry" id="${entry.id}">
+      <div class="entry-head">
+        <span class="entry-title">${entry.title}</span>
+        <span class="entry-date">${entry.date}</span>
+      </div>
+      ${entry.images.length > 0 ? `
+      <div class="photo-grid">
+        ${entry.images.map((src, i) => `
+          <a href="${src}" target="_blank" rel="noopener">
+            <img src="${src}" loading="lazy" alt="${entry.title} 写真${i+1}">
+            <span class="num">${i+1}</span>
+          </a>
+        `).join('')}
+      </div>` : entry.photosLost ? `<p class="no-photo">（写真は掲載されていましたが、保存されていないため表示できません）</p>` : `<p class="no-photo">（この記事には写真がありません）</p>`}
+      ${entry.truncated ? `<p class="truncated-note">（＊続きは読めない）</p>` : ''}
+      <p class="entry-text">${highlightNums(entry.text)}</p>
+      <div class="tags">
+        ${entry.tags.map(t => `<button class="tag-pill" data-tag="${t}">${t}</button>`).join('')}
+      </div>
+      ${entry.comments && entry.comments.length > 0 ? `
+      <div class="comments">
+        <div class="comments-label">コメント（${entry.comments.length}件）</div>
+        ${entry.comments.map(c => `
+          <div class="comment">
+            <div class="comment-meta"><span class="author">${esc(c.author)}</span>${c.date ? ' ・ ' + esc(c.date) : ''}</div>
+            <div>${esc(c.text)}</div>
+          </div>
+        `).join('')}
+      </div>` : ''}
+    </article>
+  `).join('');
+
+  main.querySelectorAll('.tag-pill').forEach(btn => {
+    btn.addEventListener('click', () => {
+      activeTags = new Set([btn.dataset.tag]);
+      renderTagFilter();
+      renderEntries();
+      window.scrollTo({top:0, behavior:'smooth'});
+    });
+  });
+}
+
+document.getElementById('search').addEventListener('input', (e) => {
+  keyword = e.target.value;
+  renderEntries();
+});
+
+renderTagFilter();
+renderEntries();
+if (location.hash) {
+  const target = document.getElementById(location.hash.slice(1));
+  if (target) target.scrollIntoView({block: 'start'});
+}
+</script>
+
+</body>
+</html>

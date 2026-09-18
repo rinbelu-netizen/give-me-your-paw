@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hey buddy, give me your paw! 絵日記帳 - 2018年9月</title>
+<style>
+  :root {
+    --bg: #faf6ef;
+    --card-bg: #ffffff;
+    --border: #e8dfd0;
+    --text: #4a4238;
+    --text-muted: #9a9082;
+    --accent: #c98a5e;
+    --accent-bg: #f5e6d8;
+    --accent-text: #8a5a35;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    padding: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: "Hiragino Kaku Gothic ProN", "Yu Gothic", "Meiryo", sans-serif;
+    line-height: 1.8;
+  }
+  header {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 32px 20px 16px;
+    text-align: center;
+  }
+  header h1 {
+    font-size: 22px;
+    font-weight: 500;
+    margin: 0 0 4px;
+    color: var(--text);
+  }
+  header p {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin: 0;
+  }
+  .controls {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 12px 20px 20px;
+    position: sticky;
+    top: 0;
+    background: var(--bg);
+    z-index: 10;
+  }
+  #search {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    font-size: 14px;
+    background: var(--card-bg);
+    color: var(--text);
+    margin-bottom: 10px;
+  }
+  .tag-filter {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .tag-btn {
+    font-size: 11px;
+    padding: 4px 12px;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    background: var(--card-bg);
+    color: var(--text-muted);
+    cursor: pointer;
+  }
+  .tag-btn.active {
+    background: var(--accent);
+    color: #fff;
+    border-color: var(--accent);
+  }
+  .count {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 0 20px 8px;
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+  main {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 0 20px 60px;
+  }
+  .entry {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 20px;
+    margin-bottom: 16px;
+  }
+  .entry-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+  .entry-title {
+    font-size: 16px;
+    font-weight: 500;
+  }
+  .entry-date {
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+  .photo-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+    gap: 6px;
+    margin-bottom: 12px;
+  }
+  .photo-grid a {
+    position: relative;
+    display: block;
+    aspect-ratio: 1;
+    overflow: hidden;
+    border-radius: 8px;
+    background: var(--accent-bg);
+  }
+  .photo-grid img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .photo-grid .num {
+    position: absolute;
+    bottom: 3px;
+    right: 4px;
+    font-size: 10px;
+    background: rgba(0,0,0,0.55);
+    color: #fff;
+    padding: 1px 5px;
+    border-radius: 8px;
+  }
+  .no-photo {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-bottom: 12px;
+  }
+  .truncated-note {
+    font-size: 12px;
+    color: var(--accent-text);
+    background: var(--accent-bg);
+    border-radius: 8px;
+    padding: 6px 10px;
+    margin: 0 0 12px;
+    display: inline-block;
+  }
+  .entry-text {
+    font-size: 14px;
+    line-height: 1.85;
+    margin: 0 0 12px;
+    white-space: pre-line;
+  }
+  .entry-text b {
+    color: var(--accent-text);
+    font-weight: 500;
+  }
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .tag-pill {
+    font-size: 11px;
+    padding: 2px 10px;
+    border-radius: 12px;
+    background: var(--accent-bg);
+    color: var(--accent-text);
+    cursor: pointer;
+    border: none;
+  }
+  .comments {
+    margin-top: 16px;
+    padding-top: 14px;
+    border-top: 1px dashed var(--border);
+  }
+  .comments-label {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+  }
+  .comment {
+    font-size: 13px;
+    line-height: 1.7;
+    margin-bottom: 12px;
+    padding-left: 10px;
+    border-left: 2px solid var(--accent-bg);
+  }
+  .comment-meta {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-bottom: 2px;
+  }
+  .comment-meta .author {
+    color: var(--accent-text);
+    font-weight: 500;
+  }
+  .no-results {
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 14px;
+    padding: 40px 0;
+    display: none;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Hey buddy, give me your paw! 絵日記帳</h1>
+  <p>ウィペットのぽー＆バド（＆うめ）と暮らす日常あれこれ ― 2018年9月 ― 心臓その4／バド7年／徳島夏休み記録その２（全文） ※so-netブログ・archive.orgより復元／写真は保存されておらず未掲載</p>
+</header>
+
+<div class="controls">
+  <input type="text" id="search" placeholder="キーワードで探す（例: 震災、ドッグラン、うみちゃん）">
+  <div class="tag-filter" id="tagFilter"></div>
+</div>
+<div class="count" id="count"></div>
+
+<main id="main"></main>
+<p class="no-results" id="noResults">該当する記事が見つかりません。</p>
+
+<script>
+const entries = [
+  {
+    "date": "2018.09.04",
+    "title": "心臓。その４（僧帽弁閉鎖不全症）",
+    "tags": [
+      "ウィペットと心臓",
+      "2018年9月"
+    ],
+    "images": [],
+    "text": "ウィペットおよびイヌの心臓について、僧帽弁閉鎖不全症について。\n論文などの情報を元に私の勝手な解釈を加えつつ、『心臓その１〜その３』まで書き連ねてきたわけですが。。チョット悩みすぎて筆が止まっておりました。\n「ウィペットと他犬種の違い、それを踏まえた投薬開始のタイミング」\nそこの糸口が一向に掴めず、悶々としていたところに！光明が差したぁ〜♪友人が投薬前後4回分の検査結果を送ってくれまして。それらデータを持って、ぽバドを車に乗せてお出かけデス。\n続きはこちらから〜↓\n約半年ぶりのぽバド心臓エコー検査でございます。\nぽバドと友人犬3頭分のデータ。主治医と眺めながらあれこれ話をして。おかげさまで、見えてきマシタ〜！！\n・犬種関係なく、僧帽弁閉鎖不全症で見るべきポイントはほぼ同じかも\n・現在のぽバド、特に気になる症状は無し\n・各エコー検査図や数値において、ぽバドの状態は前回とほぼ変化しておらず(バドに至っては以前より改善しているという不思議現象)\n結果、『今はまだ投薬は不要』という結論に達しました。\nさて、そんなわけで、今回は。\n1.心臓エコー検査のどの項目で僧帽弁不全症がわかるの？\n2.投薬開始時期の目安は？\nこれらについてまとめてみたいと考えています。とはいえ・・\n間違いや勘違いを記している可能性が大いにあります。必ず、絶対に主治医とよく相談してくださるようお願い致します。でも、もし、お役に立てたら幸いです。投薬等々、ほんと悩みますもん・・\nではここで、『心臓。その2』で登場した模式図の再登場！\n僧帽弁閉鎖不全症に焦点をあてるので、赤く塗った左側に注目です。血液は肺動脈から、左心房(LA)→ 左心室(LV)→ 大動脈(Ao)、そして全身へと運ばれ、肺静脈から右心房へと戻ってきます。\n続いては、心臓エコー検査における僧帽弁閉鎖不全症のチェック項目！\n僧帽弁閉鎖不全症を知るために必要な項目の一部 ① 僧帽弁の観察 ② 左室流入血流(E波、A波)の観察 ③ 左心房(LA)の拡張の有無 ④ 逆流の観察(カラードップラ法、逆流モザイク血流) ⑤ 左心室(LV)の観察\nその他、身体症状やVHS(胸骨心臓サイズ)、FS(左室内径短縮率)等々、身体の全てを総合的に診て先生方は判断しています。\nしかしウィペットではVHSやFSなどが基準値と異なる傾向にあるため、ここでは敢えて省略します。(ウィペットの参照値については後述)\nまた特に、①④⑤ についてはリアルタイムで見るエコー図が重要です。もし可能ならば、検査中に見せてもらうことお勧めです。\n拍動する心臓や開閉を繰り返す弁の様子、弁からの逆流がある場合にはその程度なども見ることができます。写真等はこちらへ → 心臓。その2\nというわけで、上記項目のうち主に②と③についての説明を。\nE波(拡張早期波)とは、左心房(LA)にたっぷりと血液が溜まると、左心室(LV)がドクンっと大きく膨らむ(拡張)。それにより左心房(LA)内の血液が左心室(LV)側へ引き込まれることで起きる流れ。\nA波(心房収縮波)とは、左心室(LV)が拡張し終わると、左心房(LA)がきゅっと縮む(収縮)。それにより左心房(LA)内に残っていた血液が左心室(LV)側へと押し流される時の血流。\n健康な心臓ではこのE波とA波のバランス(E/A)がある程度保たれています。\nところが。僧帽弁閉鎖不全症が重症化してくると、E波は速くA波は遅くなる それとともに③ 左心房(LA)の拡張がみられる\nでは、僧帽弁からの逆流が起きると、なぜ上のような状態になるのか？\n極端な場合の表現になりますが、以下のようなことが心臓で起きているそうです。\n左心室(LV)へと流れた血液が左心房側へと逆流する ↓ 左心房(LA)が血液でいっぱいになり膨らむ 左心房圧が高くなる<左心房(LA)が拡張する> ↓ 左心室(LV)が血液を吸い込もうと頑張り、左心室(LV)が血液でぱんぱんになる E波が速く<高く>なる ↓ 左心房(LA)が左心室(LV)へ血液を送ろうとするが、左心室(LV)は血液でぱんぱんなため送れない A波が遅く<小さく>なる ↓ 再び左心室(LV)へと流れた血液が左心房側へと逆流する ↓\nうーん。アニメーションで説明できたらなぁ。。。気を取り直して、具体的な数字で見ていくことにしましょー\n正常値は具体的にいくらなのか。逆流の重症度の数値はどれくらいなのか？*僧帽弁逆流の重症度は、これら数値だけでなく弁の状態・逆流程度など、他の様々な要素も合わせて判断することお忘れなくです。\nまずはE波とA波以外の項目について、前回貼った参照値リスト再登場！\nちなみに左心房(LA)の拡張は、左心房(LA)の内径と大動脈(AO)の内径を比較した数値でみていきます。→ 心臓。その2\nまた、ウィペットの参照値については以下の論文より抜粋。\n*1 Bavegems V,Duchateau L,Sys Su,De Rick A. Echocardiographic reference values in Whippets Vet Radiol Ultrasound.2007 May~Jun;48(3):230-8.\n*2 James W. Buchanan, DVM, M Med Sci, DACVIM111 Vertebral Heart Size(VHS) The James Buchanan Cardiology Library.October 14, 2009 (published)\n基準値 ウィペット参照値*1: VHS 10.5以下、ショー血統 L10.5 R10.8*2 / BNP(pmol/L) < 900 / AO(mm) 17.5〜23.7 / LA(mm) 23.1〜35.9 / LA/AO 1〜1.5、参照値1.32〜1.5 / LVDd(mm) 39〜、参照値33.8〜48.4 / FS(%) 33〜46、参照値27.7 主に体重 約17kgの場合の数値 VHSのウィペット参照値のL及びRは測定時の臥位の向き\n続いて、E波とA波の参照値としては、参考文献としてとてもお世話になっている、グリーン動物病院の田口大介先生のレポートより抜粋。*正常例、重症度評価の値はいずれもグリーン動物病院の患畜さん、および田口先生が集めたデータがもとになっています。判断基準は先生方で異なるため、主治医と充分に相談なさってください。またレポートはPDFで入手可能ですのでぜひどうぞですー\n田口大介(2014)「心臓エコー図検査ーその10」Vol.40(No.1),15-16,岩獣会報\n田口大介(2014)「心臓エコー図検査ーその11」Vol.40(No.2),49-50,岩獣会報\n⑴ E波の正常例 1〜10歳 平均0.73m/s 多くが1m/s以下で、1.2m/sを超えることはほとんどない 11歳以上 平均0.63m/s\n⑵ E/Aの正常例 6〜10歳 0.5< E/A < 1.5 11歳以上 0.5< E/A < 1.0\n⑶ 僧帽弁逆流の重症度評価 *弁の形態、左房の拡張程度なども踏まえて観察する。また、年齢、脱水の程度でE波血流速は変化するため大まかな例として考える。 ⑶-1.超重症例 E波 1.5m/s以上 E/A 2.0以上 ⑶-2.重症例 E波 約1.2m/s以上 1.5< E/A <2.0 ⑶-3.中等例 E波 約1.2m/s以下 1.0< E/A <2.0\n田口先生の参照値からもわかるように、僧帽弁からの逆流がある場合にはE波とA波のバランス(E/A)に変化が現れるようです。\nまた、ぽバドの主治医やデータを送ってくれた友人犬の担当医も、僧帽弁逆流の重症度の判断にE/Aと左心房の拡張(LA/AO)の程度を見ていました。\nさて最後になりますが 2.投薬開始時期の目安は？について。\nここで、ぽバドの心臓エコー検査結果の一部をご紹介！（ぽー・バド それぞれ2018年春・夏の測定値を比較する表：VHS、AO、LA、LA/AO、LVDd、FS、E波、A波、E/A の各数値）\n・左心房の拡張はまだそれほどではない\n・E波とA波のバランス(E/A)もそれほど悪くない\n・心疾患に特有の気になる症状が特にない\n・ぽバドそれぞれ程度は違えど逆流は起きている、けれど軽度\n・弁の状態は良好\n・左心室、心筋の状態は良好 etc...\nこれらのこと、そして友人犬の投薬前後の検査結果を参考にして、ぽバドの投薬『今は、まだ不要』と決めマシタ。\n心臓の薬は使い始めると一生必要となりやめられないものが多く、その他の疾患や現在飲ませている薬との兼ね合いが難しかったり、そして高価である、など様々な要素を考える必要があります。\nそのため、投薬開始時期の目安についての正解は無い！かもしれない...ゞ(￣∇￣;)ｦｲｦｲ\nなぜかと言いますと、イヌの年齢、各検査結果や現在の容態・状態。そして、家庭の事情等も含め飼主が悩み考えて決めたことが正解ではないか、と、思ったからなのです。\nとはいえ、めっちゃ悩むことに変わりはないわけで。だからこそ、同じく悩んでいる飼主さんたちの助けに少しでもなれればいいなぁ。",
+    "photosLost": true,
+    "truncated": false,
+    "comments": []
+  },
+  {
+    "date": "2018.09.20",
+    "title": "7年。",
+    "tags": [
+      "バド",
+      "2018年9月"
+    ],
+    "images": [],
+    "photosLost": true,
+    "text": "2018年9月20日の本日。バドと暮らしはじめて、まるっと7年となりマシタ〜♪\nトモダチのJINくんが同じ日にうちの子記念日&誕生日。そのおかげで気がついたというのは、バドにはナイショ♪(気にしてないやろけど笑)\n続きはこちらから〜↓",
+    "truncated": true,
+    "comments": []
+  },
+  {
+    "date": "2018.09.27",
+    "title": "ぽバドと夏休み〜その２。",
+    "tags": [
+      "ぽー",
+      "バド",
+      "徳島",
+      "夏休み",
+      "2018年9月"
+    ],
+    "images": [],
+    "photosLost": true,
+    "text": "「夏休み」と言っても、今年ではなく去年の夏休みのこと。\n2017年7月1日〜14日まで徳島に戻っておりまして、\n去年の9月に書いた ぽバドと夏休み〜その1。の続き、ぽいもの(笑\nぽーは3歳と9か月まで、バドは1歳11か月までほぼ毎日のように、\n徳島の砂浜を散歩したり、川で遊んだりして過ごしておりマシタ。\n2013年の5月からは1年に3〜４回のペースで徳島に戻る、横浜との二重生活。\nぽーが1歳前後の頃から知り合っていったイヌトモダチと飼主さんの面々。\nみんなとは十数年の付き合いな気分になっていたけれど、\n実際にはそこまで経っておらずこれを書きながらびっくりしてマス。\nそれだけ濃厚な充実した時間を送らせてもらっているのだなぁ♪\n続きはこちらから〜↓\n2017年7月2日 時刻は確か18時頃。\n特によく一緒する散歩仲間と小松海岸にて待ち合わせ。\n年末に戻って以来だから、半年ぶりの再会なのだけど、\nなんだか昨日も一緒に散歩したかのような雰囲気で集うイヌと飼主たち。\nNEOちゃんはぽーと同年齢で2018年で9歳に。もう少し若い頃、\nそれはもうよく走り回って遊んだもので。体力敵わないのは今も同じ(笑\nNEOちゃんの弟JINくんは、バドと同じく9月20日がうちの子記念日。\n2018年に3歳を迎え、この写真の時はまだ2歳になる少し前か。\nうむ・・過去記事を書いてるとイヌたちの年齢がややこしいわね(笑\n初対面時には先輩風を吹かしていたぽーだけれど、\nJINくんのおおらかで諦めない性格のおかげで良い関係になりマシタ。\nぽーの体力がもう少しあれば、一緒に走り回る姿がもっと見られただろなぁ〜\nそしてまた、散歩仲間に欠かせない彼女はむぅちゃんことむぎちゃん。\nぽー2歳、むぅちゃん6歳くらいの頃だったか。好き過ぎて、\nむぅちゃんしか目に入らず船と桟橋の間に落ちそうになったこともありマシタ(笑\nそれは、地元の情報誌にむぅちゃん、うみちゃんと載せてもらった時のことで、\n雑誌とともに残る徳島での貴重な思い出のひとつ。\n(蘭丸と凛を迎える前のみぅちゃんも載ってるんだよね〜)\nむぅちゃんはバドにとっても特別らしく。砂浜のはるか向こうに、\nむぅちゃんとmitomonさんが見えたら必ず全速力で迎えに行くのがバドの常。\n波打ち際まで走って行くぽバド、それを追いかけるJINくん。\nNEOちゃんは頃合いを図りつつそんな三頭を追いかけたり、\nmitomonさんの顔を舐めたりカジカジしてみたり。\nあまりの楽しさに、飼主がいくら呼んでも一向に戻ってこないぽバド。\nそんなみなの様子を笑いながら眺めるNEOJIN母ちゃんと私たち。\n以前のようにたっつーの投げる木を追いかけたりはないけれど、\n「楽しい、嬉しい」を表情と全身で表現してくれているむぅちゃん。\nこの日、写真をたくさん撮って記録するか、それとも撮影はそこそこにして、\nこの瞬間をしっかり楽しみ記憶に残すかを迷っておりまして。\nなぜなら、7月14日に徳島の自宅を譲るから。\n今までのように1年に数回の頻度で徳島に来ることなくなるだろうから。\n結局、撮った写真の枚数はとてもとても少なくて。\n少ないながらもmitomonさんとむぅちゃんの写真はチョット多め♪\nぽバドは遠くで走り回ってて戻って来ないし、\nむぅちゃんは近くにいるからというのもあったけれど(笑)\nそして、少ないながらも良い写真が撮れたんじゃないかと自画自賛♪\n1時間ほどの散歩、ラストは集合写真を撮りましょう。\nはい、みんな整列！並んで〜、座って〜〜！！\nバド、カメラ見て！むぅちゃん、その座り方でOK？\nうん。まぁ、いいか(笑\n2018年の春、私たちが徳島を離れてちょうど5年。むぅちゃんが旅立った。\n今までに記録した思い出を読み返してみて、改めて思う。\nほんとうに、ほんとうに楽しい毎日だったヨ♪",
+    "truncated": false,
+    "comments": [
+      {
+        "author": "むぎちゃん。",
+        "date": "2018-09-27 21:01",
+        "text": "写真ありがとう。集合写真の私の顔の隠れかた笑 また徳島に来たら会おうねー(^ ^)"
+      },
+      {
+        "author": "micky",
+        "date": "2018-09-28 08:07",
+        "text": ">むぎちゃん なるべく悲しくならないよう書きたかったのだけれど、やっぱり寂しいものは寂しいなぁ。でも楽しい時間を共有できたことほんとよかった。またむぅちゃんのどんくさい話なんかを、のんびりと笑いながらしたいなー 徳島とか関東とかどこでもいいからまた会おうね♪"
+      }
+    ]
+  }
+];
+
+(function() {
+  const seen = {};
+  entries.forEach(function(e) {
+    const key = e.date;
+    seen[key] = (seen[key] || 0) + 1;
+    e.id = 'e' + e.date.replace(/\./g, '-') + '-' + seen[key];
+  });
+})();
+
+
+// ---- render ----
+const allTags = [...new Set(entries.flatMap(e => e.tags))];
+let activeTags = new Set();
+let keyword = "";
+
+function highlightNums(text) {
+  return text.replace(/\[(\d+)\]/g, '<b>[$1]</b>');
+}
+
+function esc(s) {
+  return String(s == null ? "" : s).replace(/[&<>]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
+}
+
+function renderTagFilter() {
+  const el = document.getElementById('tagFilter');
+  el.innerHTML = allTags.map(t =>
+    `<button class="tag-btn${activeTags.has(t) ? ' active' : ''}" data-tag="${t}">${t}</button>`
+  ).join('');
+  el.querySelectorAll('.tag-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const tag = btn.dataset.tag;
+      if (activeTags.has(tag)) activeTags.delete(tag); else activeTags.add(tag);
+      renderTagFilter();
+      renderEntries();
+    });
+  });
+}
+
+function matches(entry) {
+  const tagOk = activeTags.size === 0 || entry.tags.some(t => activeTags.has(t));
+  const kw = keyword.trim();
+  const kwOk = kw === "" ||
+    entry.title.includes(kw) ||
+    entry.text.includes(kw) ||
+    entry.tags.some(t => t.includes(kw));
+  return tagOk && kwOk;
+}
+
+function renderEntries() {
+  const main = document.getElementById('main');
+  const filtered = entries.filter(matches);
+  document.getElementById('count').textContent = `${filtered.length} / ${entries.length} 件表示中`;
+  document.getElementById('noResults').style.display = filtered.length === 0 ? 'block' : 'none';
+
+  main.innerHTML = filtered.map(entry => `
+    <article class="entry" id="${entry.id}">
+      <div class="entry-head">
+        <span class="entry-title">${entry.title}</span>
+        <span class="entry-date">${entry.date}</span>
+      </div>
+      ${entry.images.length > 0 ? `
+      <div class="photo-grid">
+        ${entry.images.map((src, i) => `
+          <a href="${src}" target="_blank" rel="noopener">
+            <img src="${src}" loading="lazy" alt="${entry.title} 写真${i+1}">
+            <span class="num">${i+1}</span>
+          </a>
+        `).join('')}
+      </div>` : entry.photosLost ? `<p class="no-photo">（写真は掲載されていましたが、保存されていないため表示できません）</p>` : `<p class="no-photo">（この記事には写真がありません）</p>`}
+      ${entry.truncated ? `<p class="truncated-note">（＊続きは読めない）</p>` : ''}
+      <p class="entry-text">${highlightNums(entry.text)}</p>
+      <div class="tags">
+        ${entry.tags.map(t => `<button class="tag-pill" data-tag="${t}">${t}</button>`).join('')}
+      </div>
+      ${entry.comments && entry.comments.length > 0 ? `
+      <div class="comments">
+        <div class="comments-label">コメント（${entry.comments.length}件）</div>
+        ${entry.comments.map(c => `
+          <div class="comment">
+            <div class="comment-meta"><span class="author">${esc(c.author)}</span>${c.date ? ' ・ ' + esc(c.date) : ''}</div>
+            <div>${esc(c.text)}</div>
+          </div>
+        `).join('')}
+      </div>` : ''}
+    </article>
+  `).join('');
+
+  main.querySelectorAll('.tag-pill').forEach(btn => {
+    btn.addEventListener('click', () => {
+      activeTags = new Set([btn.dataset.tag]);
+      renderTagFilter();
+      renderEntries();
+      window.scrollTo({top:0, behavior:'smooth'});
+    });
+  });
+}
+
+document.getElementById('search').addEventListener('input', (e) => {
+  keyword = e.target.value;
+  renderEntries();
+});
+
+renderTagFilter();
+renderEntries();
+if (location.hash) {
+  const target = document.getElementById(location.hash.slice(1));
+  if (target) target.scrollIntoView({block: 'start'});
+}
+</script>
+
+</body>
+</html>

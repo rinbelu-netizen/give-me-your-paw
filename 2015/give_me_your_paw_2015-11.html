@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hey buddy, give me your paw! 絵日記帳 - 2015年11月</title>
+<style>
+  :root {
+    --bg: #faf6ef;
+    --card-bg: #ffffff;
+    --border: #e8dfd0;
+    --text: #4a4238;
+    --text-muted: #9a9082;
+    --accent: #c98a5e;
+    --accent-bg: #f5e6d8;
+    --accent-text: #8a5a35;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    padding: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: "Hiragino Kaku Gothic ProN", "Yu Gothic", "Meiryo", sans-serif;
+    line-height: 1.8;
+  }
+  header {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 32px 20px 16px;
+    text-align: center;
+  }
+  header h1 {
+    font-size: 22px;
+    font-weight: 500;
+    margin: 0 0 4px;
+    color: var(--text);
+  }
+  header p {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin: 0;
+  }
+  .controls {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 12px 20px 20px;
+    position: sticky;
+    top: 0;
+    background: var(--bg);
+    z-index: 10;
+  }
+  #search {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    font-size: 14px;
+    background: var(--card-bg);
+    color: var(--text);
+    margin-bottom: 10px;
+  }
+  .tag-filter {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .tag-btn {
+    font-size: 11px;
+    padding: 4px 12px;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    background: var(--card-bg);
+    color: var(--text-muted);
+    cursor: pointer;
+  }
+  .tag-btn.active {
+    background: var(--accent);
+    color: #fff;
+    border-color: var(--accent);
+  }
+  .count {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 0 20px 8px;
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+  main {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 0 20px 60px;
+  }
+  .entry {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 20px;
+    margin-bottom: 16px;
+  }
+  .entry-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+  .entry-title {
+    font-size: 16px;
+    font-weight: 500;
+  }
+  .entry-date {
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+  .photo-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+    gap: 6px;
+    margin-bottom: 12px;
+  }
+  .photo-grid a {
+    position: relative;
+    display: block;
+    aspect-ratio: 1;
+    overflow: hidden;
+    border-radius: 8px;
+    background: var(--accent-bg);
+  }
+  .photo-grid img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .photo-grid .num {
+    position: absolute;
+    bottom: 3px;
+    right: 4px;
+    font-size: 10px;
+    background: rgba(0,0,0,0.55);
+    color: #fff;
+    padding: 1px 5px;
+    border-radius: 8px;
+  }
+  .no-photo {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-bottom: 12px;
+  }
+  .truncated-note {
+    font-size: 12px;
+    color: var(--accent-text);
+    background: var(--accent-bg);
+    border-radius: 8px;
+    padding: 6px 10px;
+    margin: 0 0 12px;
+    display: inline-block;
+  }
+  .entry-text {
+    font-size: 14px;
+    line-height: 1.85;
+    margin: 0 0 12px;
+    white-space: pre-line;
+  }
+  .entry-text b {
+    color: var(--accent-text);
+    font-weight: 500;
+  }
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .tag-pill {
+    font-size: 11px;
+    padding: 2px 10px;
+    border-radius: 12px;
+    background: var(--accent-bg);
+    color: var(--accent-text);
+    cursor: pointer;
+    border: none;
+  }
+  .comments {
+    margin-top: 16px;
+    padding-top: 14px;
+    border-top: 1px dashed var(--border);
+  }
+  .comments-label {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+  }
+  .comment {
+    font-size: 13px;
+    line-height: 1.7;
+    margin-bottom: 12px;
+    padding-left: 10px;
+    border-left: 2px solid var(--accent-bg);
+  }
+  .comment-meta {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-bottom: 2px;
+  }
+  .comment-meta .author {
+    color: var(--accent-text);
+    font-weight: 500;
+  }
+  .no-results {
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 14px;
+    padding: 40px 0;
+    display: none;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Hey buddy, give me your paw! 絵日記帳</h1>
+  <p>ウィペットのぽー＆バド（＆うめ）と暮らす日常あれこれ ― 2015年11月 ※so-netブログ・archive.orgより復元</p>
+</header>
+
+<div class="controls">
+  <input type="text" id="search" placeholder="キーワードで探す（例: 震災、ドッグラン、うみちゃん）">
+  <div class="tag-filter" id="tagFilter"></div>
+</div>
+<div class="count" id="count"></div>
+
+<main id="main"></main>
+<p class="no-results" id="noResults">該当する記事が見つかりません。</p>
+
+<script>
+const entries = [
+  {
+    "date": "2015.11.03",
+    "title": "6年+α。",
+    "tags": [
+      "ぽー",
+      "2015年11月"
+    ],
+    "images": [],
+    "text": "2015年11月3日。ぽーと暮らし始めてから、なんと。まるっと6年となりマシタ〜！！\nいやぁ〜６年かぁ。ろくねん。1、2、3、4、5、そして6年目。ぽーにとってのこの6年間はどんな感じなのだろう。\n縁もゆかりもなかった土地に家を建て、その約3ヶ月後からスタートしたぽーとの生活。（犬舎を知るきっけかその他諸々はココから〜 → ぽーとの出会い）\n(母ティークにじゃれるコドモたち。右からぽー・たんぽぽ・カイト)\nぽーを迎えた翌日にイヌ用グッズを借りるため友人の店を訪れたときの写真。\nこのときの体重は5.7kgで、今や18.5kg前後。うむ、成長したねぇ〜！！\n成長したのは体の大きさだけではなく、苦手なことなどを今も少しずつ克服していっておりマス。\nそのうちのひとつがコドモについて。徳島に居た頃には触れ合う機会も少なく、賑やかな声や楽しそうに遊ぶ姿に足をすくませたり吠えてしまったりなのデシタ。\n横浜に来てからは出会う機会も必然的に増えているおかげか、ぽーに向かって走ってきたり触れようとしない限りはほぼスルーできるように。\n10月31日から急用で実家に帰っていた私たちは、4ヶ月ぶりに真之将と再会。ちなみに、バドと真之将の仲良しっぷりは相変わらずでございマス♪\n４ヶ月前にもぽーの変化を薄々は感じていたけれど。→ 貸別荘で団欒。\n以前なら近くにコドモがいるだけで緊張していたぽーなのだけれど。真之将なら触っても良いらしい。\nさらにはぽーからボール遊びを要求し一緒にキャッチボールまでしちゃったり！！\nぽーがコドモと遊ぶなんてこと、初めての出来事なのですよぅ〜〜（ドキドキはらはらウキウキで写真を撮る余裕がなかったのよねぇ・・・）とはいえ、真之将が落ち着きなく走り回り始めるとイライラしていたけれど(笑\nぽーがイヌトモダチと会ったり遊ぶことが楽しいと記憶しているように、コドモや真之将と一緒にいることも「楽しい」に変換できるようになればいいなぁ。まだまだこれからも共に成長していきましょう。（体の成長ではなく、ネ。笑）\nさてさて、ぽーとの6年間をさらに丁寧に思い返してみれば。些細なことですら毎日が濃く充実していて、ムダなことなど何ひとつナカッタ！！（書き残しきれていないこと多過ぎてある意味開き直り発言カモ笑）\nラストは2009年11月26日に撮影した動画で。しゃっくりをしながら足を噛んで遊ぶぽーの様子。 かっ！！可愛ええ〜〜\n最後の方でサークルの外に放置されてるハサミにぽーが注目するのですけれど・・私は何かしている最中にぽーの動画を撮り始めたんだろな〜（笑",
+    "photosLost": true,
+    "truncated": false,
+    "comments": []
+  },
+  {
+    "date": "2015.11.16",
+    "title": "Happy 3rd Birthday!",
+    "tags": [
+      "ume",
+      "2015年11月"
+    ],
+    "images": [],
+    "text": "2015年11月16日。うめ、3歳になりましたぁ〜〜♪\n（写真内に日付記載のもの以外は全て、うめ父母からの頂きものなりー）うめ、もう３歳ですってよぅ〜！\n約3年前の初登場時には置物と間違えられたうめサン（笑）→ 家族 募集中。（うめの里親探しを始めたときの記事）\n出会ったのは、うめが推定2~3ヶ月の頃デシタ。\nうめ&うめ父母との新たな暮らしが始まるまでの約1ヶ月間、ぽバドと一緒に暮らしたうめこサン。小さかったなぁ♪楽しかったなぁ〜♪年齢が近いこともあってか、バドがほんと良い遊び相手になってくれたのよネ。\nこれは散歩後の車内での様子。可愛いなぁ〜。そういえば、うめってばこの後、バドの服についてるくっつきムシを食べ始めたのだったワ（笑\nころころモフモフでこれぞ子犬ぅ〜♪だった、子犬時代のうめ。（月齢も異なるからだけれど、ぽバドは短毛＆細身パピーだったもん〜笑）\n会うたびに、成長したなぁ、オトナになったなぁと感じるけれど。\n耳も、目元も、表情も、うめ ですな ♪\nうめ母手製のケーキは、私が食べたいくらいョ！めっちゃ、美味しそう〜♪\nうめ父の趣味のおかげか、魚が大好きなうめ。ということで、油壺マリンパークで仕入れたぬいぐるみを夏の再会時にプレゼント。これ、うつぼ です。（確かイヌ用のおもちゃだったはずー）\nとても気に入ってくれたようで、壊さないよう、負けないように大切に闘って遊んでくれているそうな♪\nが、つい先日のこと。突然に、スイッチが入ったかのように、うつぼ調理をやり始め・・・\nうつぼさん、あっぱれ殉職とな〜（笑\nなんやぁ〜、うめよぅ。私が誕生日を毎年、忘れちゃうから？ん？？なに、なに？そうかー、新鮮な魚を食べられてないからかぁ（笑）\nふむふむ。うめ父が忙しくて、釣りに行けてないのねぇ。きっとね、うめ父も行きたいのだと思うョ。しかも冬は美味しい魚も多いのだ！\nとはいえ、うめ母が秋刀魚を圧力鍋で丁寧に柔らかくしてくれてるそうょ。え？もう食べたのね〜♪(ぽバドにはナイショにしておいてネ。彼らは今年、まだ食べてないから〜笑)\nあら？なんだか、途中でうめとの会話になってしもうてるやん(笑\nと、まぁ、そんなこんなで！うめは元気いっぱい、笑顔炸裂な毎日を送っているようですョ〜♪\n3歳のこの1年も、うめ父母と一緒にのんび〜り楽しく健康ですごしてね♪",
+    "photosLost": true,
+    "truncated": false,
+    "comments": [
+      {"author": "chiaki", "date": "2015-11-19", "text": "年月が過ぎるのは早いね～\nうめちゃんの里親募集をしてた時は、40代前半だったのに、いつの間にか40代後半になってるじゃな～い、私…(^_^;)\nそこ？(笑)"},
+      {"author": "うめママ", "date": "2015-11-20", "text": "今年もブログありがとー♪\n\nパピー時代可愛いな～\nいや～ほんまに可愛いわぁ～\nほんと表情豊かなコでございます( ´∀｀)\n\n秋刀魚は美味しいみたいで、\n今夜も残さず食べたよ(^-^)\nぽーさん＆バドくん！\nはよ食べさせてもらいよー♪"},
+      {"author": "calico", "date": "2015-11-20", "text": "うめちゃん3歳おめでとう～\n\nほんとに、ほんとに可愛い。\nずるいよ・・・うめちゃん！\nあの顔に出会ったら、絶対ほっとけない。\n\n秋刀魚かあ。\nスミユリもまだ食べてないわ。"},
+      {"author": "micky", "date": "2015-11-27", "text": "⇨ Chiakiさん\nほんと1年があっという間ですよねぇ。\nもう間もなく12月だぁ〜〜12月といえば、\nぽーを迎えた年の年賀状に新居と自分たちの写真を使ってたんですよ。\n6年前と今の自分たちの姿の違いに驚愕（笑\n10年後くらいにはお互いに、やれ膝が痛いとかそんな話で盛上りましょか〜\n・・・あれ？最近すでにそんな話題してるかも・・・^^;;"},
+      {"author": "micky", "date": "2015-11-27", "text": "⇨ うめママ\n昔の動画とか見直してたら、もうにやけて仕方なかったょ〜♪\nほんと表情が豊かだよねぇ！\nまぁ、最近では私に見せるのは緊張顔ばっかりだけどー^3^\n\nさんま、気に入ったんやね！良かったね〜♪\nちなみにぽバドはまだ食べてない！（笑\nメカジキとか鱈ばっかりだなぁ。うむ、そろそろ作ってやるかぁ〜"},
+      {"author": "micky", "date": "2015-11-27", "text": "⇨ calocoさん\n\nうめへのお祝いの言葉、ありがとうございます〜♪\n\nうめと出会ったときのこと、今でも鮮明に覚えてます。\nあの可愛さで、私に向かって手を差し出すんだもーん。\n一瞬で悩殺でしたもん〜（笑\n\n秋刀魚、うちもまだですよぅ〜\nゴハンのセミナー面白そうですねぇ！\nブログを拝見していて、今晩から久しぶりに、\nグリーントライプをトッピングしてやることにしましたぁ♪"},
+      {"author": "micky", "date": "2015-12-02", "text": "⇨ calicoさん\nごめんなさいです！今更ですが・・・\n前回の返信コメント、\nお名前をタイプミスしてたとこに今頃気がつきました！\nよりによって名前を打ち間違えるなんて、ほんとすみませんー"}
+    ]
+  },
+  {
+    "date": "2015.11.10",
+    "title": "ぼくの今日。",
+    "tags": [
+      "日常",
+      "2015年11月"
+    ],
+    "images": [],
+    "photosLost": true,
+    "text": "こんばんは、ぽーです。\n今日は朝から雨が降ったりやんだりな１日です。\nあ、でも。朝の散歩の時には雨はやんでいたから快適でした。\n午後になってもいつ雨がぱらぱら降るか分からない空模様でした。\nそこでmickyが『車で買物に行くついでに散歩しようか』と言いました。\nやった！留守番じゃナイっ！！\n・・・あれ？ぼくたちとの散歩がついでなんですかーっ？！\nでも、まあいいっか♪\n続きはこちらから〜⇩\n車で小さな森へ行きました。時々、雨がぱらっと降るけれど気にしません。\nそれよりも、リスが木から降りて来ない方が大問題なのですっ！！\nぼくはバドと並んでうんちもしました。そして、そして・・・踏みました。\nmickyも衝撃を受けているみたいですけど、ぼくだってイヤな気分です。\nあーぁ・・・いつも気をつけてるのになぁ。\nぼくの左後脚を眺めていたmickyが、すくっと立ち上がってそして。\n『もういいっ！好きにしろーぃ♪ヾ(≧▽≦)ノﾋｬﾋｬﾋｬ!!』\nと、こんなところに連れていってくれましたーっ！！\nぼくの脚、かかとから先が泥で変色していますね（笑\nお腹にも泥が跳ねました。\nバドは真っ白だった胸がレッドブリンドルになりました。\nでも、mickyがタオルで拭いてくれたのでキレイになりました。\nそれなのに・・・家に着いたら駐車場で足を洗われて、\n残念なことにシャンプーまでされてしまいました。\nトモダチのみんなも同じでしょうか。シャンプーの後って・・・\n暴れたくなるんですよねーーーっ！！\nではみなさん、おやすみなさいー\nごはんの匂いがしたら起きます。",
+    "truncated": false,
+    "comments": []
+  },
+  {
+    "date": "2015.11.27",
+    "title": "めぇ。",
+    "tags": [
+      "日常",
+      "2015年11月"
+    ],
+    "images": [],
+    "text": "秋から今の時期にかけて、メインとなるぽバドのおやつ。先ずは、ぽーからどうぞ♪\nそんな悲痛な顔をしなくとも、バドにもちゃんとあげるから。\nバドにもあげて、さらに、ぽーにもうひとつ♪そうそう、バドは長い舌が横にもれちゃうのよね。\nさてさて、ところで。先ほどから、ぽバドが食べてるモノ。\nそれは青森の実家の両親が送ってくれるりんごたち。トキ、涼香、星の金貨、しなのゴールド、ふじ、つがる...スーパーなどではあまり見かけない種類のモノもあったりで。\n瑞々しくシャキっとした歯ごたえにふんわり広がる甘みと香り。何よりもたまらないのはもぎたてならではの酸味。\nぽバドですら、こんな表情になるくらい・・・それは、もう美味いのです♪\nでも、敢えて聞いてみよう。どう？青森のりんごのお味はいかが？\nはいっ！感想は津軽弁で〜\nさて、私もりんご食べようっと♪",
+    "photosLost": true,
+    "truncated": false,
+    "comments": []
+  }
+];
+
+(function() {
+  const seen = {};
+  entries.forEach(function(e) {
+    const key = e.date;
+    seen[key] = (seen[key] || 0) + 1;
+    e.id = 'e' + e.date.replace(/\./g, '-') + '-' + seen[key];
+  });
+})();
+
+
+// ---- render ----
+const allTags = [...new Set(entries.flatMap(e => e.tags))];
+let activeTags = new Set();
+let keyword = "";
+
+function highlightNums(text) {
+  return text.replace(/\[(\d+)\]/g, '<b>[$1]</b>');
+}
+
+function esc(s) {
+  return String(s == null ? "" : s).replace(/[&<>]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
+}
+
+function renderTagFilter() {
+  const el = document.getElementById('tagFilter');
+  el.innerHTML = allTags.map(t =>
+    `<button class="tag-btn${activeTags.has(t) ? ' active' : ''}" data-tag="${t}">${t}</button>`
+  ).join('');
+  el.querySelectorAll('.tag-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const tag = btn.dataset.tag;
+      if (activeTags.has(tag)) activeTags.delete(tag); else activeTags.add(tag);
+      renderTagFilter();
+      renderEntries();
+    });
+  });
+}
+
+function matches(entry) {
+  const tagOk = activeTags.size === 0 || entry.tags.some(t => activeTags.has(t));
+  const kw = keyword.trim();
+  const kwOk = kw === "" ||
+    entry.title.includes(kw) ||
+    entry.text.includes(kw) ||
+    entry.tags.some(t => t.includes(kw));
+  return tagOk && kwOk;
+}
+
+function renderEntries() {
+  const main = document.getElementById('main');
+  const filtered = entries.filter(matches);
+  document.getElementById('count').textContent = `${filtered.length} / ${entries.length} 件表示中`;
+  document.getElementById('noResults').style.display = filtered.length === 0 ? 'block' : 'none';
+
+  main.innerHTML = filtered.map(entry => `
+    <article class="entry" id="${entry.id}">
+      <div class="entry-head">
+        <span class="entry-title">${entry.title}</span>
+        <span class="entry-date">${entry.date}</span>
+      </div>
+      ${entry.images.length > 0 ? `
+      <div class="photo-grid">
+        ${entry.images.map((src, i) => `
+          <a href="${src}" target="_blank" rel="noopener">
+            <img src="${src}" loading="lazy" alt="${entry.title} 写真${i+1}">
+            <span class="num">${i+1}</span>
+          </a>
+        `).join('')}
+      </div>` : entry.photosLost ? `<p class="no-photo">（写真は掲載されていましたが、保存されていないため表示できません）</p>` : `<p class="no-photo">（この記事には写真がありません）</p>`}
+      ${entry.truncated ? `<p class="truncated-note">（＊続きは読めない）</p>` : ''}
+      <p class="entry-text">${highlightNums(entry.text)}</p>
+      <div class="tags">
+        ${entry.tags.map(t => `<button class="tag-pill" data-tag="${t}">${t}</button>`).join('')}
+      </div>
+      ${entry.comments && entry.comments.length > 0 ? `
+      <div class="comments">
+        <div class="comments-label">コメント（${entry.comments.length}件）</div>
+        ${entry.comments.map(c => `
+          <div class="comment">
+            <div class="comment-meta"><span class="author">${esc(c.author)}</span>${c.date ? ' ・ ' + esc(c.date) : ''}</div>
+            <div>${esc(c.text)}</div>
+          </div>
+        `).join('')}
+      </div>` : ''}
+    </article>
+  `).join('');
+
+  main.querySelectorAll('.tag-pill').forEach(btn => {
+    btn.addEventListener('click', () => {
+      activeTags = new Set([btn.dataset.tag]);
+      renderTagFilter();
+      renderEntries();
+      window.scrollTo({top:0, behavior:'smooth'});
+    });
+  });
+}
+
+document.getElementById('search').addEventListener('input', (e) => {
+  keyword = e.target.value;
+  renderEntries();
+});
+
+renderTagFilter();
+renderEntries();
+if (location.hash) {
+  const target = document.getElementById(location.hash.slice(1));
+  if (target) target.scrollIntoView({block: 'start'});
+}
+</script>
+
+</body>
+</html>

@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hey buddy, give me your paw! 絵日記帳 - 2015年9月</title>
+<style>
+  :root {
+    --bg: #faf6ef;
+    --card-bg: #ffffff;
+    --border: #e8dfd0;
+    --text: #4a4238;
+    --text-muted: #9a9082;
+    --accent: #c98a5e;
+    --accent-bg: #f5e6d8;
+    --accent-text: #8a5a35;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    padding: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: "Hiragino Kaku Gothic ProN", "Yu Gothic", "Meiryo", sans-serif;
+    line-height: 1.8;
+  }
+  header {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 32px 20px 16px;
+    text-align: center;
+  }
+  header h1 {
+    font-size: 22px;
+    font-weight: 500;
+    margin: 0 0 4px;
+    color: var(--text);
+  }
+  header p {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin: 0;
+  }
+  .controls {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 12px 20px 20px;
+    position: sticky;
+    top: 0;
+    background: var(--bg);
+    z-index: 10;
+  }
+  #search {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    font-size: 14px;
+    background: var(--card-bg);
+    color: var(--text);
+    margin-bottom: 10px;
+  }
+  .tag-filter {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .tag-btn {
+    font-size: 11px;
+    padding: 4px 12px;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    background: var(--card-bg);
+    color: var(--text-muted);
+    cursor: pointer;
+  }
+  .tag-btn.active {
+    background: var(--accent);
+    color: #fff;
+    border-color: var(--accent);
+  }
+  .count {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 0 20px 8px;
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+  main {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 0 20px 60px;
+  }
+  .entry {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 20px;
+    margin-bottom: 16px;
+  }
+  .entry-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+  .entry-title {
+    font-size: 16px;
+    font-weight: 500;
+  }
+  .entry-date {
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+  .photo-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+    gap: 6px;
+    margin-bottom: 12px;
+  }
+  .photo-grid a {
+    position: relative;
+    display: block;
+    aspect-ratio: 1;
+    overflow: hidden;
+    border-radius: 8px;
+    background: var(--accent-bg);
+  }
+  .photo-grid img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .photo-grid .num {
+    position: absolute;
+    bottom: 3px;
+    right: 4px;
+    font-size: 10px;
+    background: rgba(0,0,0,0.55);
+    color: #fff;
+    padding: 1px 5px;
+    border-radius: 8px;
+  }
+  .no-photo {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-bottom: 12px;
+  }
+  .truncated-note {
+    font-size: 12px;
+    color: var(--accent-text);
+    background: var(--accent-bg);
+    border-radius: 8px;
+    padding: 6px 10px;
+    margin: 0 0 12px;
+    display: inline-block;
+  }
+  .entry-text {
+    font-size: 14px;
+    line-height: 1.85;
+    margin: 0 0 12px;
+    white-space: pre-line;
+  }
+  .entry-text b {
+    color: var(--accent-text);
+    font-weight: 500;
+  }
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .tag-pill {
+    font-size: 11px;
+    padding: 2px 10px;
+    border-radius: 12px;
+    background: var(--accent-bg);
+    color: var(--accent-text);
+    cursor: pointer;
+    border: none;
+  }
+  .comments {
+    margin-top: 16px;
+    padding-top: 14px;
+    border-top: 1px dashed var(--border);
+  }
+  .comments-label {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+  }
+  .comment {
+    font-size: 13px;
+    line-height: 1.7;
+    margin-bottom: 12px;
+    padding-left: 10px;
+    border-left: 2px solid var(--accent-bg);
+  }
+  .comment-meta {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-bottom: 2px;
+  }
+  .comment-meta .author {
+    color: var(--accent-text);
+    font-weight: 500;
+  }
+  .no-results {
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 14px;
+    padding: 40px 0;
+    display: none;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Hey buddy, give me your paw! 絵日記帳</h1>
+  <p>ウィペットのぽー＆バド（＆うめ）と暮らす日常あれこれ ― 2015年9月 ※so-netブログ・archive.orgより復元</p>
+</header>
+
+<div class="controls">
+  <input type="text" id="search" placeholder="キーワードで探す（例: 震災、ドッグラン、うみちゃん）">
+  <div class="tag-filter" id="tagFilter"></div>
+</div>
+<div class="count" id="count"></div>
+
+<main id="main"></main>
+<p class="no-results" id="noResults">該当する記事が見つかりません。</p>
+
+<script>
+const entries = [
+  {
+    "date": "2015.09.02",
+    "title": "夏の恒例といえば。",
+    "tags": [
+      "Family",
+      "2015年9月"
+    ],
+    "images": [],
+    "text": "一昨年、去年に引き続き、今年も開催できマシタっ♪ぽー&レイル、たっつーの合同誕生日会〜！！それは今日から少し遡って8月22日 土曜日のこと。\n今年の誕生会は去年までとはチョット違うのだ。なんと、なんと！ドッグラン『PREMIER』からスタート〜♪\n8月とは思えない程に気温が低めな日が続いていたけれど、それなりに暑さが戻り暑くなった誕生会の当日。\nだが、しかーし！予約は17時半、風も通るしなかなかに快適っ♪\nルークと遊ぶんだ〜♪と、たっつーが持って来たおもちゃ。そう。夏休みに徳島の砂浜でバドと遊んだ、バット&ボールでございマス。\nよーし！！ピッチャーはたっつー、バッターはルクレイ父だっ！遠くまでカキーンと飛ばしてイヌたちを走らせてやって〜〜\nだが、しかーし！！打ちやすい場所へとボールを投げたくても、思いっきり打って遠くへ飛ばしてやりたくても・・・\nキラっキラな目で、ボール追いかけ迫って来るコがおりまして。狙った場所に投げられナイ。狙った場所に当てられナイ。\nと、いうことにしておこう。たっつーとルクレイ父の名誉のためにも。(バドが迫ってくるのは事実なのですけどねーんw)\nさてさて、そろそろアレを始めますか〜♪みなさっ〜〜ん！！ルアーコーシングを始めますょ〜〜！！\nレイルはしっかりルアーを追って走り、ぽーはレイルを見て走るっと(笑\n4頭のなかで最もルアーを愛するオトコ・ルーク見参〜！！\n真っすぐにルアーを見据えて走るこの勇姿を見よっ！(実は走り方がとっても可愛い、ということはヒミツね)\nそれにしても、写真を改めて見ていると・・・可笑しい(笑\nルアーコーシング大好きルーク&レイルの場合は。最後までルアーを見て真っすぐ走るからほぼ直線に並んで写りマス。\n一方、こちらの兄弟の場合。・・・・コーシングマシンがなくても全力で走るかもしれナイ。(笑\nまぁ、でも楽しそうだからイイっ！！\nぽーも楽しそう・・・を、通り越して変顔だけどイイっ！！(一部の方達から、イケメンと言ってもらってるのにな〜笑)\nまぁ、大好きなレイルと遊んでるからそうなっちゃうよねっ♪\nって、レイルも楽しくて変顔になってるナ。そうか、そうなる血筋なのネ(笑\nと、ここでオーナーさんちの シャドウちゃん&トトちゃん登場〜♪(私ってばランの端っこに居てシャドウちゃんの写真を取り損ね...実はまだ撮ったことないのです。次回こそは〜〜！！)\n毎日、とっても美味しそうな手作りごはんを食べてるふたり。特に誕生日ディナーはとっても豪華で私が食べたいくらい〜〜(実はこっそり覗いては参考にさせて頂いてます！い、いつか作る！ オーナーさんのブログはこちら→ ♪ランrunラン♪)\nトトちゃん、秋の香りを確認中かしらん♪\nさて、自らが走るときはもちろん、誰かが走ってるときにも大興奮な4頭。ちょっと休憩しましょかね〜。水も飲んでおかなくっちゃあね。\n「バドも飲みタイ。でも、レイル兄ぃがいるから飲めナイ」\nぽー相手だと割り込むけれど、ルークレイルにはちゃんと遠慮するのよね(笑\n御年10歳なルーク。さすがに疲れたかな？大丈夫ーーー\nなーんて、チョット年寄り扱いしてゴメンナサイ。。。コーシング再開の気配を感じるや否や、やる気燃え滾らせておりマシタ(笑\nしっかり吠えて、たっぷり走っていたら、あっという間に1時間経過。ではでは、作ってもらった誕生日ケーキを受け取って我家へGO〜♪♪♪\n八ヶ岳山麓産のそば粉を使って蕎麦partyをするじぇ〜！！そば粉でも、麺になってからもヨダレ溜めて凝視のバド。\n製麺機の蓋をハナツンしたりして、序盤から洗い物を増やすバド・・って、あ・・そうか。あれだけ遊んだからお腹空いてるよねぇ。というわけで、ケーキの前に軽くゴハン〜♪ うむ、落ち着いたようだ。\nそれにしても。どちらの家庭でも、兄が弟を枕にするのは同じみたいやねぇ。って、あれ？？ルークが踏まれてる？(笑\nではでは、飼主たちの晩餐を始めますかぁ〜♪\nルクレイ家が持ってきてくれた、サーモンカルパッチョにアボガドサラダ、ローストビーフを並べてっと。蕎麦は温かい鴨汁と、冷たいつけ汁には薬味をあれこれと。\nいつも撮り忘れるから今回こそはと食卓を撮ったものの、よく分からんなぁ(笑\nしっかり飲んで食べて笑ったところで、ケーキタイム〜〜！！！\nプルミエのオーナーさんが作ってくれたイヌ用ケーキ♪紫芋にヨーグルトクリーム。ヤギミルクのクッキーはなんと頭数分の4枚〜♪\nたっつー用にルクレイ家が、濃厚チョコのケーキを選んできてくれマシタ♪そのケーキに自ら、ロウソクを立てさせられるたっつー(笑\n軽くとはいえゴハンを食べたのに、じっと凝視するのはもちろんバド。しかもそれはヒト用のチョコケーキやから！あなた達のは隣にあるからー\n意外としっかり硬めなチョココーティングで、ロウソクに少し時間がかかる。あぁ・・・バド、なんという顔をしてるんやな〜〜！\n口のなかはたぶん、きっとジューシーになってるであろうバド。と、その背後で落ち着きなく口元は緩みっぱなしのぽー。\nもー、ぽバドってば・・ルークたちとの差が極端すぎるわョ。(笑\nまぁ、でも。ぽバドが楽しいならイイ！！さてさて、そうこうしてる間にケーキの準備ができたぞぃ♪\nさぁさぁ、並んで〜〜♪っと、ぽーってば。好きなのに近すぎるとあかんのよねぇ(笑レイルに近すぎ！むりむり！と、暴れるので落ち着いて写真撮れずー\nまぁ、いいさ。さあ、ケーキを頂きましょ〜♪\n4頭で分けるだろうからとかなり大きめに作ってくれたそうで♪ひとり分のサイズがなんと！！ショートケーキ2個以上ときたもんだっ！！\nたっぷりあるとはいえ、ひとり一皿ずつで用意したのよ？ナゼ君たちはわざわざ一緒に同じお皿で食べるのかね。(笑\n一方、こういう状況では食べムラのあるぽー。\nだけれども、一口食べてみたらとても気に入ったらしく黙々と一心不乱に食す！そしてなにやら、ソファの上でひとりうなだれているコがおりますが・・\nもちろんバドにもこれからケーキを・・・ではなくて。実は、すでに。とっくに完食済。\nイヌたちのケーキを各お皿に取り分けてくれていたルクレイ母。先ずは香りだけでも〜♪と、待ちかねていたバドにお皿を近づけたそうな。すると・・\nガッ！ガツ！！一瞬で、ケーキが消えマシタ。まさしく、あ”っと言う間の出来事。たったふたくちで食べてしまいおった。\n切り分けても充分大きなケーキを3頭が楽しんでいる間、バドはしょぼーん(笑\nルクレイ母が土台に残ったクリームを与えてやるも不満顔。でも、キレイに舐めとっていたけどネ。というか、バドは食べたからっ！！\nルクレイ母曰く、「バドを見縊っていた〜」やてぇ。どうだ、すごいだろーっ！！(笑\nヒト用ケーキは、濃厚チョコとはうらはらに甘さ控えめでめちゃ美味！！そしてこれまたルクレイ家が用意してくれたヴィンテージビールと相性ぴったり〜♪\nそして、ビールといえば！カイト&セスク家、北海道限定ビールをありがとぉ〜〜もう既に全て美味しく頂いちゃいましたっ♪\nそしてさらに。ルクレイ母からこんなステキな物をもろたぁ〜！！かばんはもちろん手作り、そして絵はなんと！月雫ママが描いてくれたのだ〜〜♪\n木の枝に月雫とルークレイルが座ってるのだ！！そしてグラスは月雫ママがお友達に頼んで作ってくれたものっ♪♪♪サンドブラストでウィペットが掘られてますですぅー\nあれ？誰の誕生日会やったけか？・・・まぁ、いいよねっ！！\nと、私がウキャウキャ舞い上がっている頃、ルクレイ父はぽーといちゃいちゃ♪バドは・・・ふてくされてる？？いや、実はかなり眠くなっているだけ〜(笑\nと、そんなこんなの賑やか誕生日会なのデシタ〜っ♪\n<お知らせ>月雫ママのお店を紹介しまっす♪鎌倉にて手描き・手作り雑貨のお店をやってマス。⇨ 南屋\n手描きは服や鞄にあれこれと布ものならO.K.素材もほとんどが手作りの一品もの。イヌ服も数種あるらしく、飼主とイヌでお揃いの服なんてのもできちゃう♪他にもアクセサリーや小物など色々あるので、ぜひ覗いてみてくださいな〜\nそして、サンドブラストのグラスはこちら〜 → Feliciete\nグラスの名入れなども可能だし、様々な犬種のデザインがありまっす！個人的には表札がめちゃ気になってます♪",
+    "photosLost": true,
+    "truncated": false,
+    "comments": []
+  },
+  {
+    "date": "2015.09.08",
+    "title": "みっそー！",
+    "tags": [
+      "暮らし",
+      "2015年9月"
+    ],
+    "images": [],
+    "text": "雨続きな今週は、気温もぐぐっとさがって肌寒い。同じく急に気温低下した先月下旬頃、ぽバドともに胃腸がびみょーに不調になったから今回は気をつけないとっ！\nそんなこんなの、9月7日 月曜日のこと。\nその日もソファでへそ天、ゼッコッウチョ〜〜・・・って、あれ？このコはだぁれ？？\nぽバドと同じく短毛&胸深なこのコは、ドーベルマンのエディなり〜♪\nエディ&ドリスの仲良し兄妹に会ってきました〜ん！！ドリちゃんはジャーマンピンシャーなのだじぇ〜\nさぁーて、さてさて。遊ぼうか〜〜\nあ・・・いや、あかんあかん〜。今回のおうち訪問の第一目的は『味噌造り』なのだ。終わるまでガマン！\nエディドリス母の手作り味噌を貰ってからは、そのあまりの美味しさにすっかり虜になりまして。遂には、「私も作ってみる〜！」というわけなのデス。\nではっ！！よろしくお願いしまーす♪ 終わったらエディたちと遊ぶ〜\nエディドリス家に到着したらすでに皆さん作業開始中。お友達のみなさん、味噌造りはすでに何度か経験済みだそう。\n材料から下準備、その他諸々エディドリス母がぜーんぶ用意してくれてマス。なのであとは先輩方々からアドバイスを頂きつつコツを掴んで覚えるだけ〜♪♪\n先ずは蒸し上がった大豆を丁寧につぶしまーす！「丁寧に」と書きつつ、実は潰し足りないまま次へ進んだじぇ！\n大豆をつぶし終えたら、麹と塩を混ぜて〜この塩が美味しさのヒミツでもあるそうで、つまり..ミソですな！\n味噌造り初体験の私は、皆さんとは初対面。だけれども、おうちのそばをぽバド連れて歩いていたのを見かけてもらっていたり、東北出身の方がいらして親近感UPでもはや初対面な気がしナイ！！\nなにより、こうして何かの作業を一緒にするって楽しいっ♪\nそうこうしてる間に、あっという間に完成〜！タッパーに詰め蓋をして、あとは発酵・熟成を待つのみダ♪\nエディドリス母の美味しいランチを頂いて、皆さんとお喋りを楽しんで♪そして次は。次は〜〜〜エディ&ドリスといちゃいちゃタイムぅ〜\nとてもとてもヒト懐こいエディ＆ドリス♪お腹まで見せてくれて、もうシアワセいっぱいたまりませーん！！うふ〜\nそして私の目の前で始まる、わちゃわちゃ兄妹遊び♪\nあ〜〜ぽバドが家で待ってるのにぃ〜〜〜\nふたりが可愛くて、なかなか帰れナーイっ！！\nあぅあぅ・・・・後ろ髪ひかれながらもお暇して（と、実はけっこう長居させてもらっていたり..)帰宅〜！\nぽバド、お待たせ〜♪ 正真正銘の防腐剤等無添加な安心安全な味噌だじぇ！！食べごろは年末くらいかな。 君たちのご飯にも加えようね〜♪\nそういえば車での帰り道、シートベルト未装着の警告音が鳴りまして。何度かつけ直してみるも鳴り止まず、車検を終えたばかりというのに・・・\nで、ふと気がついたのです。その警告ランプが助手席側だということに。\nどうやらですねぇ・・・助手席の『味噌』がシートベルトを締めろと言われていたらしい(笑\nたった5kgのタッパーなのに。センサーのちょうど良い位置に置いてしまったのか。そんなことがあるのですねぇ（笑\nさてさて、ラストの写真は冒頭のエディと同じくへそ天で〜♪\nエディ&ドリス母サン、今回もお世話になりましたぁ〜♪楽しかった〜♪ いつもほんっとありがとうございます！次は散歩か、お茶か、ランか・・・楽しみだぁ〜〜♪",
+    "photosLost": true,
+    "truncated": false,
+    "comments": []
+  },
+  {
+    "date": "2015.09.11",
+    "title": "阻む。",
+    "tags": [
+      "ぽー",
+      "バド",
+      "2015年9月"
+    ],
+    "images": [],
+    "text": "こんにちは、ぽーです。\n今日は幾つかある『ぽー流留守番阻止法』の、とあるひとつについて紹介します。\n先ずは日頃から飼主たちをよく観察しておくことが大切です。そうすれば、たとえ飼主が「いつもと同じ」を装ったとしても何かがチガウと分かります。\nどうやら今日もmickyがどこかに行こうと企んでいるようです。ちなみに、この時点ではバドはまだ分かってません。\n飼主たちの「お出かけ」気分に気がついたら、そおっとばを離れてこの椅子に座って少し待ちます。\nこの椅子は玄関に行くための階段を降りた真正面にあります。(書斎に置くつもりが階段が狭くて通らず、この場所になったそうです)\nもうすぐぼくが居ないことに気がついたmickyが降りてくるはずです。\nほら、来たー。あ、バドも一緒に来ましたね。\nそうしたら、じーっと見つめて訴えるんです。\n階段を降りようとすると真正面だから、ぼくを見るしかないのです。\n決して吠えたりはしません。黙って静かに訴える 脅す のです。\n写真を撮られても、mickyがなぜだか笑っていても気にしません。留守番はいやだということを訴え続けるのみです。\n訴え続けます。せいいっぱいに！留守番はいやですって。。。\nでも、ちょっと・・心が折れそうです。。。\nこんな時に頼れるのが、バドなんです！！\nバド、言えてる？ちゃんとバドの気持ち伝えられてる？ぼくにかぶっててよく見えないんだけど、言えた？\n今回は無事「留守番阻止作戦」が成功しました！買物に連れていってもらえましたー\n車で留守番もヒマだけど、家に置いてかれるよりはいいです。\n「ぽーたちも荷物を運んでくれたらいいのにー」 mickyが呟いてます。それはムリです。だって、ぼくたちはそういう犬種ではないですから。\nでも・・・バドはよく荷物を減らす努力をしてますよ。キャベツとかキャベツとかキャベ..なんだか悪い予感がするからぼくは協力しないですけど。\nぼくたちは荷物は運べないけれど、こうしてmickyや周りを見てます。",
+    "photosLost": true,
+    "truncated": false,
+    "comments": []
+  },
+  {
+    "date": "2015.09.24",
+    "title": "南屋 @二階堂。",
+    "tags": [
+      "出掛ける",
+      "2015年9月"
+    ],
+    "images": [],
+    "photosLost": true,
+    "text": "9月15日 火曜日のこと。\n目的地まではあと3km。向かう先をわかっているのか、\nそわそわと交互に顔を覗かせては前方の確認をするぽバド。\nいつもなら、このあとは散歩の記録になるけれど。\n今回はちょっと趣向を変えてみよう。うん、そうしよう。(￣∇￣*)ﾌﾌ♪\n続きはこちらから〜⇩\n場所は、鎌倉市 二階堂。\n鎌倉宮や荏柄天神社(えがらてんじんじゃ)へと続く参道沿いにあるお店。\n彩とりどりな明るくほんわか雰囲気に思わず足をとめちゃうお店。\nそのお店とは、手描き・手作りの服や雑貨を扱う『南屋』〜♪\nぷらっと店内を覗いてみれば、可愛い看板犬たちがお出迎え・・・\n・・・ん？　なぁに？\nえへへ、バレたか。♪(*￣∇￣*)\nぽバドに看板犬させてみたかったのょ〜。実はチョット憧れだったのだ。\nしかーし、ぽバドに看板犬の仕事はむいてないナ。うん。(笑\nではでは、改めまして〜。\n南屋の看板犬、イングリッシュコッカーの月雫(つきな)で〜す♪\n月雫ママこと、ミナミさん手描きの服を着てモデルもこなしちゃうじぇ！\nそう、そうなのだ。月雫といえば、ぽバドの散歩トモダチ。\nそして月雫のママのお店がココ、『南屋』というわけなのデシタっ♪\nいつも遊びに夢中でお店のことを紹介できてないままだったのですョー\nお店にあるモノほぼ全て手作りで、そこに描きこまれる月雫ママの絵。\n手描きだからひとつとして同じモノはなーし！全てオリジナルな一点もの。\nこちらはほんの一部の数例なり。その他、雰囲気異なるモノもたくさんょ〜！\nちなみに、かばんの絵は上からワイマラナー、コッカー、柴。\nイヌ服もあるし、写真からペットの絵も描いてもらえマス♪\n(ルークレイル家から貰った鞄も月雫ママ作〜 →夏の恒例といえば。)\nオリジナルな商品だからこそ「あっ！これだ！！」なんてものが見つかっちゃう♪\nというのが、私自身の経験談でもあったりしマス。\nというわけでっ！！ぽバドの看板犬ごっこを堪能したらば。 ヾ(~∇~;) ｺﾚｺﾚ\nワイマの零音にジャックの桐子ちゃん、\nそして月雫のイラストに見送られつつ店の外へ〜。\n月雫、ぽバド、おまたせしたね〜♪\nなんだけど、その前に。(笑\n南屋から歩いてすぐのイタリアンレストラン La Porta へ。\n店内はもちろん、イヌO.K.！！\nランチセットのかぼちゃスープに、鯵とししとうのオイルパスタを選択。\n真似できそうカモと選んでみたけれど。この絶妙な味加減とか諸々、再現ムリやぁ〜\n写真を撮り忘れたけれど、食後にはジェラートを。\n店内に入らずとも注文できるから散歩かねて選ぶのも良いカモ♪\nLa Portaのスタッフさん、皆に可愛がられている月雫サン。\n月雫も嬉しくって、嬉しすぎておかしなことに〜(ﾉ∇≦*)ﾊﾊｯ♪\n飼主たちのお腹が満たされたから。\n月雫、ぽバド、おまたせしたね〜〜♪\n道をしっかり覚えているらしく、\n嬉々としていつもの散歩コースへ向かおうとしたぽー。\nあ〜〜今日はロング散歩の装備ではないのだよ。スマヌ。\n近いうちにまた皆で歩きに行こねー。\nというわけで！！みなさま『南屋』をよろしくーっ♪\nもちろん、店内イヌO.K. ＊注：ぽバドは常駐してませんのでアシカラズ(笑",
+    "truncated": false,
+    "comments": []
+  },
+  {
+    "date": "2015.09.28",
+    "title": "Altキー。",
+    "tags": [
+      "バド",
+      "2015年9月"
+    ],
+    "images": [],
+    "text": "おもちゃで遊ぶことが、何よりもとにかく大好きなバド。\n一方、ぽーはどちらかと言えばおもちゃよりも散歩が好き。ならば、バドは散歩についてはどうかというと・・・\n散歩が嫌いなわけではナイけれど。パピーの頃のように周囲のものにオロオロ怖がることもナイけれど。\n前方だけを見てなんだか必死に歩くのがバドの散歩スタイル。\nところがそこに。おもちゃの中でもとりわけ大好きなボールが現れると・・・\nはいっ！ボールがあるときー ないときー あるときーー ないときーーーー\nあははははっ♪\nちなみに、ボールを持ったまま歩いていると、「早よ、投げて♪」と鼻でツンツンされ続けマス（笑",
+    "photosLost": true,
+    "truncated": false,
+    "comments": []
+  },
+  {
+    "date": "2015.09.30",
+    "title": "4年+α と 16年。",
+    "tags": [
+      "犬と暮らす",
+      "2015年9月"
+    ],
+    "images": [],
+    "photosLost": true,
+    "text": "2015年 9月20日のこと。\nぽバドを車に乗せて道を考えないまま選ばないままいざ出発！！\nはいっ！見事、渋滞にはまるなりー( ´△｀)ｱｧ-\nしまったナァ。20日は連休まっただ中でしかも日曜・・\nん？ 20日...だと？ あーっっ！！\nバドを迎えた日、4周年記念でではナイカ〜♪♪♪\n(今回はニロラト家の力を借りずに思い出せたじぇ！...次は当日に気がつこう、うん笑)\n顔まわりの濃いめだったブリンドルはかなり薄くなったけれど、\nそのぶん私たちとの関係はずいぶんと濃くなりマシタ。(上手いこと言えた！(๑˃̵ᴗ˂̵)و ﾖｼ! )\nまだまだ予測不能、ミラクルな行動で笑いを常に提供。\n今年は特にらしさを良い方向に発揮してくれたムードメーカー バドくん。\n2015年9月20日も相棒ぽーと一緒に楽しい１日を過ごしてきマシタ〜♪\n続きはこちらから〜⇩\nさて、友人宅へ到着したのは約束の予定時間からなんと1時間半後。ﾍ(-.-ﾍ;)ｽﾏﾇ〜\nまずは、約1年ぶりの再会から♪　マキちゃん、久しぶりぃ～～♪♪\n→ 15年と15歳。\n元気なことは聞かせてもらってはいたけれど、会ってみてそれを実感！\nごはんもしっかり食べるそうだし、散歩も手製の介助グッズで楽しんでいるそうな♪\n元気そうな姿に嬉しくて、思わずはしゃぎすぎてしまったカモ。\n慣れないニオイや騒々しさのせいか、ちょっと困ってるぽい・・(￣∇￣*)ゞｴﾍﾍ\nでも、でも、そんな仕草も可愛いなぁ〜♪\nさすがにこれ以上は負担になるよネ。次の目的地へ移動しよう。\n16年来の友人であるよっしーと一緒にGO〜！！\nやって参りましたのは『宮ヶ瀬湖』の宮ヶ瀬湖畔園地公園。\n記念撮影用看板があるから、よっしーと撮る♪\nそうそう、たまには、たっつーと撮る♪\nうーむ。上はたっつーのスマホ、下は一眼カメラ。\n発色具合はともかく、明るさ等々レンズのせいだけではないかもなぁ・・・\nそれはさておき。\n「ダムへようこそ」と書いているけど行けてません(笑\n想像以上に各エリアが広いのと、到着時間が遅くて行けずでしたん。\n飲食店がずらりと並ぶエリアから、お昼ゴハンに選んだお店はココ。\n『丸太小屋レストラン　びんずる』\nテラス席ならばイヌもO.K. 屋根はあるし、テーブル間のゆとりもたっぷり。\nなんとなく年季の入った雰囲気のとても心地よいログハウス。\nHPによるとご主人が息子さんとともに自作した建物だそうな。\nしかも材料は処分される予定だった木製の電柱。その数は400本〜！！\nそしてお勧めメニューは清川村特産の清川恵水ポークを使った料理。\nどれもボリュームもあり美味♪ が、写真を撮れてナーイ！\nなので、代わりにぽバドの写真を貼っておこうっと。\nテーブルの下で食べ物が落ちてくるのを待つバドの図。\nヒマすぎて、通りを行くヒトやイヌをぽーっと眺めるぽーの図。\nそしてこちらは、お店のコ♪ おとなしいコだったなぁ〜\nさて、ぽバドおまたせ〜♪ ぷらりと園内散策と行きましょか〜\nそうなのよねー。あちらの方角がとても気になるよね〜。\nわんっ！うおんっ！わわんっ！！とイヌたちの声で大盛上りしてるのだもんね。\nぽー、どない？　何か楽しいものが見えたー？\nバドは・・何だ？　たっつーが気になるのか？(笑\nどうやら「宮ヶ瀬BOWWOWドッグスポーツフェス」なるものが、\n行われているらしい。ボーダーコリーやウィペットらしきイヌもいるわねぇ。\nイベント会場から聞こえる大興奮なイヌたちの声にぴぃぴぃと鼻を鳴らすぽー。\nコーシングもやりそうな設備だなぁ。後でちょろっと見に行ってみようか。\nまずはね、吊り橋に行ってみたいのょ。ちょっと歩いた先にあるらしいのょ。\nいやいや、吊り橋を渡ったあとにフツウの道から行けるから。行くから。\nチガウよー。ぽーがやりたいこととはチガウことしてるのょー\nうーーん・・・・(´～｀ヾ) ﾎﾟﾘﾎﾟﾘ\nお、吊り橋が近くなってきた〜♪　って、えーと、バドくん？？\n吊り橋に到着！！　さぁ、渡ってみますょ〜♪\n意外に細め、そして揺れるわね。だがしかし、ぽバドともに平気そうやね♪\nちなみに、ぽーはまだイベント会場が気になって鼻を鳴らしておりマシタ(笑\nさて、と。\nここまで書いたところで続きは次回に〜。\n背後からビシバシと浴びせられる視線がイタイ。\n「そろそろゴハンの準備した方が良いと思うんですけど」\n「しむ。バドはおなかすいてもうあかんー」と無言の圧力が・・笑\n（＊この記事にはコメント2件が寄せられていましたが、内容は復元できていません。）",
+    "truncated": false,
+    "comments": []
+  }
+];
+
+(function() {
+  const seen = {};
+  entries.forEach(function(e) {
+    const key = e.date;
+    seen[key] = (seen[key] || 0) + 1;
+    e.id = 'e' + e.date.replace(/\./g, '-') + '-' + seen[key];
+  });
+})();
+
+
+// ---- render ----
+const allTags = [...new Set(entries.flatMap(e => e.tags))];
+let activeTags = new Set();
+let keyword = "";
+
+function highlightNums(text) {
+  return text.replace(/\[(\d+)\]/g, '<b>[$1]</b>');
+}
+
+function esc(s) {
+  return String(s == null ? "" : s).replace(/[&<>]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
+}
+
+function renderTagFilter() {
+  const el = document.getElementById('tagFilter');
+  el.innerHTML = allTags.map(t =>
+    `<button class="tag-btn${activeTags.has(t) ? ' active' : ''}" data-tag="${t}">${t}</button>`
+  ).join('');
+  el.querySelectorAll('.tag-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const tag = btn.dataset.tag;
+      if (activeTags.has(tag)) activeTags.delete(tag); else activeTags.add(tag);
+      renderTagFilter();
+      renderEntries();
+    });
+  });
+}
+
+function matches(entry) {
+  const tagOk = activeTags.size === 0 || entry.tags.some(t => activeTags.has(t));
+  const kw = keyword.trim();
+  const kwOk = kw === "" ||
+    entry.title.includes(kw) ||
+    entry.text.includes(kw) ||
+    entry.tags.some(t => t.includes(kw));
+  return tagOk && kwOk;
+}
+
+function renderEntries() {
+  const main = document.getElementById('main');
+  const filtered = entries.filter(matches);
+  document.getElementById('count').textContent = `${filtered.length} / ${entries.length} 件表示中`;
+  document.getElementById('noResults').style.display = filtered.length === 0 ? 'block' : 'none';
+
+  main.innerHTML = filtered.map(entry => `
+    <article class="entry" id="${entry.id}">
+      <div class="entry-head">
+        <span class="entry-title">${entry.title}</span>
+        <span class="entry-date">${entry.date}</span>
+      </div>
+      ${entry.images.length > 0 ? `
+      <div class="photo-grid">
+        ${entry.images.map((src, i) => `
+          <a href="${src}" target="_blank" rel="noopener">
+            <img src="${src}" loading="lazy" alt="${entry.title} 写真${i+1}">
+            <span class="num">${i+1}</span>
+          </a>
+        `).join('')}
+      </div>` : entry.photosLost ? `<p class="no-photo">（写真は掲載されていましたが、保存されていないため表示できません）</p>` : `<p class="no-photo">（この記事には写真がありません）</p>`}
+      ${entry.truncated ? `<p class="truncated-note">（＊続きは読めない）</p>` : ''}
+      <p class="entry-text">${highlightNums(entry.text)}</p>
+      <div class="tags">
+        ${entry.tags.map(t => `<button class="tag-pill" data-tag="${t}">${t}</button>`).join('')}
+      </div>
+      ${entry.comments && entry.comments.length > 0 ? `
+      <div class="comments">
+        <div class="comments-label">コメント（${entry.comments.length}件）</div>
+        ${entry.comments.map(c => `
+          <div class="comment">
+            <div class="comment-meta"><span class="author">${esc(c.author)}</span>${c.date ? ' ・ ' + esc(c.date) : ''}</div>
+            <div>${esc(c.text)}</div>
+          </div>
+        `).join('')}
+      </div>` : ''}
+    </article>
+  `).join('');
+
+  main.querySelectorAll('.tag-pill').forEach(btn => {
+    btn.addEventListener('click', () => {
+      activeTags = new Set([btn.dataset.tag]);
+      renderTagFilter();
+      renderEntries();
+      window.scrollTo({top:0, behavior:'smooth'});
+    });
+  });
+}
+
+document.getElementById('search').addEventListener('input', (e) => {
+  keyword = e.target.value;
+  renderEntries();
+});
+
+renderTagFilter();
+renderEntries();
+if (location.hash) {
+  const target = document.getElementById(location.hash.slice(1));
+  if (target) target.scrollIntoView({block: 'start'});
+}
+</script>
+
+</body>
+</html>

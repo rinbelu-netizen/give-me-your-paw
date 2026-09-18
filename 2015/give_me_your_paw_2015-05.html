@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hey buddy, give me your paw! 絵日記帳 - 2015年5月</title>
+<style>
+  :root {
+    --bg: #faf6ef;
+    --card-bg: #ffffff;
+    --border: #e8dfd0;
+    --text: #4a4238;
+    --text-muted: #9a9082;
+    --accent: #c98a5e;
+    --accent-bg: #f5e6d8;
+    --accent-text: #8a5a35;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    padding: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: "Hiragino Kaku Gothic ProN", "Yu Gothic", "Meiryo", sans-serif;
+    line-height: 1.8;
+  }
+  header {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 32px 20px 16px;
+    text-align: center;
+  }
+  header h1 {
+    font-size: 22px;
+    font-weight: 500;
+    margin: 0 0 4px;
+    color: var(--text);
+  }
+  header p {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin: 0;
+  }
+  .controls {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 12px 20px 20px;
+    position: sticky;
+    top: 0;
+    background: var(--bg);
+    z-index: 10;
+  }
+  #search {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    font-size: 14px;
+    background: var(--card-bg);
+    color: var(--text);
+    margin-bottom: 10px;
+  }
+  .tag-filter {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .tag-btn {
+    font-size: 11px;
+    padding: 4px 12px;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    background: var(--card-bg);
+    color: var(--text-muted);
+    cursor: pointer;
+  }
+  .tag-btn.active {
+    background: var(--accent);
+    color: #fff;
+    border-color: var(--accent);
+  }
+  .count {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 0 20px 8px;
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+  main {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 0 20px 60px;
+  }
+  .entry {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 20px;
+    margin-bottom: 16px;
+  }
+  .entry-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+  .entry-title {
+    font-size: 16px;
+    font-weight: 500;
+  }
+  .entry-date {
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+  .photo-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+    gap: 6px;
+    margin-bottom: 12px;
+  }
+  .photo-grid a {
+    position: relative;
+    display: block;
+    aspect-ratio: 1;
+    overflow: hidden;
+    border-radius: 8px;
+    background: var(--accent-bg);
+  }
+  .photo-grid img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .photo-grid .num {
+    position: absolute;
+    bottom: 3px;
+    right: 4px;
+    font-size: 10px;
+    background: rgba(0,0,0,0.55);
+    color: #fff;
+    padding: 1px 5px;
+    border-radius: 8px;
+  }
+  .no-photo {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-bottom: 12px;
+  }
+  .truncated-note {
+    font-size: 12px;
+    color: var(--accent-text);
+    background: var(--accent-bg);
+    border-radius: 8px;
+    padding: 6px 10px;
+    margin: 0 0 12px;
+    display: inline-block;
+  }
+  .entry-text {
+    font-size: 14px;
+    line-height: 1.85;
+    margin: 0 0 12px;
+    white-space: pre-line;
+  }
+  .entry-text b {
+    color: var(--accent-text);
+    font-weight: 500;
+  }
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .tag-pill {
+    font-size: 11px;
+    padding: 2px 10px;
+    border-radius: 12px;
+    background: var(--accent-bg);
+    color: var(--accent-text);
+    cursor: pointer;
+    border: none;
+  }
+  .comments {
+    margin-top: 16px;
+    padding-top: 14px;
+    border-top: 1px dashed var(--border);
+  }
+  .comments-label {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+  }
+  .comment {
+    font-size: 13px;
+    line-height: 1.7;
+    margin-bottom: 12px;
+    padding-left: 10px;
+    border-left: 2px solid var(--accent-bg);
+  }
+  .comment-meta {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-bottom: 2px;
+  }
+  .comment-meta .author {
+    color: var(--accent-text);
+    font-weight: 500;
+  }
+  .no-results {
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 14px;
+    padding: 40px 0;
+    display: none;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Hey buddy, give me your paw! 絵日記帳</h1>
+  <p>ウィペットのぽー＆バド（＆うめ）と暮らす日常あれこれ ― 2015年5月 ※so-netブログ・archive.orgカテゴリーページより復元、概要のみ・写真は保存されておらず未掲載</p>
+</header>
+
+<div class="controls">
+  <input type="text" id="search" placeholder="キーワードで探す（例: 震災、ドッグラン、うみちゃん）">
+  <div class="tag-filter" id="tagFilter"></div>
+</div>
+<div class="count" id="count"></div>
+
+<main id="main"></main>
+<p class="no-results" id="noResults">該当する記事が見つかりません。</p>
+
+<script>
+const entries = [
+  {
+    "date": "2015.05.03",
+    "title": "新生ぽー＆バド、そして飼主。",
+    "tags": [
+      "犬と暮らす",
+      "2015年5月"
+    ],
+    "images": [],
+    "photosLost": true,
+    "text": "窮寇は追うことなかれ。の続きー\nぽバドの喧嘩する声を聞き、すぐさま2階へと駆け上がる。もちろん、昇りきった時にはすでに喧嘩は終了していて、お互いに顔を背けながら立ち尽くすぽーとバド。前回とチガウのは、バドが少し怯えているようにみえること。そしてバドが額に怪我をしているということ。(２週間弱経過して瘡蓋もとれた後の写真。左目の上のほうにちょこんとネ）放置しておけば瘡蓋になり治るような気がしないでもないけれど、去年の秋に開院したばかりの病院へ行ってみることに。バドだけではなくぽーも連れて行こう。（車に乗ることを拒否しなければだけど）掃除機のようにショック療法的な刺激になればいいなぁなんて期待を持って。\n続きはこちらから〜⇩\n（この記事は概要のみ復元されています。全文は保存されていません。）\nコメント2件が寄せられていますが、内容は復元できていません。",
+    "truncated": true,
+    "comments": []
+  },
+  {
+    "date": "2015.05.07",
+    "title": "ぽバドその後、そして連休へ。〜その１",
+    "tags": [
+      "GW",
+      "2015年5月"
+    ],
+    "images": [],
+    "photosLost": true,
+    "text": "たいへんお騒がせいたしました、ぽバドその後。すこぶる順調デス♪ヽ(=´▽`=)ﾉﾜｰｲ♪ご飯前にぴぃぴぃふぃーとハナを鳴らすのはバドの専売特許でして（笑それが、例の喧嘩以降はぽーも啼いて要求するようになり。なんとなく甘えん坊度が増し、まるで子犬返りをしたかのような。そんなご飯時の要求鳴きもいつの間にかしなくなり、ぽーは自分の首をバドの首元に擦り寄せたり、寛ぎ時には耳を舐めたり。方や、バドはぽーの前ではひっくり返ったり口元を舐めたり、時には遠慮して場所を譲ったり（特にぽーが眠かったり疲れているときネ）落ち着かない状況になるとぽーにマウントするのは変わらずで（笑（しかし、ぽーがバドのマウントを外すようになったナー）様々な行動から考えるとやはりぽバドの上下関係はナイか微妙なのかも。だからこそ私たち飼主が平等に接するということを肝に銘じているところデス。そうそう、至近距離で顔を合わせても唸ったり避けたりすることもなくなりマシタ♪以前のように・・というよりも、以前よりもさらに仲良くなった気がしないでもないような・・・もぉ〜そこまで仲良しアピールしなくていいってばぁ〜ヾ(*≧▽)ﾉ彡ﾊﾊ!!（決してヤラセではありませぬw）ぽバドとの穏やかな生活が戻り、いつの間にか横浜での暮らしも丸2年に。2015年のGWはたっつーの実家、青森へ帰ってきました〜♪というわけで、続きはこちらから〜↓\n（この記事は概要のみ復元されています。全文は保存されていません。）\nコメント2件が寄せられていますが、内容は復元できていません。",
+    "truncated": true,
+    "comments": []
+  },
+  {
+    "date": "2015.05.11",
+    "title": "久度寺山へ。連休〜その２",
+    "tags": [
+      "GW",
+      "2015年5月"
+    ],
+    "images": [],
+    "photosLost": true,
+    "text": "約2年ぶりな青森帰省、2日目の朝は快晴！5月3日。先ずはじめの予定は山歩なり〜♪久度寺山山頂(663m)を目指し稜線を進んでライオン岩へ。さらに岩落山山頂(573m)へ向かいそこから下山する約3時間ほどのコース。親子連れや地元の小学生が学校行事で登る初心者向けな山だそう。へたれな私でもなんとなかりそ〜とか思っていたら、傾斜もそこそこあり侮れないらしい。(たっつーも登った経験有りだそうなー)まずは義妹の旦那さんの勤めるGSで洗車して気合いを入れる。(車で登るわけじゃないけれど、高速を走ると虫だらけになるもんネ)\n続きはこちらからー⇩\n（この記事は概要のみ復元されています。全文は保存されていません。）",
+    "truncated": true,
+    "comments": []
+  },
+  {
+    "date": "2015.05.15",
+    "title": "弘前城と運転代行。連休〜その３",
+    "tags": [
+      "GW",
+      "2015年5月"
+    ],
+    "images": [],
+    "photosLost": true,
+    "text": "予定が盛り沢山な5月3日の日曜日。夕方からは義父母や義妹とお出かけで、ぽバドは実家で留守番ね♪弘前市内の駐車場に車を停め、皆でテクテクと弘前城へと向かう。雪化粧の岩木山と夕日がステキすぎてなんと表現してよいものやら〜(*´∇｀*)午前中には暑い暑いと言いながら久度寺山を登っていた私たち。友人情報によると、八甲田山ではホワイトアウトになりパウダースノーを楽しめたそうなっ！ちなみに、岩木山の標高1,625m、八甲田山は最高峰で1,585m。ぽバドを遊ばせられないかと、八甲田山行きもこっそり考えていたのですけれど・・無理だったわねぇ。それよりも、辿り着けなかっただろなぁ〜（笑さてさて、話を本題に戻しまして。5月連休の弘前城といえば、あれですよネ♪\n続きはこちらからー⇩\n（この記事は概要のみ復元されています。全文は保存されていません。）",
+    "truncated": true,
+    "comments": []
+  },
+  {
+    "date": "2015.05.18",
+    "title": "消防観閲式と家族と。連休〜その4",
+    "tags": [
+      "GW",
+      "2015年5月"
+    ],
+    "images": [],
+    "photosLost": true,
+    "text": "ソメイヨシノの開花はとうに完了してしまったけれど。りんごはこれからが花盛りを迎える季節なのが、5月初旬の弘前。毎朝・毎夕、りんご畑の間をのぉ〜んび〜〜りと散歩♪そうそう、お決まりの構図でも撮っておこう♪そうそう、そう。りんごの花は何色なのかご存知ですか？私はまっ白だと思ってマシタ！\n続きはこちらから〜⇩\n（この記事は概要のみ復元されています。全文は保存されていません。）",
+    "truncated": true,
+    "comments": []
+  },
+  {
+    "date": "2015.05.22",
+    "title": "〆はイヌまみれで♪ 連休〜その5。",
+    "tags": [
+      "GW",
+      "2015年5月"
+    ],
+    "images": [],
+    "photosLost": true,
+    "text": "2015年5月6日 午前中のうちに弘前を発ちましょかねー。あっという間だったけれど、ハプニングもあったけれど。義父母とのんびり過ごせて弟妹家族たちと遊んだりお喋りを楽しんだり♪初めて実家で留守番をさせた時には、バリケンでぴぃぴぃ鳴いていたというぽー。今回は留守番の雰囲気を察した途端、義父のそばで座り込みバリケン拒否（笑けっきょくそのまま大人しくフリーで留守番できたのデシタ♪（バドは自宅でも狭い方が落ち着くからサークルで留守番〜）近いうちにまた帰りま〜す！！青森を出発し、次の目的地は宮城の仙台なり。\n続きはこちらから〜⇩\n（この記事は概要のみ復元されています。全文は保存されていません。）",
+    "truncated": true,
+    "comments": []
+  },
+  {
+    "date": "2015.05.25",
+    "title": "ぽバドと甥たち。",
+    "tags": [
+      "Family",
+      "2015年5月"
+    ],
+    "images": [],
+    "photosLost": true,
+    "text": "こんにちは、ぽーです。今日はボクが、5月10日の出来事をお話します。mickyが言うには、『コドモとイヌを同時に撮るのは難しい』そうです。じゃあ、ボクが手伝ってあげますね。\n続きはこちらからですー⇩\n（この記事は概要のみ復元されています。全文は保存されていません。）",
+    "truncated": true,
+    "comments": []
+  }
+];
+
+(function() {
+  const seen = {};
+  entries.forEach(function(e) {
+    const key = e.date;
+    seen[key] = (seen[key] || 0) + 1;
+    e.id = 'e' + e.date.replace(/\./g, '-') + '-' + seen[key];
+  });
+})();
+
+
+// ---- render ----
+const allTags = [...new Set(entries.flatMap(e => e.tags))];
+let activeTags = new Set();
+let keyword = "";
+
+function highlightNums(text) {
+  return text.replace(/\[(\d+)\]/g, '<b>[$1]</b>');
+}
+
+function esc(s) {
+  return String(s == null ? "" : s).replace(/[&<>]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
+}
+
+function renderTagFilter() {
+  const el = document.getElementById('tagFilter');
+  el.innerHTML = allTags.map(t =>
+    `<button class="tag-btn${activeTags.has(t) ? ' active' : ''}" data-tag="${t}">${t}</button>`
+  ).join('');
+  el.querySelectorAll('.tag-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const tag = btn.dataset.tag;
+      if (activeTags.has(tag)) activeTags.delete(tag); else activeTags.add(tag);
+      renderTagFilter();
+      renderEntries();
+    });
+  });
+}
+
+function matches(entry) {
+  const tagOk = activeTags.size === 0 || entry.tags.some(t => activeTags.has(t));
+  const kw = keyword.trim();
+  const kwOk = kw === "" ||
+    entry.title.includes(kw) ||
+    entry.text.includes(kw) ||
+    entry.tags.some(t => t.includes(kw));
+  return tagOk && kwOk;
+}
+
+function renderEntries() {
+  const main = document.getElementById('main');
+  const filtered = entries.filter(matches);
+  document.getElementById('count').textContent = `${filtered.length} / ${entries.length} 件表示中`;
+  document.getElementById('noResults').style.display = filtered.length === 0 ? 'block' : 'none';
+
+  main.innerHTML = filtered.map(entry => `
+    <article class="entry" id="${entry.id}">
+      <div class="entry-head">
+        <span class="entry-title">${entry.title}</span>
+        <span class="entry-date">${entry.date}</span>
+      </div>
+      ${entry.images.length > 0 ? `
+      <div class="photo-grid">
+        ${entry.images.map((src, i) => `
+          <a href="${src}" target="_blank" rel="noopener">
+            <img src="${src}" loading="lazy" alt="${entry.title} 写真${i+1}">
+            <span class="num">${i+1}</span>
+          </a>
+        `).join('')}
+      </div>` : entry.photosLost ? `<p class="no-photo">（写真は掲載されていましたが、保存されていないため表示できません）</p>` : `<p class="no-photo">（この記事には写真がありません）</p>`}
+      ${entry.truncated ? `<p class="truncated-note">（＊続きは読めない）</p>` : ''}
+      <p class="entry-text">${highlightNums(entry.text)}</p>
+      <div class="tags">
+        ${entry.tags.map(t => `<button class="tag-pill" data-tag="${t}">${t}</button>`).join('')}
+      </div>
+      ${entry.comments && entry.comments.length > 0 ? `
+      <div class="comments">
+        <div class="comments-label">コメント（${entry.comments.length}件）</div>
+        ${entry.comments.map(c => `
+          <div class="comment">
+            <div class="comment-meta"><span class="author">${esc(c.author)}</span>${c.date ? ' ・ ' + esc(c.date) : ''}</div>
+            <div>${esc(c.text)}</div>
+          </div>
+        `).join('')}
+      </div>` : ''}
+    </article>
+  `).join('');
+
+  main.querySelectorAll('.tag-pill').forEach(btn => {
+    btn.addEventListener('click', () => {
+      activeTags = new Set([btn.dataset.tag]);
+      renderTagFilter();
+      renderEntries();
+      window.scrollTo({top:0, behavior:'smooth'});
+    });
+  });
+}
+
+document.getElementById('search').addEventListener('input', (e) => {
+  keyword = e.target.value;
+  renderEntries();
+});
+
+renderTagFilter();
+renderEntries();
+if (location.hash) {
+  const target = document.getElementById(location.hash.slice(1));
+  if (target) target.scrollIntoView({block: 'start'});
+}
+</script>
+
+</body>
+</html>

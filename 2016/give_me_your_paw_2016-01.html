@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hey buddy, give me your paw! 絵日記帳 - 2016年1月</title>
+<style>
+  :root {
+    --bg: #faf6ef;
+    --card-bg: #ffffff;
+    --border: #e8dfd0;
+    --text: #4a4238;
+    --text-muted: #9a9082;
+    --accent: #c98a5e;
+    --accent-bg: #f5e6d8;
+    --accent-text: #8a5a35;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    padding: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: "Hiragino Kaku Gothic ProN", "Yu Gothic", "Meiryo", sans-serif;
+    line-height: 1.8;
+  }
+  header {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 32px 20px 16px;
+    text-align: center;
+  }
+  header h1 {
+    font-size: 22px;
+    font-weight: 500;
+    margin: 0 0 4px;
+    color: var(--text);
+  }
+  header p {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin: 0;
+  }
+  .controls {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 12px 20px 20px;
+    position: sticky;
+    top: 0;
+    background: var(--bg);
+    z-index: 10;
+  }
+  #search {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    font-size: 14px;
+    background: var(--card-bg);
+    color: var(--text);
+    margin-bottom: 10px;
+  }
+  .tag-filter {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .tag-btn {
+    font-size: 11px;
+    padding: 4px 12px;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    background: var(--card-bg);
+    color: var(--text-muted);
+    cursor: pointer;
+  }
+  .tag-btn.active {
+    background: var(--accent);
+    color: #fff;
+    border-color: var(--accent);
+  }
+  .count {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 0 20px 8px;
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+  main {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 0 20px 60px;
+  }
+  .entry {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 20px;
+    margin-bottom: 16px;
+  }
+  .entry-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+  .entry-title {
+    font-size: 16px;
+    font-weight: 500;
+  }
+  .entry-date {
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+  .photo-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+    gap: 6px;
+    margin-bottom: 12px;
+  }
+  .photo-grid a {
+    position: relative;
+    display: block;
+    aspect-ratio: 1;
+    overflow: hidden;
+    border-radius: 8px;
+    background: var(--accent-bg);
+  }
+  .photo-grid img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .photo-grid .num {
+    position: absolute;
+    bottom: 3px;
+    right: 4px;
+    font-size: 10px;
+    background: rgba(0,0,0,0.55);
+    color: #fff;
+    padding: 1px 5px;
+    border-radius: 8px;
+  }
+  .no-photo {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-bottom: 12px;
+  }
+  .truncated-note {
+    font-size: 12px;
+    color: var(--accent-text);
+    background: var(--accent-bg);
+    border-radius: 8px;
+    padding: 6px 10px;
+    margin: 0 0 12px;
+    display: inline-block;
+  }
+  .entry-text {
+    font-size: 14px;
+    line-height: 1.85;
+    margin: 0 0 12px;
+    white-space: pre-line;
+  }
+  .entry-text b {
+    color: var(--accent-text);
+    font-weight: 500;
+  }
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .tag-pill {
+    font-size: 11px;
+    padding: 2px 10px;
+    border-radius: 12px;
+    background: var(--accent-bg);
+    color: var(--accent-text);
+    cursor: pointer;
+    border: none;
+  }
+  .comments {
+    margin-top: 16px;
+    padding-top: 14px;
+    border-top: 1px dashed var(--border);
+  }
+  .comments-label {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+  }
+  .comment {
+    font-size: 13px;
+    line-height: 1.7;
+    margin-bottom: 12px;
+    padding-left: 10px;
+    border-left: 2px solid var(--accent-bg);
+  }
+  .comment-meta {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-bottom: 2px;
+  }
+  .comment-meta .author {
+    color: var(--accent-text);
+    font-weight: 500;
+  }
+  .no-results {
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 14px;
+    padding: 40px 0;
+    display: none;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Hey buddy, give me your paw! 絵日記帳</h1>
+  <p>ウィペットのぽー＆バド（＆うめ）と暮らす日常あれこれ ― 2016年1月 ※so-netブログ・archive.orgより復元（一部末尾で途切れ）</p>
+</header>
+
+<div class="controls">
+  <input type="text" id="search" placeholder="キーワードで探す（例: 震災、ドッグラン、うみちゃん）">
+  <div class="tag-filter" id="tagFilter"></div>
+</div>
+<div class="count" id="count"></div>
+
+<main id="main"></main>
+<p class="no-results" id="noResults">該当する記事が見つかりません。</p>
+
+<script>
+const entries = [
+  {
+    "date": "2016.01.06",
+    "title": "お正月休み 2015〜その1。",
+    "tags": [
+      "お正月",
+      "2016年1月"
+    ],
+    "images": [],
+    "text": "ブログ更新が滞っている間に2016年がやって参りましたっ！！今年もぽー&バドともどもよろしくお願いいたしまーす♪\nさてさて、2015年の冬休みは実家の奈良からスタートなり〜。\n2015年12月26日 土曜日早朝。東から西へと向かって走れば、目の前には真っ白に輝く満月が。\n渋滞もほぼなく(四日市あたりであったような...)お昼時には奈良市内に到着。お気に入りの梅光軒でお昼をとったら実家へGO！\nぽーとは約半年違いの年齢で、幼い頃にはぽーの足で遊んだりもしていた実家のネコ３兄妹たち。遊び好きで名前を呼べば返事をし、とにかく母にべったりのれたす。\n1ヶ月半程前に、突然に先代犬のリンとベルの元へと遊びに行ってしまいました。ベルは誰にでもフレンドリーだったから全く心配ないし、リンは捨て猫を見つけちゃうほどネコ好きだから、きっと仲良くやってるよネ。\n時々しか登場していないけれど、ココではいつでもいつまでも3匹一緒に。\nと、そんなこんながありまして勢いよく新年の挨拶ができないうえに、チョット寂しい気分でスタートなぽバドとのブログ。だが、しかしっ！！\n実家では美味しい香りに大量のヨダレで笑いを誘い、両親を元気づけるためにそれはもう色々と大活躍してきマシタ。誰がって、もちろんこの方ですとも(笑\nぽーもねぇ、たまにこっそりやらかしているのだけれど、バドのおかげで目立たないんですよねぇ。何をしたのかって？\n両親祖母と一緒に引き上げ湯葉を楽しんでみたり、のんびり実家滞在な3日間。\n続いては、本州から海を渡り、橋を２本渡って・・・・\n帰ってきたじぇ、徳島〜♪ ただいま、まいほーむ〜〜♪♪暖冬なおかげでぬくぬくぽかぽかを通り越し、真夏並みに暑い縁側(笑\n留守中の我家をパトロールしてくれている 陽太＆暖太兄弟に会いに行く♪下が兄ちゃんのヒナタ、上が弟のハルタ。ヴォルティスのイヌ代表応援団員だじぇ！\n1日の午前中には徳島を発つから、年を越す前にお参りへ行っておこう。これまた、真夏のような空ではないか。暖かくてぽバドも服要らずだったものネ。\n田舎路をのぉ〜んび〜〜〜りと散歩したりもして、\n自宅では七輪を囲炉裏に置いて、阿波牛で焼肉っ！！(囲炉裏で肉や魚を直接焼くと臭くなっちゃうのデス。七輪大活躍♪)\nぽバドは飼主たちがお腹いっぱいになるのをひたすら待つ。\n飼主たちが食べ終わったら貰えるはずだから、ひたすらに耐えて待つ。\nチョット待ちきれなくなって、ぽーは飼主たちの間に座って、待つ・・、ではなく、直談判(笑\nバドは様子を伺いながら、お利口に待っているふう。\n『今度こそ、ボクたちのかも・・・』\nぽーの反応に期待が高まり顔をあげたバド。と、その下に見えるは色がビミョーにおかしくなった框。・・・あぁ、なんだ、ただの水たまりか。...\n軽く焼いて、冷まして・・・ほいっ！お待たせ〜♪\nはい！ バドも、おまたせ〜♪\nさらに最終日には恵比寿丸にて刺身三昧で徳島を堪能♪\nさてさて、ところで。ぽバドの徳島といえば、外せないのが砂浜&トモダチなわけでして。\nなんだか、ぽバドとよく似た走り方。このコはだ〜れだ？\nというわけで、お正月休み 2015〜その2。につづくーー",
+    "photosLost": true,
+    "truncated": false,
+    "comments": []
+  },
+  {
+    "date": "2016.01.08",
+    "title": "お正月休み 2015〜その2。",
+    "tags": [
+      "お正月",
+      "2016年1月"
+    ],
+    "images": [],
+    "text": "2015年12月29日 夕方。今回の徳島帰省初となる砂浜では、既にトモダチが待ってくれていて。久しぶり〜、そして、おまたせ〜♪\n伏せているのはNEOちゃんで、左端でおしりだけ見えているのがむぅちゃんね。と、いうことは？ 中央でこちらを向いているコはだぁれ？\n「だれ？あれは誰？」と不思議そうにこちらを見つめているコ。そのコはNEOちゃんの弟、JINくんだじぇ〜♪\nNEOちゃんとJINくんとの新生活の始まりは9月20日だそうな。そしてその日はなんと、我家にバドを迎えた日でもあるのダ。なんか、嬉し楽し〜♪\nいつもNEO&むぅちゃんとの再会時には、フリーのまま気ままに散歩スタート。だけど今回は、ぽーがJINくんと仲良くしてくれるかどうかが気がかりなのですョ。\nと、いうわけで先ずは。マズルガ&リード装着で対面&様子を見てみて・・・お、大丈夫そう♪\nならば、フリーで対面だ。さぁ、どうかなん〜\nお〜っ♪ ぽーの耳も尾も上がってるけど、いい感じやん〜♪\nそしてバドも加わり、追いかけっこスタート〜♪\nそんな若者たちと壮年'sの様子を見守る むぅちゃん。(というより、近眼と久しぶりなことで誰か分かるまで時間かかってたヨウナー )\nうん、うん♪ JINくんも、楽しそうやん〜\n楽しそ・・ん？アレ？ よーく見ると、表情がチョット必死なような...\nあぁぁ・・・NEOちゃんに助けを求めてるやーん......\n久しぶりの砂浜に遊び慣れたトモダチ、そして初めましてなJINくん。そんな好条件が揃ってぽーのテンションはMAX・・どころか溢れこぼれてたのデス。\nそんなぽーにとって元気いっぱいな若者JINくんは・・・ずばり、ルアーにしか見えナイ。と、いうわけで・・・\n猛スピードでJINくんに駆け寄り、驚かせ砂まみれにするということを。何度も、何度も、繰り返す・・・\n実はこの行動はふだんバドと遊ぶときと同じだったのだけれど。そんなこと諸々に気がついたのは、陽もかなり暮れ始めてからという・・・\nところでちなみにその頃、むぅちゃんは。\nNEOちゃん、ごめんョー。\nでも、まぁ。ぽーの理由に気がついたらあとはカンタン！バドの気分もあげてふたりで走らせれば良いのだー♪\nあ、久しぶりに撮れた。このバドの顔(笑\nちなみにところでその頃、むぅちゃんは。\nそうなのよね。夏に会ったときより足の運びもしっかりしてきたもんね。ぽバドがぶつかって転ばせたりしたら大変だーそれにしても、激しいナー。(そういや、初っ端にバドは水たまりにダイブしたのだったワ)\nしばらくして、ようやくNEO&JIN姉弟に平穏散歩が訪れて、\nむぅちゃんにも安心まったりな時間が♪\nと、思いきや。私に写真を撮られてることに気がつき困るっと。\n散々、ぽーに砂まみれにされたJINくん。ぽーのことを苦手になってしまうかしらと心配していたけれど。\n何度も自らぽーに近寄ってくれたりして、どうやら気になる存在であるらしい♪\n次に会うときは第一印象のイメージが抜けてればいいナーアハハ..\nあぁー、もっと一緒に散歩する機会が欲しいーーーーー次は5月かナー。次回はしっかりガス抜きしてから行きまっす！\nむぅちゃん、NEOちゃん、JINくん、またよろしくねぇ〜♪",
+    "photosLost": true,
+    "truncated": false,
+    "comments": []
+  },
+  {
+    "date": "2016.01.12",
+    "title": "お正月休み 2015〜その3。",
+    "tags": [
+      "お正月",
+      "ume",
+      "2016年1月"
+    ],
+    "images": [],
+    "text": "2015年12月30日には、とあるお宅を訪問するなり。\nそうなのダ。我家の徳島帰省で欠かせないことのひとつ。それはうめとの再会っ！うめ、久しぶりぃ〜〜♪♪♪\nまずは、うめ家の庭にて遊ばせてもらいましょ〜♪ もちろん、ぽバドもねー♪\n訪問先がうめ家と知り、さっそく勝手気まま自由奔放に行動を開始するぽバド。\nぽーはうめ母にすーりすりと何度も何度も甘えてみたり、(ヤキモチ焼きのうめも相手がぽーだと何も言えずでガマンのときー笑)\nバドは隣家にヒトの気配を感じて覗いてみたり・・それはアカン！\nぽーが手頃な枝をはっけーん！それはうめのお気に入りなんだってー\nバドはこのボールが気に入った！ それは言わずもがなの、うめのボールやねー\nうーむ、ぽバドは兄貴分とはいえ、ここはうめのナワバリだもんねぇ。いくらなんでも、ぽバドは自由にしすぎよねぇ・・・\nお！うめ、言ってみる？兄ちゃんに抵抗してみる？！って、どこに向かって言ってるのー 尻尾に緊張が現れまくりやーん(笑)\n小さな抵抗むなしく、ぽーに「がうっ」と一喝されすごすご引き下がるっと(笑\n11月に3歳を迎えたうめ。しっかり自我もでき、オトナになったうめ。なのだけれど ぽバドには、特にぽーにはまだまだ適わないみたいやネ(笑\n仕方なし、ぽバドのことは諦めてたっつーに甘えに行くうめ。あれこれとたっぷり色々とおしゃべりをして・・・\n全身全霊をかけて、体表面の出来る限りを使って・・密着♡\nアカン。これは、アカーン！！\nよし、ぽバドには車で留守番してもらおう。そいでもって、私たちは室内へとおジャマして、うめといちゃいちゃしよう、うん。\nいちゃいちゃもいいけど、遊ぶのもいいよねー♪ テンションあげて大暴れダっ！！\nと、うめがおもちゃを持ってキタ。言われるがままに投げてみると・・\nなんと、なんと、キャッチボールが開始〜！うめはなんて特技を習得しているのだ！これは楽しくていつまでも遊んじゃう〜♪\nという様子は、写真だけではうまく伝えられナイ。といわけで、動画でどぞっ！ただし・・延々と投げ続けたせいか、チョット飽きてきてる風デス(笑\nあっという間に、再会の時は過ぎてそろそろおいとまを。もぉーそんな顔をしないでョーーーー\nまた会いに来るからネ。もちろん、優しいコワイ兄ちゃん'sぽバドも一緒にねっ♪\nうめママから貰った写真〜。夏の再会時に引き続き、私に羽交い締めされるうめ。またもや、心を飛ばしてるやーん。でも、やめてあげナイ(笑",
+    "photosLost": true,
+    "truncated": false,
+    "comments": []
+  },
+  {
+    "date": "2016.01.14",
+    "title": "お正月休み 2015〜その4。",
+    "tags": [
+      "お正月",
+      "2016年1月"
+    ],
+    "images": [],
+    "text": "2015年 徳島帰省最終日と、言えば、やはりココに行っておかないとやね〜♪\n海風は心地よく、砂浜散歩を楽しむには絶好の日和ではないデスカー♪\nなにせ駐車場から端っこまでは4km以上あるもんね。のんびり草地を探索したり、砂地をふたりで走ってみたり、思いっきり砂浴びをしたりと自由気ままに砂浜を楽しむぽバド。\n徳島で暮らした年数、ぽーは3年半でバドは1年と8ヶ月。一方、横浜での生活は今年の5月になればまるっと3年になっちゃう。\nバドに至っては徳島より横浜での生活の方が長くなっているけれど、それでもココの砂浜は特別・格別なようで始終ウッキウキ♪\nあちらへこちらへと好き放題に歩いていたぽバド、突如私たちに注目〜。\nそれはナゼかと言いますと、私たちがランチタイムを始めたからデシタ♪\n自宅前に来ていた移動販売のパン屋さんのバターロールに、阿波豚ウィンナーと、うめ母のお父さんが作ったレタスを挟んで完成っ♪\nんまーい！海を眺めながら食べるのがこれまた美味いっ！！ぽバドにはちょこっとだけパンの味見をさせてあげよう(笑\nふたたび、のんびりのんびりと砂浜をあるく。\nそういや、バドの爪は後脚だけよく削れるのよね。砂にのこった足跡を見るとそれがよく分かりマス。\nこの砂浜散歩のようにのんびりと、穏やかな気分で2016年を過ごせますように。\nそして年が明けて、2016年1月1日。「また帰って来るよー」と家に挨拶をし、横浜に向けて出発〜！\n初日の出ならぬ、初夕焼けを眺めて・・・(駿河湾沼津SAだったハズ）\n服部兄とニャイロの攻防戦に興奮したり、各々の観戦場所で友人たちと実況中継し合って箱根駅伝を楽しんで、\n2015年のお正月休みもまったりと完了なりっ。",
+    "photosLost": true,
+    "truncated": false,
+    "comments": []
+  },
+  {
+    "date": "2016.01.21",
+    "title": "食べる。歩く。なおる。",
+    "tags": [
+      "出掛ける",
+      "2016年1月"
+    ],
+    "images": [],
+    "text": "ちょうど、2週間前の1月7日 木曜日のこと。\n今回で5回目、いや、実質6回目というべきか・・・去年の11月にも予定していたけれど、私は体調不良で不参加で、しかも雨のためランチのみだったとか。\nそうね、5回半目にしておきましょかネ♪\n目的地が近づくと、ぽバド揃ってわくわくそわそわし始める場所へとGO！\nなんのこっちゃ？！",
+    "photosLost": true,
+    "truncated": true,
+    "comments": []
+  }
+];
+
+(function() {
+  const seen = {};
+  entries.forEach(function(e) {
+    const key = e.date;
+    seen[key] = (seen[key] || 0) + 1;
+    e.id = 'e' + e.date.replace(/\./g, '-') + '-' + seen[key];
+  });
+})();
+
+
+// ---- render ----
+const allTags = [...new Set(entries.flatMap(e => e.tags))];
+let activeTags = new Set();
+let keyword = "";
+
+function highlightNums(text) {
+  return text.replace(/\[(\d+)\]/g, '<b>[$1]</b>');
+}
+
+function esc(s) {
+  return String(s == null ? "" : s).replace(/[&<>]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
+}
+
+function renderTagFilter() {
+  const el = document.getElementById('tagFilter');
+  el.innerHTML = allTags.map(t =>
+    `<button class="tag-btn${activeTags.has(t) ? ' active' : ''}" data-tag="${t}">${t}</button>`
+  ).join('');
+  el.querySelectorAll('.tag-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const tag = btn.dataset.tag;
+      if (activeTags.has(tag)) activeTags.delete(tag); else activeTags.add(tag);
+      renderTagFilter();
+      renderEntries();
+    });
+  });
+}
+
+function matches(entry) {
+  const tagOk = activeTags.size === 0 || entry.tags.some(t => activeTags.has(t));
+  const kw = keyword.trim();
+  const kwOk = kw === "" ||
+    entry.title.includes(kw) ||
+    entry.text.includes(kw) ||
+    entry.tags.some(t => t.includes(kw));
+  return tagOk && kwOk;
+}
+
+function renderEntries() {
+  const main = document.getElementById('main');
+  const filtered = entries.filter(matches);
+  document.getElementById('count').textContent = `${filtered.length} / ${entries.length} 件表示中`;
+  document.getElementById('noResults').style.display = filtered.length === 0 ? 'block' : 'none';
+
+  main.innerHTML = filtered.map(entry => `
+    <article class="entry" id="${entry.id}">
+      <div class="entry-head">
+        <span class="entry-title">${entry.title}</span>
+        <span class="entry-date">${entry.date}</span>
+      </div>
+      ${entry.images.length > 0 ? `
+      <div class="photo-grid">
+        ${entry.images.map((src, i) => `
+          <a href="${src}" target="_blank" rel="noopener">
+            <img src="${src}" loading="lazy" alt="${entry.title} 写真${i+1}">
+            <span class="num">${i+1}</span>
+          </a>
+        `).join('')}
+      </div>` : entry.photosLost ? `<p class="no-photo">（写真は掲載されていましたが、保存されていないため表示できません）</p>` : `<p class="no-photo">（この記事には写真がありません）</p>`}
+      ${entry.truncated ? `<p class="truncated-note">（＊続きは読めない）</p>` : ''}
+      <p class="entry-text">${highlightNums(entry.text)}</p>
+      <div class="tags">
+        ${entry.tags.map(t => `<button class="tag-pill" data-tag="${t}">${t}</button>`).join('')}
+      </div>
+      ${entry.comments && entry.comments.length > 0 ? `
+      <div class="comments">
+        <div class="comments-label">コメント（${entry.comments.length}件）</div>
+        ${entry.comments.map(c => `
+          <div class="comment">
+            <div class="comment-meta"><span class="author">${esc(c.author)}</span>${c.date ? ' ・ ' + esc(c.date) : ''}</div>
+            <div>${esc(c.text)}</div>
+          </div>
+        `).join('')}
+      </div>` : ''}
+    </article>
+  `).join('');
+
+  main.querySelectorAll('.tag-pill').forEach(btn => {
+    btn.addEventListener('click', () => {
+      activeTags = new Set([btn.dataset.tag]);
+      renderTagFilter();
+      renderEntries();
+      window.scrollTo({top:0, behavior:'smooth'});
+    });
+  });
+}
+
+document.getElementById('search').addEventListener('input', (e) => {
+  keyword = e.target.value;
+  renderEntries();
+});
+
+renderTagFilter();
+renderEntries();
+if (location.hash) {
+  const target = document.getElementById(location.hash.slice(1));
+  if (target) target.scrollIntoView({block: 'start'});
+}
+</script>
+
+</body>
+</html>

@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hey buddy, give me your paw! 絵日記帳 - 2016年2月</title>
+<style>
+  :root {
+    --bg: #faf6ef;
+    --card-bg: #ffffff;
+    --border: #e8dfd0;
+    --text: #4a4238;
+    --text-muted: #9a9082;
+    --accent: #c98a5e;
+    --accent-bg: #f5e6d8;
+    --accent-text: #8a5a35;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    padding: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: "Hiragino Kaku Gothic ProN", "Yu Gothic", "Meiryo", sans-serif;
+    line-height: 1.8;
+  }
+  header {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 32px 20px 16px;
+    text-align: center;
+  }
+  header h1 {
+    font-size: 22px;
+    font-weight: 500;
+    margin: 0 0 4px;
+    color: var(--text);
+  }
+  header p {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin: 0;
+  }
+  .controls {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 12px 20px 20px;
+    position: sticky;
+    top: 0;
+    background: var(--bg);
+    z-index: 10;
+  }
+  #search {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    font-size: 14px;
+    background: var(--card-bg);
+    color: var(--text);
+    margin-bottom: 10px;
+  }
+  .tag-filter {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .tag-btn {
+    font-size: 11px;
+    padding: 4px 12px;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    background: var(--card-bg);
+    color: var(--text-muted);
+    cursor: pointer;
+  }
+  .tag-btn.active {
+    background: var(--accent);
+    color: #fff;
+    border-color: var(--accent);
+  }
+  .count {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 0 20px 8px;
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+  main {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 0 20px 60px;
+  }
+  .entry {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 20px;
+    margin-bottom: 16px;
+  }
+  .entry-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+  .entry-title {
+    font-size: 16px;
+    font-weight: 500;
+  }
+  .entry-date {
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+  .photo-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+    gap: 6px;
+    margin-bottom: 12px;
+  }
+  .photo-grid a {
+    position: relative;
+    display: block;
+    aspect-ratio: 1;
+    overflow: hidden;
+    border-radius: 8px;
+    background: var(--accent-bg);
+  }
+  .photo-grid img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .photo-grid .num {
+    position: absolute;
+    bottom: 3px;
+    right: 4px;
+    font-size: 10px;
+    background: rgba(0,0,0,0.55);
+    color: #fff;
+    padding: 1px 5px;
+    border-radius: 8px;
+  }
+  .no-photo {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-bottom: 12px;
+  }
+  .truncated-note {
+    font-size: 12px;
+    color: var(--accent-text);
+    background: var(--accent-bg);
+    border-radius: 8px;
+    padding: 6px 10px;
+    margin: 0 0 12px;
+    display: inline-block;
+  }
+  .entry-text {
+    font-size: 14px;
+    line-height: 1.85;
+    margin: 0 0 12px;
+    white-space: pre-line;
+  }
+  .entry-text b {
+    color: var(--accent-text);
+    font-weight: 500;
+  }
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .tag-pill {
+    font-size: 11px;
+    padding: 2px 10px;
+    border-radius: 12px;
+    background: var(--accent-bg);
+    color: var(--accent-text);
+    cursor: pointer;
+    border: none;
+  }
+  .comments {
+    margin-top: 16px;
+    padding-top: 14px;
+    border-top: 1px dashed var(--border);
+  }
+  .comments-label {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+  }
+  .comment {
+    font-size: 13px;
+    line-height: 1.7;
+    margin-bottom: 12px;
+    padding-left: 10px;
+    border-left: 2px solid var(--accent-bg);
+  }
+  .comment-meta {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-bottom: 2px;
+  }
+  .comment-meta .author {
+    color: var(--accent-text);
+    font-weight: 500;
+  }
+  .no-results {
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 14px;
+    padding: 40px 0;
+    display: none;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Hey buddy, give me your paw! 絵日記帳</h1>
+  <p>ウィペットのぽー＆バド（＆うめ）と暮らす日常あれこれ ― 2016年2月 ※so-netブログ・archive.orgより復元</p>
+</header>
+
+<div class="controls">
+  <input type="text" id="search" placeholder="キーワードで探す（例: 震災、ドッグラン、うみちゃん）">
+  <div class="tag-filter" id="tagFilter"></div>
+</div>
+<div class="count" id="count"></div>
+
+<main id="main"></main>
+<p class="no-results" id="noResults">該当する記事が見つかりません。</p>
+
+<script>
+const entries = [
+  {
+    "date": "2016.02.05",
+    "title": "2016年1月備忘録。",
+    "tags": [
+      "日常",
+      "2016年2月"
+    ],
+    "images": [],
+    "text": "1月のできごとを、ざくざくっと記録。\nまずは、買物&散歩かねて横須賀へ。ん〜〜いずもは、やっぱ大きい！かっこいいー\n猿島へと渡る人々を見送ってみる。(たしか、渡船はペット不可のはず）\nモアイモ食堂に外席が設けられていたので、思わず座って・・・\n横須賀バーガーを注文♪ これで夜ゴハンの予定が大幅にくるうっと。(笑\nまたとある日には、(比較的)近所にミニ富士塚のある公園を発見っ！\n富士塚といえば・・初めて案内してくれたのがたーぼー&ゆっきー。その彼女たちと、中野や吉祥寺を散策。もちろん、ぽバドは留守番で♪\nランチはこのレトロな雰囲気なお店にて。大きな囲炉裏と真っ赤に焼けた炭。そこで旬の魚を焼いてくれるのだー\nあこうだいを頂きマシタ。美味しかったナー♪そういえば、つがるとの関係を尋ね忘れてしもうたなぁー\nと、そんな感じで1月前半は関東でのんびり過ごして、後半からは実家の奈良へ。\n真之将とも約3ヶ月ぶりの再会。コドモが苦手なぽーも真之将だけは特別らしい。そして、バドとの名コンビぶりは言わずもがなのこの調子♪\nぽバドになかなか近寄れない、そんな従甥姪やオトナたちに気がついた真之将。それはもう得意気な表情で、何度も何度もぽバドの相手をするっと(笑\nぽバドの近くに座らせられて、泣き始めた生後8ヶ月の従甥に、\n「お兄ちゃん、たすけてぇー」とすがり付かれた真之将。\nドヤ顔が困惑顔へと変わり、さらにオトナたちの笑いを誘う。\nひとりっこ真之将の、貴重なお兄ちゃん体験♪\n「怖くないって教えてあげて」と伝えたら、ぎゅっと抱きしめてあげたりしてその姿がまた可愛かったりで♪\nバドはといえば、泣き止ませようとしたのか従甥の頬に鼻でツン。従甥はさらに大泣きし、 困り果てたバドが遂に私たちの元へ逃げ込んでくるという(笑(ちなみにぽーは、泣きはじめた途端に距離おいて眺めておりましたん)\nいやぁ〜コドモとイヌのやり取りは面白くて楽しい！！\nさてさて、ぽーより数ヶ月程はやく産まれた実家のネコたち。子猫のころはそれなりだったけれど、どうも私に懐いてくれないのですよねー\nというわけで、ごはんで釣ってみる大作戦っ！！\n「何やねん」と始めは警戒していたパセリ、２回目でほぼ懐柔(ほんまかいなー)\n一方、ごんたはなかなか気を許してくれず。ネコ用こたつの中でならなんとか食べてくれるようになる(笑\nうーむ。こちらの写真の方がよく見えるわね♪\nちなみに、母が与えるとこうして3匹並んで食べていたそうな。あたりまえといえばそうなんだけど・・・むぅー、くやしいナー(笑\n少し残したから、れたすにあげましょう。れたすは食が細かったのよねー。\n横浜で見つけたこのぬいぐるみ。れたすの子猫時代に似ているなと思っていたら、毛触りに顔の大きさや重さ加減までも似ているそうな。連れ帰ってヨカッタ。\n実家のある場所は、鹿や東大寺のあたりよりは田舎の方なんデス。\nこうした竹林なども多くて・・・\nいや、竹林というよりは古墳のような。。。実家付近の歴史もまたゆっくり調べて散策してみないとー\nと、いうわけで。そんなこんなの関東⇄関西を行き来した1月なのデシター。",
+    "photosLost": true,
+    "truncated": false,
+    "comments": []
+  },
+  {
+    "date": "2016.02.18",
+    "title": "初雪・初outlet mall。",
+    "tags": [
+      "friends",
+      "2016年2月"
+    ],
+    "images": [],
+    "text": "2016年2月12日 金曜日のこと。時刻は9時、迎えに来てくれたルークレイル家の車へget in!!\n後部座席にはレイルとレイニー&リタ。もちろん、ぽバドも乗ってイヌまみれ♪\n好き過ぎなのか、何なのか。ルクレイ号に乗せてもらうといつも遠慮気味ぽー。さらに今回はなんといいますか、ミョーな座り方&ビミョーな表情(笑\nそんなぽーの姿に「可愛い〜♪」と、レイリタ母が助手席から撮ってくれた写真から..今回の記録日記スタートっ！\n今回のお出かけ最大の目的は、富士五湖周辺でのぷちトレッキング。その後は、御殿場アウトレットで買物して温泉で〆っ♪(以降、レイリタ母から貰った写真を借りつつ記録〜)\n先ずは足柄SAにておやつ代わりのサンドイッチをgetして、イヌたちはドッグランでぷち息抜きでもしましょかね〜。\nランで出会った1歳のゴールデンの女のコ。愛嬌たっぷりで、ぽバドが挨拶するとコロンとお腹をみせてくれたり。なんとなく、うみちゃんに雰囲気が似てたのよねぇ...\nぽーのことを気に入ってくれたのか、うろうろするぽーの側へ何度も駆け寄っては遊びに誘ってくれて。\nなのにっ！彼女の誘いにのるよりも、ニオイ確認の方が重要だったらしいぽー。・・・もぅ〜いつも以上のノリの悪さに飼主がっかりよぅー\nとはいえね、真の目的はココではないからね。では、出発〜！！\nというわけで！トレッキングコース近くの駐車場へと到着。\nほどほどに積雪アリね。歩く予定の道の様子もビジターセンターで再確認。イヌ連れだもの、人気コースはなるべく避けて迷惑にならないよう楽しもうっ！\nえーと、これは何に注目してるところだったかしらーこちらは、ブルブルしたところのレイルを激写。犬種不明やーん(笑\n直前までぱらっと僅かに降っていた雨は、歩き始めた途端にピタリと止んで。道も凍っておらず、小さなレイニーが埋まってしまう心配もなく、イイ感じっ！！\nではでは、軽〜く雪遊びトレッキング開始〜\n元気よく走りだそうとしている後姿はバド、前を行くはレイニー&リタとレイリタ母。レイルは常にルクレイ母の側から離れず、ぽーは常にレイルの側から離れず・・・\nちょっとーー、みんな、待ってぇぇ〜〜〜！！\n一応ね、飼主としての威厳を示しておきますと・・・行動範囲が広く自由なぽバドだけれど、呼んで指示すれば私の側を歩くのだっ！！\nでも、基本は先頭から最後尾までを行ったり来たり。時には野生動物の気配に耳を立てたり追いかけようとしてみたり。\nレイルのそばに居ることが多いぽーだけれど、こんな場面も♪\n富士山は見えなくても、1,000mの眺望はスバラシーっ♪\nチョット寒いけれど、イヌもヒトも軽食をとってひと休み。\n5頭揃って「マテ」の図。 \"お利口ね〜”と褒めた途端に、動くバド(笑\n再び、来た道を歩いて・・・君たち、そこはコース外ですョ—！！\n駐車場に戻ったら車に荷物を置いて、軽く湖畔を散策。そして、その後は試着タイム〜。\n2年だか、3年越しだかで制作中なルークレイルの服に、・・・\n一度は作ってみたかった、女のコ用のスカート風！！にゃ〜〜〜〜リタちゃん、可愛ええっ！！\n周辺のお店に立ち寄り、立ち寄り。そして『甲州ほうとう 小作』へ。手のひらサイズ、驚きサイズのかぼちゃに、里芋・ごぼう等々、野菜たっぷり。\nその後も楽しく目的を果たし、ラストはまたーりのびーりと源泉を堪能。まるっと一日、遊びたおしたわけデシタ〜♪(後半はイヌたち、おつきあいありがとねー)\n〆は、ルクレイ家に借りたスヌードの記念撮影でっ！！楽しかったね〜♪ アリガトウ！！また誘ってやってチョーダイ〜〜♪♪♪",
+    "photosLost": true,
+    "truncated": false,
+    "comments": []
+  }
+];
+
+(function() {
+  const seen = {};
+  entries.forEach(function(e) {
+    const key = e.date;
+    seen[key] = (seen[key] || 0) + 1;
+    e.id = 'e' + e.date.replace(/\./g, '-') + '-' + seen[key];
+  });
+})();
+
+
+// ---- render ----
+const allTags = [...new Set(entries.flatMap(e => e.tags))];
+let activeTags = new Set();
+let keyword = "";
+
+function highlightNums(text) {
+  return text.replace(/\[(\d+)\]/g, '<b>[$1]</b>');
+}
+
+function esc(s) {
+  return String(s == null ? "" : s).replace(/[&<>]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
+}
+
+function renderTagFilter() {
+  const el = document.getElementById('tagFilter');
+  el.innerHTML = allTags.map(t =>
+    `<button class="tag-btn${activeTags.has(t) ? ' active' : ''}" data-tag="${t}">${t}</button>`
+  ).join('');
+  el.querySelectorAll('.tag-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const tag = btn.dataset.tag;
+      if (activeTags.has(tag)) activeTags.delete(tag); else activeTags.add(tag);
+      renderTagFilter();
+      renderEntries();
+    });
+  });
+}
+
+function matches(entry) {
+  const tagOk = activeTags.size === 0 || entry.tags.some(t => activeTags.has(t));
+  const kw = keyword.trim();
+  const kwOk = kw === "" ||
+    entry.title.includes(kw) ||
+    entry.text.includes(kw) ||
+    entry.tags.some(t => t.includes(kw));
+  return tagOk && kwOk;
+}
+
+function renderEntries() {
+  const main = document.getElementById('main');
+  const filtered = entries.filter(matches);
+  document.getElementById('count').textContent = `${filtered.length} / ${entries.length} 件表示中`;
+  document.getElementById('noResults').style.display = filtered.length === 0 ? 'block' : 'none';
+
+  main.innerHTML = filtered.map(entry => `
+    <article class="entry" id="${entry.id}">
+      <div class="entry-head">
+        <span class="entry-title">${entry.title}</span>
+        <span class="entry-date">${entry.date}</span>
+      </div>
+      ${entry.images.length > 0 ? `
+      <div class="photo-grid">
+        ${entry.images.map((src, i) => `
+          <a href="${src}" target="_blank" rel="noopener">
+            <img src="${src}" loading="lazy" alt="${entry.title} 写真${i+1}">
+            <span class="num">${i+1}</span>
+          </a>
+        `).join('')}
+      </div>` : entry.photosLost ? `<p class="no-photo">（写真は掲載されていましたが、保存されていないため表示できません）</p>` : `<p class="no-photo">（この記事には写真がありません）</p>`}
+      ${entry.truncated ? `<p class="truncated-note">（＊続きは読めない）</p>` : ''}
+      <p class="entry-text">${highlightNums(entry.text)}</p>
+      <div class="tags">
+        ${entry.tags.map(t => `<button class="tag-pill" data-tag="${t}">${t}</button>`).join('')}
+      </div>
+      ${entry.comments && entry.comments.length > 0 ? `
+      <div class="comments">
+        <div class="comments-label">コメント（${entry.comments.length}件）</div>
+        ${entry.comments.map(c => `
+          <div class="comment">
+            <div class="comment-meta"><span class="author">${esc(c.author)}</span>${c.date ? ' ・ ' + esc(c.date) : ''}</div>
+            <div>${esc(c.text)}</div>
+          </div>
+        `).join('')}
+      </div>` : ''}
+    </article>
+  `).join('');
+
+  main.querySelectorAll('.tag-pill').forEach(btn => {
+    btn.addEventListener('click', () => {
+      activeTags = new Set([btn.dataset.tag]);
+      renderTagFilter();
+      renderEntries();
+      window.scrollTo({top:0, behavior:'smooth'});
+    });
+  });
+}
+
+document.getElementById('search').addEventListener('input', (e) => {
+  keyword = e.target.value;
+  renderEntries();
+});
+
+renderTagFilter();
+renderEntries();
+if (location.hash) {
+  const target = document.getElementById(location.hash.slice(1));
+  if (target) target.scrollIntoView({block: 'start'});
+}
+</script>
+
+</body>
+</html>
