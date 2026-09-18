@@ -1,0 +1,12 @@
+{
+  "name": "Hey buddy, give me your paw! 絵日記帳",
+  "short_name": "絵日記帳",
+  "start_url": "toc.html",
+  "display": "standalone",
+  "background_color": "#faf6ef",
+  "theme_color": "#c98a5e",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}
